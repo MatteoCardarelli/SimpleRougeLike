@@ -41,13 +41,13 @@ public class CharacterServiceTest {
     @Test
     public void heal_IncreasesHealthCorrectly() {
         player.setHealth(50);
-        characterService.heal(player, 20.0);
+        characterService.heal(player, 20);
         assertEquals(70.0, player.getHealth(), 0.0);
     }
 
     @Test
     public void heal_HealthDoesNotExceedMaxHealth() {
-        characterService.heal(player, 50.0);
+        characterService.heal(player, 50);
         assertEquals(100.0, player.getHealth(), 0.0);
     }
 

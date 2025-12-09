@@ -1,5 +1,7 @@
 package com.github.matteoCarda.simplerougelike.model.entity;
 
+import com.github.matteoCarda.simplerougelike.service.ItemService;
+
 /**
  * Un oggetto {@link Item} che ripristina la salute del giocatore quando usato.
  */
@@ -23,5 +25,11 @@ public class PotionItem extends Item{
      */
     public double getHealingAmount() {
         return healingAmount;
+    }
+
+    @Override
+    public boolean use(Player player, ItemService itemService) {
+        // Delega la logica di cura a ItemService
+        return itemService.applyHealing(player, this);
     }
 }

@@ -27,10 +27,8 @@ public abstract class Character extends GameObject {
 
     public int getHealth() { return this.health; }
     public void setHealth(int health) { this.health = health; }
-
     public int getMaxHealth() { return this.maxHealth; }
     public void setMaxHealth(int maxHealth) { this.maxHealth = maxHealth; }
-
     public double getAttackPower() { return this.attackPower; }
     public void setAttackPower(double attackPower) { this.attackPower = attackPower; }
 }

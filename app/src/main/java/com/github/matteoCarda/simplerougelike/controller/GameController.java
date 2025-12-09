@@ -1,7 +1,5 @@
 package com.github.matteoCarda.simplerougelike.controller;
 
-import android.widget.ProgressBar;
-
 import com.github.matteoCarda.simplerougelike.model.GameMap;
 import com.github.matteoCarda.simplerougelike.model.entity.Character;
 import com.github.matteoCarda.simplerougelike.model.entity.Enemy;
@@ -13,7 +11,6 @@ import com.github.matteoCarda.simplerougelike.service.EnemyAIService;
 import com.github.matteoCarda.simplerougelike.service.ItemService;
 import com.github.matteoCarda.simplerougelike.service.PlayerService;
 import com.github.matteoCarda.simplerougelike.util.MapGenerator;
-import com.github.matteoCarda.simplerougelike.view.GameView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +42,11 @@ public class GameController {
     // Gestione del Field of View (FOV)
     private static final int PLAYER_VISION_RADIUS = 8;
     private FOV fov;
-    private ProgressBar healthBar;
-    private ProgressBar xpBar;
+    private GameUpdateListener gameUpdateListener;
     private double[][] playerFov; // Mappa di visibilità per il rendering
     private double[][] resistanceMap; // Mappa statica della "resistenza" alla luce (1.0 = muro)
 
-    public enum GameState { PLAYING, GAME_OVER, VICTORY }
+    public enum GameState { PLAYING, GAME_OVER, PAUSED, VICTORY }
     public enum Direction { UP, DOWN, LEFT, RIGHT }
 
     /**
@@ -81,9 +77,9 @@ public class GameController {
     public GameState getGameState() { return gameState; }
     public double[][] getPlayerFov() { return playerFov; }
     public boolean isAlive(Character character) { return characterService.isAlive(character);}
-    public void setHealthBar(ProgressBar healthBar) {this.healthBar = healthBar;}
-    public void setXpBar(ProgressBar xpBar) {this.xpBar = xpBar;}
-
+    public void setGameUpdateListener(GameUpdateListener listener) {
+        this.gameUpdateListener = listener;
+    }
 
     /**
      * Inizializza una nuova partita, generando mappa e stato del FOV.
@@ -102,20 +98,11 @@ public class GameController {
             }
         }
         calculateFov();
-        updateUI();
+        if (gameUpdateListener != null) {
+            gameUpdateListener.onGameUpdated();
+        }
     }
 
-    private void updateUI(){
-        if (healthBar != null && gameMap != null) {
-            Player player = gameMap.getPlayer();
-            healthBar.setMax(player.getMaxHealth());
-            healthBar.setProgress(player.getHealth());
-        }
-        if (xpBar != null) {
-            xpBar.setMax(player.getExperienceToNextLevel());
-            xpBar.setProgress(player.getExperience());
-        }
-    }
 
     /**
      * Gestisce un intero turno di gioco a partire dall'azione del giocatore.
@@ -127,7 +114,9 @@ public class GameController {
         handlePlayerAction(direction);
         processEnemyTurns();
         checkEndGameConditions();
-        updateUI();
+        if (gameUpdateListener != null) {
+            gameUpdateListener.onGameUpdated();
+        }
     }
 
     /**
@@ -210,6 +199,24 @@ public class GameController {
         return null;
     }
 
+    public void useItemFromInventory(Item item) {
+        Player player = getGameMap().getPlayer();
+
+        // Passiamo anche l'istanza di itemService al metodo dell'oggetto
+        boolean success = itemService.useItem(player, item);
+
+        if (success) {
+            processEnemyTurns();
+            checkEndGameConditions();
+        }
+
+        // NUOVA LOGICA: Notifica il listener che lo stato è cambiato.
+        if (gameUpdateListener != null) {
+            gameUpdateListener.onGameUpdated();
+        }
+    }
+
+
     /**
      * Cerca un oggetto in una data coordinata.
      */
@@ -239,4 +246,30 @@ public class GameController {
     private void calculateFov() {
         FOV.reuseFOV(resistanceMap, playerFov, player.getX(), player.getY(), PLAYER_VISION_RADIUS);
     }
+
+    /**
+     * Gestisce la richiesta di aprire l'inventario.
+     * È responsabilità del controller decidere se mettere in pausa il gioco.
+     */
+    public void requestOpenInventory() {
+        // Il controller ha l'autorità di cambiare il proprio stato.
+        setGameState(GameState.PAUSED);
+        // In futuro, potremmo anche fare altro qui, come fermare i timer, ecc.
+    }
+
+    /**
+     * Gestisce la richiesta di chiudere l'inventario, spesso dopo un'azione.
+     */
+    public void requestCloseInventory() {
+        setGameState(GameState.PLAYING);
+        // Potremmo anche forzare un aggiornamento della UI qui, se necessario.
+        if (gameUpdateListener != null) {
+            gameUpdateListener.onGameUpdated();
+        }
+    }
+
+    private void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
 }

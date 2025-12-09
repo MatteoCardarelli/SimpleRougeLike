@@ -44,4 +44,40 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/inventory_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#A0444444"
+        android:gravity="center"
+        android:padding="40dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Inventario"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Questo è un contenitore scrollabile per la lista degli oggetti -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Questo LinearLayout verrà popolato dinamicamente con gli oggetti -->
+        <LinearLayout
+            android:id="@+id/inventory_item_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+    </ScrollView>
+
+</LinearLayout>
+
 </FrameLayout>
