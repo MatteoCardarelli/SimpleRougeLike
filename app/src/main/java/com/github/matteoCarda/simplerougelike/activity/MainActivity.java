@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.matteoCarda.simplerougelike.R;
@@ -18,6 +19,7 @@ import com.github.matteoCarda.simplerougelike.model.entity.Item;
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.view.GameView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,8 +30,7 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
 
     private GameController gameController;
     private GameView gameView;
-    private GestureDetector gameViewGestureDetector;
-    private GestureDetector inventoryGestureDetector;
+    private GestureDetector gestureDetector;
     private ProgressBar healthBar;
     private ProgressBar xpBar;
     private LinearLayout inventoryLayout;
@@ -91,59 +92,53 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // Passa SEMPRE l'evento al nostro unico GestureDetector
-        boolean handled = gameViewGestureDetector.onTouchEvent(event);
-        if (!handled) {return super.onTouchEvent(event);
-        }
-        return true;
+        // Passa l'evento al gestore di swipe.
+        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
     }
-
 
     /**
      * Configura il GestureDetector per tradurre gli swipe in comandi di gioco.
      */
     private void setupGestureDetector() {
-        gameViewGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             private static final int SWIPE_THRESHOLD = 100; // Minima distanza (pixel)
             private static final int SWIPE_VELOCITY_THRESHOLD = 100; // Minima velocità
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                if (inventoryLayout.getVisibility() != View.VISIBLE) {
+                float diffX = e2.getX() - e1.getX();
+                float diffY = e2.getY() - e1.getY();
 
-                    float diffX = e2.getX() - e1.getX();
-                    float diffY = e2.getY() - e1.getY();
-
-                    if (Math.abs(diffX) > Math.abs(diffY)) {
-                        // Swipe orizzontale
-                        if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                            if (diffX > 0) {
-                                gameController.handlePlayerTurn(GameController.Direction.RIGHT);
-                            } else {
-                                gameController.handlePlayerTurn(GameController.Direction.LEFT);
-                            }
-                            return true;
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    // Swipe orizzontale
+                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+                            gameController.handlePlayerTurn(GameController.Direction.RIGHT);
+                        } else {
+                            gameController.handlePlayerTurn(GameController.Direction.LEFT);
                         }
-                    } else {
-                        // Swipe verticale
-                        if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                            if (diffY > 0) {
-                                gameController.handlePlayerTurn(GameController.Direction.DOWN);
-                            } else {
-                                gameController.handlePlayerTurn(GameController.Direction.UP);
-                            }
-                            return true;
+                        return true;
+                    }
+                } else {
+                    // Swipe verticale
+                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffY > 0) {
+                            gameController.handlePlayerTurn(GameController.Direction.DOWN);
+                        } else {
+                            gameController.handlePlayerTurn(GameController.Direction.UP);
                         }
+                        return true;
                     }
                 }
                 return false;
             }
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                if (inventoryLayout.getVisibility() == View.VISIBLE) {
-                    closeInventory();
-                } else {
-                    openInventory();
+                // L'utente ha espresso l'intento di "interagire con l'inventario"
+                if (gameController.getGameState() == GameController.GameState.PLAYING) {
+                    openInventory(); // openInventory ora chiama requestOpenInventory()
+                } else if (gameController.getGameState() == GameController.GameState.PAUSED) {
+                    closeInventory(); // closeInventory ora chiama requestCloseInventory()
                 }
                 return true;
             }
