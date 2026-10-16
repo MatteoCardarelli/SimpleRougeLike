@@ -1,43 +1,94 @@
-questo è l'obiettivo di questo progetto Creare un videogioco per mobile (Android, sviluppato in Java) basato sull'esplorazione e la sopravvivenza in un ambiente strutturato a griglia. L'obiettivo principale è navigare un labirinto generato casualmente, raccogliere oggetti e affrontare o evitare nemici, il tutto seguendo un sistema di gioco a turni.
+# SimpleRogueLike
 
-🧩 Meccaniche di Gioco Chiave
-Gioco a Turni (Turn-Based): Il tempo avanza solo quando il Giocatore compie un'azione. Dopo ogni mossa del Giocatore (spostamento, attacco, raccolta), tutti gli altri personaggi (Nemici) eseguono la loro azione.
+[![Android CI](https://github.com/MatteoCardarelli/SimpleRougeLike/actions/workflows/android-ci.yml/badge.svg?branch=master)](https://github.com/MatteoCardarelli/SimpleRougeLike/actions/workflows/android-ci.yml)
 
-Griglia Fissa (Grid-Based): L'intero mondo di gioco è rappresentato da una matrice bidimensionale (griglia). Il movimento del Giocatore e dei Nemici è discreto (da una cella all'altra), non libero e fluido in pixel.
+Un roguelike a turni per Android, scritto in Java.
 
-Generazione Procedurale della Mappa: Ogni partita presenta un labirinto nuovo e casuale. La mappa (la matrice) viene creata all'avvio del gioco, definendo dove si trovano Muri, Pavimenti, e posizionando il Giocatore, i Nemici e gli Oggetti.
+Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-Interazioni Base:
+> **Stato: refactoring in corso.** Il codice attuale è la prima versione del gioco, in un solo modulo. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e la vecchia sparisce solo quando la nuova fa tutto quello che faceva lei (vedi [Roadmap](#roadmap)).
 
-Collisione: Il Giocatore non può muoversi su una cella occupata da un Muro.
+## Il gioco
 
-Combattimento: Se il Giocatore si muove su una cella occupata da un Nemico, si verifica un semplice scambio di danni.
+- **Mappa a griglia** di stanze e corridoi, generata a ogni partita.
+- **A turni:** il tempo passa solo quando il giocatore agisce, e dopo ogni sua azione agiscono tutti i nemici.
+- **Swipe** per muoversi; muoversi verso un nemico vuol dire attaccarlo.
+- **Esperienza e livelli:** ogni nemico sconfitto dà esperienza, ogni livello aumenta salute e attacco.
+- **Pozioni** da raccogliere sulla mappa e usare dall'inventario, che si apre con un doppio tap.
+- **In arrivo con la v1:** nebbia di guerra che ricorda le zone esplorate, registro dei messaggi, schermata di fine partita, accessibilità di base.
 
-Raccolta: Il Giocatore può raccogliere oggetti (es. pozioni, chiavi) che appaiono sulla mappa per modificare le sue statistiche o sbloccare l'uscita.
+## Architettura
 
-Fase 1: Creazione del Modello di Dati (Il "Cosa")Prima di poter controllare qualsiasi cosa, dobbiamo definire cosa esiste nel nostro gioco. Questi sono i "mattoni" del nostro mondo.
-1.Definire le Entità di Gioco (Package: model)◦Tile (Cella): Crea una classe base o un'interfaccia Tile. Ogni cella della griglia sarà un Tile.
-▪Proprietà: isWalkable (boolean, indica se un personaggio può passarci sopra).▪Implementazioni:▪WallTile: isWalkable sarà false.▪FloorTile: isWalkable sarà true.◦GameObject (Oggetto di Gioco):
-Crea una classe base astratta per tutto ciò che ha una posizione sulla mappa.▪Proprietà: int x, int y (coordinate sulla griglia).◦Character (Personaggio): Una classe astratta che estende GameObject. 
-Rappresenta le entità "viventi".▪Proprietà: int health, int attackPower.▪Metodi: takeDamage(int amount), isAlive().◦Player (Giocatore): Estende Character. La classe che il giocatore controlla.◦Enemy
-(Nemico): Estende Character. Conterrà la logica per l'IA (Intelligenza Artificiale) di base.◦Item (Oggetto): Estende GameObject. Rappresenta oggetti raccoglibili.▪Esempi di implementazioni: PotionItem 
-(cura la vita), KeyItem (apre l'uscita).2.Definire la Mappa di Gioco (Package: model)◦GameMap: Una classe che rappresenta l'intero livello.▪Proprietà:▪Tile[][] grid: La matrice bidimensionale che forma
-la struttura del labirinto.▪List<Enemy> enemies: La lista dei nemici presenti nel livello.▪List<Item> items: La lista degli oggetti.▪Responsabilità: Contiene i dati del livello ma non la logica per generarli.
-Fase 2: Generazione Procedurale del Mondo (Il "Come si Crea")Ora che abbiamo i mattoni, costruiamo il labirinto.1.Creare il Generatore di Mappe (Package: utility o generator)◦MapGenerator: Una classe responsabile della creazione di una GameMap.
-▪Metodo chiave: generateMap(int width, int height).▪Logica interna:a.Inizializza una griglia piena di muri (WallTile).b.Implementa un algoritmo per "scavare" stanze e corridoi (es. Drunken Walker, Cellular Automata, o semplici stanze collegate da corridoi).
-Le celle scavate diventano FloorTile.c.Posiziona il Player in una posizione iniziale valida (su un FloorTile).d.Posiziona casualmente Enemy e Item su celle FloorTile libere.e.Restituisce un'istanza di GameMap completamente popolata.
-Fase 3: Sviluppo del Controller di Gioco (Il "Come Funziona")Questo è il cuore della logica di gioco, dove andrai a lavorare nel file GameController.java.1.Struttura del GameController◦Usa il pattern Singleton per assicurarti che esista una sola 
-istanza del controller in tutta l'app.◦Proprietà:▪private GameMap gameMap;▪private Player player;▪private GameState gameState; (un enum con stati come PLAYING, GAME_OVER, VICTORY).◦Metodo di Inizializzazione:▪public void newGame(int width, int height)
-:a.Chiama MapGenerator per creare una nuova gameMap.b.Estrae il player dalla mappa generata.c.Imposta gameState su PLAYING.2.Gestire l'Input del Giocatore◦Crea un enum per le direzioni: enum Direction { UP, DOWN, LEFT, RIGHT }.
-◦Metodo chiave: public void handlePlayerMove(Direction direction):a.Se gameState non è PLAYING, non fare nulla.b.Calcola le coordinate di destinazione (targetX, targetY).c.Logica di movimento/interazione:▪Controlla se le coordinate sono dentro i limiti
-della mappa.▪Prendi il Tile a targetX, targetY. Se è un muro (!isWalkable), interrompi l'azione.▪Controlla se c'è un nemico sulla cella di destinazione. 
-Se sì, avvia il combattimento: player.attack(enemy) e enemy.attack(player).▪Controlla se c'è un oggetto. Se sì, raccoglilo: aggiungilo all'inventario del giocatore e rimuovilo dalla mappa.▪Se la cella è libera e calpestabile,
-aggiorna le coordinate del giocatore.d.Dopo l'azione del giocatore, scatena il turno dei nemici.3.Gestire il Turno dei Nemici◦Metodo chiave: private void processEnemyTurns():a.Itera su tutti i 
-nemici in gameMap.getEnemies().b.Per ogni nemico:▪Implementa una IA molto semplice: se il giocatore è nel raggio di visione, muoviti verso di lui. Altrimenti, muoviti a caso o stai fermo.▪La logica di movimento del nemico
-seguirà regole simili a quelle del giocatore (non può attraversare muri, può attaccare il giocatore).c.Controlla lo stato del gioco dopo il turno (es. player.isAlive()). Se la vita del giocatore è <= 0, imposta gameState su GAME_OVER.
-Fase 4: Visualizzazione (L'Interfaccia Utente)Come il giocatore vede e interagisce con il gioco.1.Creare una View Personalizzata (Package: view)◦GridView (o MapView): Una classe che estende View di Android.
-◦Responsabilità: Disegnare lo stato attuale del gioco.◦Metodo onDraw(Canvas canvas):a.Ottieni l'istanza del GameController.b.Se il gioco non è ancora iniziato, non disegnare nulla o mostra una schermata di caricamento.c.Itera sulla griglia gameMap.getGrid()
-e disegna ogni Tile (es. un rettangolo marrone per WallTile, grigio per FloorTile).d.Disegna il giocatore, i nemici e gli oggetti sulla griglia usando bitmap o forme colorate.◦Interazione: Implementa onTouchEvent per rilevare gli swipe (scorrimenti) del dito
-e tradurli in Direction da passare al GameController.handlePlayerMove().2.Collegare la View all'Activity◦Nella tua MainActivity, aggiungi la GridView personalizzata al layout.◦Nell'onCreate dell'Activity, inizializza il GameController con newGame().
-◦Dopo ogni azione di gioco che modifica lo stato (es. dopo handlePlayerMove), devi dire alla tua GridView di ridisegnarsi chiamando gridView.invalidate().
-Questo piano d'azione fornisce una roadmap chiara. Ti consiglio di iniziare con la Fase 1, creando le classi del modello, poiché tutto il resto dipenderà da esse.
+Architettura esagonale (*ports and adapters*) divisa in quattro moduli Gradle. Le dipendenze vanno solo verso il centro, cioè verso le regole del gioco.
+
+```mermaid
+flowchart LR
+  app[":app<br/>Android · MVVM · Hilt"]
+  application[":application<br/>turni, comandi, stati"]
+  infrastructure[":infrastructure<br/>adapter verso SquidLib"]
+  domain[":domain<br/>regole del gioco, Java puro"]
+
+  app --> application
+  app --> infrastructure
+  application --> domain
+  infrastructure --> domain
+```
+
+| Modulo | Cosa contiene |
+|---|---|
+| `:domain` | Le regole: mappa, personaggi, oggetti, combattimento, esperienza, intelligenza dei nemici. Java puro, senza Android e senza librerie esterne. Definisce le *porte*: le interfacce per generare il terreno, trovare un percorso e calcolare il campo visivo. |
+| `:application` | Un turno dall'inizio alla fine: il comando del giocatore, le azioni dei nemici, lo stato della partita, cosa il giocatore può vedere. È l'unico punto d'ingresso per l'interfaccia. |
+| `:infrastructure` | Gli *adapter*: implementano le porte del dominio usando SquidLib. Sostituire la libreria vuol dire scrivere un altro adapter, senza toccare le regole. |
+| `:app` | L'app Android: trasforma i gesti in comandi, disegna la partita, riproduce gli eventi di ogni turno, gestisce l'inventario. |
+
+**Le scelte principali**
+
+- **Il gioco non conosce Android.** I tre moduli interni sono librerie Java: lì un `import android.*` non compila, e le regole si provano sulla JVM in pochi millisecondi.
+- **Deterministico.** Stesso seed e stessi comandi danno la stessa partita, sul computer come sul telefono. Un bug si riproduce dal seed della partita in cui è comparso.
+- **Ogni turno racconta cosa è successo.** Oltre allo stato finale, un turno restituisce la sequenza ordinata degli eventi (mosse, attacchi, danni, morti, oggetti raccolti). L'interfaccia li usa per i messaggi e, più avanti, per le animazioni.
+- **Si aggiunge, non si modifica.** Un oggetto o un nemico nuovo è una riga di catalogo. Comportamenti dei nemici, effetti degli oggetti, comandi e regole di fine turno si aggiungono implementando un'interfaccia, senza cambiare le classi esistenti.
+
+## Qualità
+
+Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI esegue i test unitari della prima versione.
+
+- **Regole d'architettura verificate dai test** con ArchUnit: dipendenze tra moduli e package, niente Android nel dominio, niente sorgenti casuali che rompano il determinismo.
+- **Test sulla JVM** con JUnit 5 e AssertJ, senza mock nel dominio: i test giocano su mappe disegnate in ASCII.
+- **Test di proprietà** con jqwik, su sequenze casuali di mosse: due personaggi non occupano mai la stessa cella, un morto resta morto, la stessa partita giocata due volte dà lo stesso risultato.
+- **Test di contratto:** ogni adapter e ogni implementazione finta usata nei test passano gli stessi test.
+- **Test golden:** una partita registrata deve produrre lo stesso risultato sulla JVM e su un dispositivo Android.
+- **Copertura e mutation testing** con soglie minime (JaCoCo e PIT).
+- **Stile e controlli statici** bloccanti: Spotless, Android Lint, NullAway.
+- **GitHub Actions** su ogni push e pull request, con i test strumentati su un emulatore prima del merge nella branch principale.
+
+## Roadmap
+
+- [ ] **0. Preparazione:** configurazione di build condivisa, dipendenze ripulite, formattazione automatica, CI su tutte le branch.
+- [ ] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
+- [ ] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
+- [ ] **4. `:application`:** turni completi, comandi, stati della partita.
+- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore, poi Hilt e MVVM, il nuovo rendering e le funzionalità nuove.
+- [ ] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
+
+Dopo la v1: animazioni, poi nuovi contenuti.
+
+## Compilare ed eseguire
+
+Servono Android Studio, il JDK 17 e un dispositivo o un emulatore con Android 11 (API 30) o successivo. Si apre la cartella del progetto in Android Studio e si avvia la configurazione `app`, oppure da terminale:
+
+```bash
+./gradlew assembleDebug        # compila l'APK di debug
+./gradlew testDebugUnitTest    # esegue i test unitari
+```
+
+Su Windows si usa `gradlew.bat` al posto di `./gradlew`.
+
+## Tecnologie
+
+Java · Android SDK (minimo API 30) · AndroidX e Material Components · [SquidLib](https://github.com/yellowstonegames/SquidLib) per generazione delle mappe, percorsi e campo visivo · GitHub Actions. Con il refactoring: Hilt, JUnit 5, ArchUnit, jqwik, PIT, JaCoCo, Spotless, NullAway.
+
+## Autore
+
+Matteo Cardarelli.
+
+Il progetto non ha ancora una licenza: tutti i diritti sono riservati.
