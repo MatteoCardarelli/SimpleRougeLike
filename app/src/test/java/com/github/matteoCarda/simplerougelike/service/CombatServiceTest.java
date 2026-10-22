@@ -15,10 +15,16 @@ public class CombatServiceTest {
 
     // --- Novità di Mockito ---
 
-    // @Mock crea un oggetto finto (un mock) di CharacterService.
-    // Questo oggetto NON eseguirà la vera logica di CharacterService.
+    // @Mock crea oggetti finti (mock) di CharacterService e PlayerService.
+    // I mock NON eseguono la vera logica delle classi: registrano le chiamate
+    // che ricevono e rispondono quello che decidiamo noi con when(...).
     @Mock
     private CharacterService mockCharacterService;
+
+    // CombatService riceve anche PlayerService nel costruttore:
+    // senza questo mock, @InjectMocks gli passerebbe null.
+    @Mock
+    private PlayerService mockPlayerService;
 
     // @InjectMocks crea un'istanza REALE di CombatService e cerca di
     // iniettare automaticamente tutti gli oggetti annotati con @Mock
@@ -95,5 +101,39 @@ public class CombatServiceTest {
         // Assert
         // Verifichiamo che il metodo abbia restituito false.
         assertFalse(targetDied);
+    }
+
+    @Test
+    public void performAttack_whenPlayerKillsEnemy_grantsExperience() {
+        // Arrange
+        // Il nemico è vivo al primo controllo e morto al secondo:
+        // simuliamo che il colpo del player lo uccida.
+        when(mockCharacterService.isAlive(enemy))
+                .thenReturn(true)
+                .thenReturn(false);
+
+        // Act
+        combatService.performAttack(player, enemy);
+
+        // Assert
+        // CombatService deve dare l'esperienza una sola volta, al player,
+        // e nella quantità prevista dal nemico. Usiamo getExperienceValue()
+        // invece di scrivere 25, così il test resta valido se il valore cambia.
+        // Non controlliamo l'esperienza del player: PlayerService è un mock,
+        // e la sua logica è già provata in PlayerServiceTest.
+        verify(mockPlayerService, times(1)).addExperience(player, enemy.getExperienceValue());
+    }
+
+    @Test
+    public void performAttack_whenEnemySurvives_grantsNoExperience() {
+        // Arrange
+        // Niente da preparare: setUp lascia il nemico vivo anche dopo il colpo.
+
+        // Act
+        combatService.performAttack(player, enemy);
+
+        // Assert
+        // Se il nemico sopravvive, PlayerService non deve ricevere nessuna chiamata.
+        verify(mockPlayerService,never()).addExperience(player, enemy.getExperienceValue());
     }
 }
