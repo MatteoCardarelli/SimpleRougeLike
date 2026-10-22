@@ -133,7 +133,8 @@ public class CombatServiceTest {
         combatService.performAttack(player, enemy);
 
         // Assert
-        // Se il nemico sopravvive, PlayerService non deve ricevere nessuna chiamata.
-        verify(mockPlayerService,never()).addExperience(player, enemy.getExperienceValue());
+        // Se il nemico sopravvive, addExperience non deve essere chiamato,
+        // qualunque siano il player e la quantità di esperienza.
+        verify(mockPlayerService, never()).addExperience(any(Player.class), anyInt());
     }
 }
