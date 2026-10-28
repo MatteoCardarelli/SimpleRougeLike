@@ -6,4 +6,7 @@ plugins {
 dependencies {
     implementation(libs.android.gradle.plugin)
     implementation(libs.spotless.gradle.plugin)
+    implementation(libs.errorprone.gradle.plugin)
+    implementation(libs.animalsniffer.gradle.plugin)
+    implementation(libs.pitest.gradle.plugin)
 }
