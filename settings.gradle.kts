@@ -23,4 +23,5 @@ dependencyResolutionManagement {
 rootProject.name = "SimpleRougeLike"
 include(":app")
 include(":domain")
+include(":infrastructure")
  
