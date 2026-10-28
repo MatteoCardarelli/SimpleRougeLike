@@ -31,6 +31,14 @@ public final class Player extends Actor {
         this.inventory = new Inventory(inventoryCapacity);
     }
 
+    public Player(EntityId id, PlayerDefinition definition) {
+        this(
+                id,
+                definition.stats(),
+                definition.experienceToFirstLevel(),
+                definition.inventoryCapacity());
+    }
+
     @Override
     public Kind kind() {
         return KIND;

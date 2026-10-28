@@ -64,7 +64,7 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI, su ogni push e
 ## Roadmap
 
 - [x] **0. Preparazione:** configurazione di build condivisa, dipendenze ripulite, formattazione automatica, CI su tutte le branch.
-- [ ] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
+- [x] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
 - [ ] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
 - [ ] **4. `:application`:** turni completi, comandi, stati della partita.
 - [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore, poi Hilt e MVVM, il nuovo rendering e le funzionalità nuove.
