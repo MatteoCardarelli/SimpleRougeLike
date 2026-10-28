@@ -26,6 +26,10 @@ java {
 dependencies {
     api(lib("jspecify"))
     testFixturesApi(lib("jspecify"))
+    // I test di contratto delle porte stanno nei testFixtures: chi li estende eredita JUnit e AssertJ.
+    testFixturesApi(platform(lib("junit-bom")))
+    testFixturesApi(lib("junit-jupiter"))
+    testFixturesApi(lib("assertj-core"))
 
     errorprone(lib("errorprone-core"))
     errorprone(lib("nullaway"))
