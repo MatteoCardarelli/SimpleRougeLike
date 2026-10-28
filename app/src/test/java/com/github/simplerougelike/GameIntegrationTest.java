@@ -1,7 +1,5 @@
 package com.github.simplerougelike;
 
-import org.junit.Assert;
-import org.junit.Test;
 import static org.junit.Assert.*;
 
 import com.github.matteoCarda.simplerougelike.model.GameMap;
@@ -11,9 +9,9 @@ import com.github.matteoCarda.simplerougelike.service.CharacterService;
 import com.github.matteoCarda.simplerougelike.service.CombatService;
 import com.github.matteoCarda.simplerougelike.service.EnemyAIService;
 import com.github.matteoCarda.simplerougelike.service.PlayerService;
-import com.github.matteoCarda.simplerougelike.service.PlayerServiceTest;
 import com.github.matteoCarda.simplerougelike.util.MapGenerator;
-
+import org.junit.Assert;
+import org.junit.Test;
 import squidpony.squidai.DijkstraMap;
 
 public class GameIntegrationTest {
@@ -23,7 +21,8 @@ public class GameIntegrationTest {
         // Arrange: Creiamo le istanze REALI di tutti i servizi
         CharacterService characterService = new CharacterService();
         PlayerService playerService = new PlayerService();
-        CombatService combatService = new CombatService(characterService, playerService); // Inietta il vero servizio
+        CombatService combatService =
+                new CombatService(characterService, playerService); // Inietta il vero servizio
         EnemyAIService enemyAIService = new EnemyAIService(combatService, characterService);
 
         // Creiamo una mappa con un giocatore e un nemico vicini
@@ -38,13 +37,17 @@ public class GameIntegrationTest {
         double playerInitialHealth = player.getHealth();
 
         // Act: Simuliamo il turno dell'IA
-        DijkstraMap dijkstraMap = enemyAIService.getDijkstraMap(gameMap); // Calcoliamo la mappa dei percorsi
+        DijkstraMap dijkstraMap =
+                enemyAIService.getDijkstraMap(gameMap); // Calcoliamo la mappa dei percorsi
         dijkstraMap.setGoal(player.getX(), player.getY());
         enemyAIService.performTurn(enemy, gameMap, player, dijkstraMap);
 
         // Assert: Verifichiamo il risultato finale
         // Ci aspettiamo che la salute del giocatore sia diminuita
-        assertTrue("La salute del giocatore dovrebbe essere diminuita dopo l'attacco", player.getHealth() < playerInitialHealth);
-        Assert.assertEquals(playerInitialHealth - Math.round(enemy.getAttackPower()), player.getHealth(), 0.0);
+        assertTrue(
+                "La salute del giocatore dovrebbe essere diminuita dopo l'attacco",
+                player.getHealth() < playerInitialHealth);
+        Assert.assertEquals(
+                playerInitialHealth - Math.round(enemy.getAttackPower()), player.getHealth(), 0.0);
     }
 }

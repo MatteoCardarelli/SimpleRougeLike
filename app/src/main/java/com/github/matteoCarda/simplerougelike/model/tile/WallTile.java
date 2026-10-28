@@ -1,9 +1,6 @@
 package com.github.matteoCarda.simplerougelike.model.tile;
 
-/**
- * Rappresenta una casella di tipo "Muro" sulla mappa.
- * Non è mai calpestabile.
- */
+/** Rappresenta una casella di tipo "Muro" sulla mappa. Non è mai calpestabile. */
 public class WallTile extends Tile {
 
     /**
@@ -12,8 +9,8 @@ public class WallTile extends Tile {
      * @param x La coordinata x della casella.
      * @param y La coordinata y della casella.
      */
-    public WallTile(int x, int y){
-        super(x,y);
+    public WallTile(int x, int y) {
+        super(x, y);
     }
 
     /**
@@ -22,8 +19,7 @@ public class WallTile extends Tile {
      * @return false, perché il muro non è mai calpestabile.
      */
     @Override
-    public boolean isWalkable(){
+    public boolean isWalkable() {
         return false;
     }
-
 }

@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.github.matteoCarda.simplerougelike.controller.GameController;
@@ -16,10 +15,9 @@ import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.model.tile.Tile; // Import necessario
 
 /**
- * La View principale del gioco, responsabile di tutto il rendering.
- * Disegna la mappa, il giocatore, i nemici e gli oggetti basandosi sullo stato
- * fornito dal GameController. Implementa una telecamera che segue il giocatore e
- * un sistema di Field of View (FOV) per il "fog of war".
+ * La View principale del gioco, responsabile di tutto il rendering. Disegna la mappa, il giocatore,
+ * i nemici e gli oggetti basandosi sullo stato fornito dal GameController. Implementa una
+ * telecamera che segue il giocatore e un sistema di Field of View (FOV) per il "fog of war".
  */
 public class GameView extends View {
 
@@ -35,13 +33,24 @@ public class GameView extends View {
 
     // --- COSTRUTTORI ---
     // Questi sono i costruttori standard di una View Android. Chiamano tutti il metodo init().
-    public GameView(Context context) { super(context); init(); }
-    public GameView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); init(); }
-    public GameView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) { super(context, attrs, defStyleAttr); init(); }
+    public GameView(Context context) {
+        super(context);
+        init();
+    }
+
+    public GameView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public GameView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
 
     /**
-     * Inizializza gli oggetti necessari per la View.
-     * Ottiene l'istanza del GameController e crea l'oggetto Paint.
+     * Inizializza gli oggetti necessari per la View. Ottiene l'istanza del GameController e crea
+     * l'oggetto Paint.
      */
     private void init() {
         gameController = GameController.getInstance();
@@ -49,8 +58,8 @@ public class GameView extends View {
     }
 
     /**
-     * Metodo chiamato da Android quando le dimensioni della View cambiano.
-     * Lo usiamo per memorizzare larghezza e altezza dello schermo.
+     * Metodo chiamato da Android quando le dimensioni della View cambiano. Lo usiamo per
+     * memorizzare larghezza e altezza dello schermo.
      */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -60,7 +69,9 @@ public class GameView extends View {
     }
 
     /**
-     * Il cuore del rendering. Questo metodo viene chiamato da Android ogni volta che la view deve essere ridisegnata.
+     * Il cuore del rendering. Questo metodo viene chiamato da Android ogni volta che la view deve
+     * essere ridisegnata.
+     *
      * @param canvas L'area di disegno su cui operare.
      */
     @Override
@@ -70,12 +81,14 @@ public class GameView extends View {
         canvas.drawColor(Color.BLACK);
 
         // Se non c'è una partita in corso, non c'è nulla da disegnare.
-        if (gameController.getGameMap() == null || gameController.getGameState() != GameController.GameState.PLAYING) {
+        if (gameController.getGameMap() == null
+                || gameController.getGameState() != GameController.GameState.PLAYING) {
             return;
         }
 
         Player player = gameController.getGameMap().getPlayer();
-        double[][] fovMap = gameController.getPlayerFov(); // La mappa della visibilità del giocatore.
+        double[][] fovMap =
+                gameController.getPlayerFov(); // La mappa della visibilità del giocatore.
 
         // --- 1. CALCOLO DELLA TELECAMERA ---
         float cameraOffsetX = player.getX() * cellSize - screenWidth / 2f + cellSize / 2f;
@@ -97,7 +110,6 @@ public class GameView extends View {
         startY = Math.max(0, startY);
         endY = Math.min(gameController.getGameMap().getHeight(), endY);
 
-
         // --- NUOVA LOGICA DI DISEGNO A 2 STATI ---
         for (int x = startX; x < endX; x++) {
             for (int y = startY; y < endY; y++) {
@@ -108,17 +120,23 @@ public class GameView extends View {
 
                 if (isInFov) {
                     // STATO 1: DENTRO IL CAMPO VISIVO (colori normali/saturi)
-                    paint.setColor(tile.isWalkable() ? Color.DKGRAY : Color.rgb(139, 69, 19)); // Marrone per i muri
+                    paint.setColor(
+                            tile.isWalkable()
+                                    ? Color.DKGRAY
+                                    : Color.rgb(139, 69, 19)); // Marrone per i muri
                 } else {
                     // STATO 2: FUORI DAL CAMPO VISIVO (colori scuri/desaturati)
-                    paint.setColor(tile.isWalkable() ? Color.rgb(40, 40, 40) : Color.rgb(50, 25, 5)); // Grigio scuro / Marrone scuro
+                    paint.setColor(
+                            tile.isWalkable()
+                                    ? Color.rgb(40, 40, 40)
+                                    : Color.rgb(50, 25, 5)); // Grigio scuro / Marrone scuro
                 }
 
                 // Disegniamo la casella in ogni caso, non ci sono più aree nere.
-                canvas.drawRect(x * cellSize, y * cellSize, (x + 1) * cellSize, (y + 1) * cellSize, paint);
+                canvas.drawRect(
+                        x * cellSize, y * cellSize, (x + 1) * cellSize, (y + 1) * cellSize, paint);
             }
         }
-
 
         // --- 3. DISEGNO DELLE ENTITÀ ---
         // La logica qui è corretta: disegna oggetti e nemici SOLO se sono nel campo visivo attuale.
@@ -128,24 +146,28 @@ public class GameView extends View {
         // Disegniamo il giocatore per ultimo in modo che sia sempre in cima
         drawPlayer(canvas, player);
 
-
         // --- 4. RIPRISTINO DEL CANVAS ---
         canvas.restore();
     }
 
-
     /**
      * Disegna il giocatore sulla mappa.
+     *
      * @param canvas Il canvas su cui disegnare.
      * @param player L'oggetto Player da disegnare.
      */
     private void drawPlayer(Canvas canvas, Player player) {
         paint.setColor(Color.GREEN);
-        canvas.drawCircle(player.getX() * cellSize + cellSize / 2, player.getY() * cellSize + cellSize / 2, cellSize / 2.2f, paint);
+        canvas.drawCircle(
+                player.getX() * cellSize + cellSize / 2,
+                player.getY() * cellSize + cellSize / 2,
+                cellSize / 2.2f,
+                paint);
     }
 
     /**
      * Disegna tutti gli oggetti presenti sulla mappa che sono visibili al giocatore.
+     *
      * @param canvas Il canvas su cui disegnare.
      * @param fovMap La mappa del campo visivo per controllare la visibilità.
      */
@@ -155,14 +177,19 @@ public class GameView extends View {
         for (Item item : gameController.getGameMap().getItems()) {
             if (fovMap[item.getX()][item.getY()] > 0.0) {
                 float offset = cellSize * 0.25f;
-                canvas.drawRect(item.getX() * cellSize + offset, item.getY() * cellSize + offset,
-                        (item.getX() + 1) * cellSize - offset, (item.getY() + 1) * cellSize - offset, paint);
+                canvas.drawRect(
+                        item.getX() * cellSize + offset,
+                        item.getY() * cellSize + offset,
+                        (item.getX() + 1) * cellSize - offset,
+                        (item.getY() + 1) * cellSize - offset,
+                        paint);
             }
         }
     }
 
     /**
      * Disegna tutti i nemici vivi che sono visibili al giocatore.
+     *
      * @param canvas Il canvas su cui disegnare.
      * @param fovMap La mappa del campo visivo per controllare la visibilità.
      */
@@ -171,11 +198,17 @@ public class GameView extends View {
         paint.setColor(Color.RED);
         for (Enemy enemy : gameController.getGameMap().getEnemies()) {
             // BUGFIX: Ho aggiunto il controllo dei limiti dell'array per fovMap
-            if (gameController.isAlive(enemy) &&
-                    enemy.getX() >= 0 && enemy.getX() < fovMap.length &&
-                    enemy.getY() >= 0 && enemy.getY() < fovMap[0].length &&
-                    fovMap[enemy.getX()][enemy.getY()] > 0.0) {
-                canvas.drawCircle(enemy.getX() * cellSize + cellSize / 2, enemy.getY() * cellSize + cellSize / 2, cellSize / 2.2f, paint);
+            if (gameController.isAlive(enemy)
+                    && enemy.getX() >= 0
+                    && enemy.getX() < fovMap.length
+                    && enemy.getY() >= 0
+                    && enemy.getY() < fovMap[0].length
+                    && fovMap[enemy.getX()][enemy.getY()] > 0.0) {
+                canvas.drawCircle(
+                        enemy.getX() * cellSize + cellSize / 2,
+                        enemy.getY() * cellSize + cellSize / 2,
+                        cellSize / 2.2f,
+                        paint);
             }
         }
     }

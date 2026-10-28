@@ -1,5 +1,8 @@
 package com.github.matteoCarda.simplerougelike.service;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import com.github.matteoCarda.simplerougelike.model.entity.Enemy;
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import org.junit.Before;
@@ -8,9 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 public class CombatServiceTest {
 
     // --- Novità di Mockito ---
@@ -18,19 +18,16 @@ public class CombatServiceTest {
     // @Mock crea oggetti finti (mock) di CharacterService e PlayerService.
     // I mock NON eseguono la vera logica delle classi: registrano le chiamate
     // che ricevono e rispondono quello che decidiamo noi con when(...).
-    @Mock
-    private CharacterService mockCharacterService;
+    @Mock private CharacterService mockCharacterService;
 
     // CombatService riceve anche PlayerService nel costruttore:
     // senza questo mock, @InjectMocks gli passerebbe null.
-    @Mock
-    private PlayerService mockPlayerService;
+    @Mock private PlayerService mockPlayerService;
 
     // @InjectMocks crea un'istanza REALE di CombatService e cerca di
     // iniettare automaticamente tutti gli oggetti annotati con @Mock
     // nei suoi campi corrispondenti (nel nostro caso, nel costruttore).
-    @InjectMocks
-    private CombatService combatService;
+    @InjectMocks private CombatService combatService;
 
     // --- Oggetti di gioco standard ---
     private Player player;
@@ -38,12 +35,13 @@ public class CombatServiceTest {
 
     @Before
     public void setUp() {
-        // Questa riga è FONDAMENTALE. Inizializza tutti gli oggetti annotati con @Mock e @InjectMocks.
+        // Questa riga è FONDAMENTALE. Inizializza tutti gli oggetti annotati con @Mock e
+        // @InjectMocks.
         MockitoAnnotations.openMocks(this);
 
         // Creiamo istanze reali per il giocatore e il nemico
         player = new Player(0, 0); // 100 HP, 10 Attack
-        enemy = new Enemy(1, 1);   // 30 HP, 5 Attack
+        enemy = new Enemy(1, 1); // 30 HP, 5 Attack
 
         when(mockCharacterService.isAlive(enemy)).thenReturn(true);
         when(mockCharacterService.isAlive(player)).thenReturn(true);
@@ -75,10 +73,7 @@ public class CombatServiceTest {
         // "QUANDO (when) viene chiamato `isAlive` sul nostro mockCharacterService
         //  con il nemico come argomento, ALLORA (thenReturn) deve restituire false."
         // Stiamo simulando lo scenario in cui il nemico muore dopo l'attacco.
-        when(mockCharacterService.isAlive(enemy))
-                .thenReturn(true)
-                .thenReturn(false);
-
+        when(mockCharacterService.isAlive(enemy)).thenReturn(true).thenReturn(false);
 
         // Act
         // Eseguiamo l'attacco
@@ -108,9 +103,7 @@ public class CombatServiceTest {
         // Arrange
         // Il nemico è vivo al primo controllo e morto al secondo:
         // simuliamo che il colpo del player lo uccida.
-        when(mockCharacterService.isAlive(enemy))
-                .thenReturn(true)
-                .thenReturn(false);
+        when(mockCharacterService.isAlive(enemy)).thenReturn(true).thenReturn(false);
 
         // Act
         combatService.performAttack(player, enemy);

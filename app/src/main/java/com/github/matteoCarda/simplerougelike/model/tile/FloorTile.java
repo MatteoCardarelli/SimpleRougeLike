@@ -1,12 +1,11 @@
 package com.github.matteoCarda.simplerougelike.model.tile;
 
-/**
- * Una {@link Tile} calpestabile che rappresenta il pavimento.
- */
+/** Una {@link Tile} calpestabile che rappresenta il pavimento. */
 public class FloorTile extends Tile {
 
     /**
      * Costruttore.
+     *
      * @param x Coordinata x.
      * @param y Coordinata y.
      */
@@ -16,6 +15,7 @@ public class FloorTile extends Tile {
 
     /**
      * Il pavimento è sempre calpestabile.
+     *
      * @return Sempre true.
      */
     @Override

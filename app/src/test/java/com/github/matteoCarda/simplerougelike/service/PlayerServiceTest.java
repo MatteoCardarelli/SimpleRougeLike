@@ -1,9 +1,10 @@
 package com.github.matteoCarda.simplerougelike.service;
 
+import static org.junit.Assert.*;
+
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class PlayerServiceTest {
 
@@ -33,8 +34,8 @@ public class PlayerServiceTest {
         playerService.addExperience(player, 120);
 
         // Assert: Verifichiamo lo stato dopo il level-up secondo la nuova regola.
-        assertEquals(2, player.getLevel());         // Livello corretto
-        assertEquals(20, player.getExperience());   // Esperienza rimanente corretta
+        assertEquals(2, player.getLevel()); // Livello corretto
+        assertEquals(20, player.getExperience()); // Esperienza rimanente corretta
 
         // --- VERIFICHE DELLA SALUTE CORRETTE ---
         // La vita massima deve essere aumentata di 20 (100 -> 120).
@@ -43,7 +44,9 @@ public class PlayerServiceTest {
         assertEquals(80, player.getHealth());
 
         assertEquals(12.0, player.getAttackPower(), 0.0); // Attacco corretto
-        assertTrue("Il requisito per il prossimo livello deve essere aumentato", player.getExperienceToNextLevel() > 100);
+        assertTrue(
+                "Il requisito per il prossimo livello deve essere aumentato",
+                player.getExperienceToNextLevel() > 100);
     }
 
     @Test
@@ -62,7 +65,7 @@ public class PlayerServiceTest {
 
         // Verifichiamo la salute dopo DUE level-up
         assertEquals(140, player.getMaxHealth()); // 100 + 20 + 20
-        assertEquals(90, player.getHealth());    // 50 + 20 + 20
+        assertEquals(90, player.getHealth()); // 50 + 20 + 20
     }
 
     @Test

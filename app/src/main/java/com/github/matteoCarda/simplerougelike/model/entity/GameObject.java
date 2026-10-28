@@ -1,8 +1,8 @@
 package com.github.matteoCarda.simplerougelike.model.entity;
 
 /**
- * Classe base per tutti gli oggetti posizionabili sulla mappa.
- * Fornisce coordinate (x,y) e metodi base per la posizione.
+ * Classe base per tutti gli oggetti posizionabili sulla mappa. Fornisce coordinate (x,y) e metodi
+ * base per la posizione.
  */
 public abstract class GameObject {
     protected int x;
@@ -10,6 +10,7 @@ public abstract class GameObject {
 
     /**
      * Costruttore.
+     *
      * @param x Coordinata x iniziale.
      * @param y Coordinata y iniziale.
      */
@@ -18,12 +19,17 @@ public abstract class GameObject {
         this.y = y;
     }
 
-    public int getX() { return x; }
+    public int getX() {
+        return x;
+    }
 
-    public int getY() { return y; }
+    public int getY() {
+        return y;
+    }
 
     /**
      * Aggiorna la posizione dell'oggetto.
+     *
      * @param x Nuova coordinata x.
      * @param y Nuova coordinata y.
      */

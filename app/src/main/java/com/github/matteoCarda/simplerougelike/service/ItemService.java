@@ -4,9 +4,7 @@ import com.github.matteoCarda.simplerougelike.model.entity.Item;
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.model.entity.PotionItem;
 
-/**
- * Gestisce le interazioni con gli oggetti {@link Item}.
- */
+/** Gestisce le interazioni con gli oggetti {@link Item}. */
 public class ItemService {
 
     private final CharacterService characterService;
@@ -16,8 +14,9 @@ public class ItemService {
     }
 
     /**
-     * Metodo principale per l'utilizzo di un oggetto.
-     * Esegue l'azione dell'oggetto e lo rimuove se consumabile.
+     * Metodo principale per l'utilizzo di un oggetto. Esegue l'azione dell'oggetto e lo rimuove se
+     * consumabile.
+     *
      * @param player Il giocatore che usa l'oggetto.
      * @param item L'oggetto da utilizzare.
      * @return true se l'oggetto è stato usato con successo.
@@ -40,6 +39,7 @@ public class ItemService {
 
     /**
      * Applica specificamente un effetto di cura. Chiamato da PotionItem.use().
+     *
      * @param player Il giocatore da curare.
      * @param potion La pozione che definisce la quantità di cura.
      * @return true se la cura è stata applicata.
@@ -54,8 +54,8 @@ public class ItemService {
     }
 
     /**
-     * Logica eseguita quando un giocatore raccoglie un oggetto dalla mappa.
-     * Attualmente, si limita ad aggiungere l'oggetto all'inventario.
+     * Logica eseguita quando un giocatore raccoglie un oggetto dalla mappa. Attualmente, si limita
+     * ad aggiungere l'oggetto all'inventario.
      *
      * @param item L'oggetto da raccogliere.
      * @param player Il giocatore che raccoglie l'oggetto.
@@ -65,7 +65,8 @@ public class ItemService {
         boolean itemTaken = characterService.takeItem(player, item);
 
         if (itemTaken) {
-            System.out.println(player.getClass().getSimpleName() + " ha raccolto: " + item.getName());
+            System.out.println(
+                    player.getClass().getSimpleName() + " ha raccolto: " + item.getName());
         }
 
         // In futuro, si potrebbero aggiungere logiche specifiche per tipo di oggetto,

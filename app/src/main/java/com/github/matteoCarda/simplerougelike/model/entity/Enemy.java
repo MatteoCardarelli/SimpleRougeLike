@@ -1,8 +1,8 @@
 package com.github.matteoCarda.simplerougelike.model.entity;
 
 /**
- * Rappresenta un'entità nemica.
- * Estende {@link Character} con statistiche di base fisse e un valore di esperienza.
+ * Rappresenta un'entità nemica. Estende {@link Character} con statistiche di base fisse e un valore
+ * di esperienza.
  */
 public class Enemy extends Character {
 
@@ -10,6 +10,7 @@ public class Enemy extends Character {
 
     /**
      * Costruttore.
+     *
      * @param x Coordinata x iniziale.
      * @param y Coordinata y iniziale.
      */
@@ -19,9 +20,7 @@ public class Enemy extends Character {
         this.experienceValue = 25; // Valore di esperienza di default
     }
 
-    /**
-     * Ritorna il valore di esperienza che questo nemico conferisce quando sconfitto.
-     */
+    /** Ritorna il valore di esperienza che questo nemico conferisce quando sconfitto. */
     public int getExperienceValue() {
         return experienceValue;
     }
