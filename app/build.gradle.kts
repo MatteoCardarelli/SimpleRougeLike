@@ -1,5 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.spotless)
+}
+
+// google-java-format 1.36 e successivi richiedono Java 21: la CI usa il JDK 17.
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat(libs.versions.googleJavaFormat.get()).aosp()
+    }
 }
 
 android {

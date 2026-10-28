@@ -1,10 +1,13 @@
 package com.github.matteoCarda.simplerougelike.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.github.matteoCarda.simplerougelike.model.GameMap;
 import com.github.matteoCarda.simplerougelike.model.entity.Enemy;
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.util.MapGenerator;
-
+import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,27 +16,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import squidpony.squidai.DijkstraMap;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-
 public class EnemyAIServiceTest {
 
     // --- Mock delle dipendenze ---
-    @Mock
-    private CombatService mockCombatService;
-    @Mock
-    private CharacterService mockCharacterService;
+    @Mock private CombatService mockCombatService;
+    @Mock private CharacterService mockCharacterService;
     // Creiamo un mock anche per DijkstraMap, perché non vogliamo dipendere
     // dalla vera logica di pathfinding di squidlib in un test unitario.
-    @Mock
-    private DijkstraMap mockDijkstraMap;
+    @Mock private DijkstraMap mockDijkstraMap;
 
     // --- Classe sotto test ---
-    @InjectMocks
-    private EnemyAIService enemyAIService;
+    @InjectMocks private EnemyAIService enemyAIService;
 
     // --- Oggetti di gioco ---
     private Player player;
@@ -46,7 +39,8 @@ public class EnemyAIServiceTest {
 
         // Per i test dell'IA, abbiamo bisogno di una mappa valida.
         // Usiamo il nostro MapGenerator per crearne una.
-        // Nota: MapGenerator non è una dipendenza di EnemyAIService, quindi possiamo usare l'oggetto reale.
+        // Nota: MapGenerator non è una dipendenza di EnemyAIService, quindi possiamo usare
+        // l'oggetto reale.
         MapGenerator mapGenerator = new MapGenerator();
         gameMap = mapGenerator.generateMap(20, 20, 1, 0); // Mappa piccola con 1 nemico e 0 oggetti
 
@@ -123,17 +117,21 @@ public class EnemyAIServiceTest {
         enemyAIService.performTurn(enemy, gameMap, player, mockDijkstraMap);
 
         // Assert
-        // Verifichiamo che l'IA NON abbia cercato un percorso (perché il giocatore è troppo lontano).
+        // Verifichiamo che l'IA NON abbia cercato un percorso (perché il giocatore è troppo
+        // lontano).
         verify(mockDijkstraMap, never()).findPath(anyInt(), any(), any(), any(), any());
 
         // Verifichiamo che NON abbia attaccato.
         verify(mockCombatService, never()).performAttack(any(), any());
 
         // Poiché il movimento è casuale, non possiamo sapere la posizione esatta.
-        // Possiamo però verificare che la nuova posizione non sia la stessa di prima (è una verifica debole ma utile).
+        // Possiamo però verificare che la nuova posizione non sia la stessa di prima (è una
+        // verifica debole ma utile).
         boolean hasMoved = (enemy.getX() != originalX || enemy.getY() != originalY);
         // Se `isMoveValid` fallisce per tutte le direzioni, il nemico potrebbe non muoversi.
-        // Il test più robusto è semplicemente verificare che la logica di attacco/inseguimento non sia stata attivata.
-        // L'asserzione `hasMoved` potrebbe fallire casualmente, quindi ci fidiamo delle verifiche `never()` di cui sopra.
+        // Il test più robusto è semplicemente verificare che la logica di attacco/inseguimento non
+        // sia stata attivata.
+        // L'asserzione `hasMoved` potrebbe fallire casualmente, quindi ci fidiamo delle verifiche
+        // `never()` di cui sopra.
     }
 }

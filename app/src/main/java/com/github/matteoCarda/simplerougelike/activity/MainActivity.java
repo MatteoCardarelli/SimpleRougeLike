@@ -7,24 +7,19 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.github.matteoCarda.simplerougelike.R;
 import com.github.matteoCarda.simplerougelike.controller.GameController;
 import com.github.matteoCarda.simplerougelike.controller.GameUpdateListener;
 import com.github.matteoCarda.simplerougelike.model.entity.Item;
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.view.GameView;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Activity principale dell'app.
- * Ospita la GameView e cattura l'input dell'utente (swipe) per passarlo al GameController.
+ * Activity principale dell'app. Ospita la GameView e cattura l'input dell'utente (swipe) per
+ * passarlo al GameController.
  */
 public class MainActivity extends AppCompatActivity implements GameUpdateListener {
 
@@ -57,28 +52,33 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
         inventoryItemList = findViewById(R.id.inventory_item_list);
 
         // NUOVO SISTEMA PER GESTIRE IL TASTO "INDIETRO"
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                // Qui mettiamo la stessa logica di prima:
-                // controlliamo se l'inventario è visibile.
+        getOnBackPressedDispatcher()
+                .addCallback(
+                        this,
+                        new OnBackPressedCallback(true) {
+                            @Override
+                            public void handleOnBackPressed() {
+                                // Qui mettiamo la stessa logica di prima:
+                                // controlliamo se l'inventario è visibile.
 
-                if (inventoryLayout.getVisibility() == View.VISIBLE) {
-                    // Se l'inventario è aperto, lo chiudiamo.
-                    closeInventory();
-                } else {
-                    // Se l'inventario è chiuso, eseguiamo l'azione di default
-                    // (che di solito è chiudere l'activity o tornare indietro).
-                    // Per farlo in modo sicuro, disabilitiamo temporaneamente questo callback
-                    // e chiamiamo di nuovo il dispatcher.
-                    setEnabled(false); // Disabilita questo callback
-                    getOnBackPressedDispatcher().onBackPressed(); // Esegui l'azione standard
-                }
-            }
-        });
+                                if (inventoryLayout.getVisibility() == View.VISIBLE) {
+                                    // Se l'inventario è aperto, lo chiudiamo.
+                                    closeInventory();
+                                } else {
+                                    // Se l'inventario è chiuso, eseguiamo l'azione di default
+                                    // (che di solito è chiudere l'activity o tornare indietro).
+                                    // Per farlo in modo sicuro, disabilitiamo temporaneamente
+                                    // questo callback
+                                    // e chiamiamo di nuovo il dispatcher.
+                                    setEnabled(false); // Disabilita questo callback
+                                    getOnBackPressedDispatcher()
+                                            .onBackPressed(); // Esegui l'azione standard
+                                }
+                            }
+                        });
 
-
-        if (savedInstanceState == null || gameController.getGameState() != GameController.GameState.PLAYING) {
+        if (savedInstanceState == null
+                || gameController.getGameState() != GameController.GameState.PLAYING) {
             // Inizia una NUOVA partita SOLO se:
             // 1. L'app è stata appena avviata.
             // 2. O se la partita precedente era finita.
@@ -96,53 +96,71 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
         return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
-    /**
-     * Configura il GestureDetector per tradurre gli swipe in comandi di gioco.
-     */
+    /** Configura il GestureDetector per tradurre gli swipe in comandi di gioco. */
     private void setupGestureDetector() {
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            private static final int SWIPE_THRESHOLD = 100; // Minima distanza (pixel)
-            private static final int SWIPE_VELOCITY_THRESHOLD = 100; // Minima velocità
+        gestureDetector =
+                new GestureDetector(
+                        this,
+                        new GestureDetector.SimpleOnGestureListener() {
+                            private static final int SWIPE_THRESHOLD =
+                                    100; // Minima distanza (pixel)
+                            private static final int SWIPE_VELOCITY_THRESHOLD =
+                                    100; // Minima velocità
 
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                float diffX = e2.getX() - e1.getX();
-                float diffY = e2.getY() - e1.getY();
+                            @Override
+                            public boolean onFling(
+                                    MotionEvent e1,
+                                    MotionEvent e2,
+                                    float velocityX,
+                                    float velocityY) {
+                                float diffX = e2.getX() - e1.getX();
+                                float diffY = e2.getY() - e1.getY();
 
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // Swipe orizzontale
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffX > 0) {
-                            gameController.handlePlayerTurn(GameController.Direction.RIGHT);
-                        } else {
-                            gameController.handlePlayerTurn(GameController.Direction.LEFT);
-                        }
-                        return true;
-                    }
-                } else {
-                    // Swipe verticale
-                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffY > 0) {
-                            gameController.handlePlayerTurn(GameController.Direction.DOWN);
-                        } else {
-                            gameController.handlePlayerTurn(GameController.Direction.UP);
-                        }
-                        return true;
-                    }
-                }
-                return false;
-            }
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                // L'utente ha espresso l'intento di "interagire con l'inventario"
-                if (gameController.getGameState() == GameController.GameState.PLAYING) {
-                    openInventory(); // openInventory ora chiama requestOpenInventory()
-                } else if (gameController.getGameState() == GameController.GameState.PAUSED) {
-                    closeInventory(); // closeInventory ora chiama requestCloseInventory()
-                }
-                return true;
-            }
-        });
+                                if (Math.abs(diffX) > Math.abs(diffY)) {
+                                    // Swipe orizzontale
+                                    if (Math.abs(diffX) > SWIPE_THRESHOLD
+                                            && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                                        if (diffX > 0) {
+                                            gameController.handlePlayerTurn(
+                                                    GameController.Direction.RIGHT);
+                                        } else {
+                                            gameController.handlePlayerTurn(
+                                                    GameController.Direction.LEFT);
+                                        }
+                                        return true;
+                                    }
+                                } else {
+                                    // Swipe verticale
+                                    if (Math.abs(diffY) > SWIPE_THRESHOLD
+                                            && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                                        if (diffY > 0) {
+                                            gameController.handlePlayerTurn(
+                                                    GameController.Direction.DOWN);
+                                        } else {
+                                            gameController.handlePlayerTurn(
+                                                    GameController.Direction.UP);
+                                        }
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onDoubleTap(MotionEvent e) {
+                                // L'utente ha espresso l'intento di "interagire con l'inventario"
+                                if (gameController.getGameState()
+                                        == GameController.GameState.PLAYING) {
+                                    openInventory(); // openInventory ora chiama
+                                    // requestOpenInventory()
+                                } else if (gameController.getGameState()
+                                        == GameController.GameState.PAUSED) {
+                                    closeInventory(); // closeInventory ora chiama
+                                    // requestCloseInventory()
+                                }
+                                return true;
+                            }
+                        });
     }
 
     private void openInventory() {
@@ -168,13 +186,15 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
                 itemView.setTextColor(getResources().getColor(android.R.color.white));
                 itemView.setTextSize(20);
                 itemView.setPadding(0, 8, 0, 8);
-                itemView.setBackgroundResource(android.R.drawable.btn_default); // Semplice sfondo cliccabile
+                itemView.setBackgroundResource(
+                        android.R.drawable.btn_default); // Semplice sfondo cliccabile
 
                 // Imposta l'azione al click
-                itemView.setOnClickListener(v -> {
-                    gameController.useItemFromInventory(item);
-                    closeInventory(); // Chiudi l'inventario dopo aver usato l'oggetto
-                });
+                itemView.setOnClickListener(
+                        v -> {
+                            gameController.useItemFromInventory(item);
+                            closeInventory(); // Chiudi l'inventario dopo aver usato l'oggetto
+                        });
 
                 inventoryItemList.addView(itemView);
             }
@@ -193,7 +213,8 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
 
     @Override
     public void onGameUpdated() {
-        // Questa funzione ora centralizza TUTTI gli aggiornamenti della UI// 1. Recupera i dati più recenti dal controller
+        // Questa funzione ora centralizza TUTTI gli aggiornamenti della UI// 1. Recupera i dati più
+        // recenti dal controller
         Player player = gameController.getGameMap().getPlayer();
         if (player == null) return; // Sicurezza
 
@@ -207,7 +228,4 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
         // 3. Ridisegna la GameView
         gameView.invalidate();
     }
-
-
-
 }

@@ -11,16 +11,14 @@ import com.github.matteoCarda.simplerougelike.service.EnemyAIService;
 import com.github.matteoCarda.simplerougelike.service.ItemService;
 import com.github.matteoCarda.simplerougelike.service.PlayerService;
 import com.github.matteoCarda.simplerougelike.util.MapGenerator;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import squidpony.squidai.DijkstraMap;
 import squidpony.squidgrid.FOV;
 
 /**
- * Gestore centrale dello stato e della logica di gioco (Singleton).
- * Fa da ponte tra l'input dell'utente, i servizi di logica e lo stato del modello.
+ * Gestore centrale dello stato e della logica di gioco (Singleton). Fa da ponte tra l'input
+ * dell'utente, i servizi di logica e lo stato del modello.
  */
 public class GameController {
     private static GameController instance;
@@ -30,7 +28,6 @@ public class GameController {
     private Player player;
     private GameState gameState;
     private PlayerService playerService;
-
 
     // Servizi delegati alla logica di business
     private final MapGenerator mapGenerator;
@@ -46,12 +43,21 @@ public class GameController {
     private double[][] playerFov; // Mappa di visibilità per il rendering
     private double[][] resistanceMap; // Mappa statica della "resistenza" alla luce (1.0 = muro)
 
-    public enum GameState { PLAYING, GAME_OVER, PAUSED, VICTORY }
-    public enum Direction { UP, DOWN, LEFT, RIGHT }
+    public enum GameState {
+        PLAYING,
+        GAME_OVER,
+        PAUSED,
+        VICTORY
+    }
 
-    /**
-     * Accesso all'istanza unica del GameController.
-     */
+    public enum Direction {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    }
+
+    /** Accesso all'istanza unica del GameController. */
     public static synchronized GameController getInstance() {
         if (instance == null) {
             instance = new GameController();
@@ -59,9 +65,7 @@ public class GameController {
         return instance;
     }
 
-    /**
-     * Costruttore privato (Singleton). Inizializza tutti i servizi.
-     */
+    /** Costruttore privato (Singleton). Inizializza tutti i servizi. */
     private GameController() {
         this.mapGenerator = new MapGenerator();
         this.characterService = new CharacterService();
@@ -73,17 +77,27 @@ public class GameController {
     }
 
     // --- GETTERS PER LA VIEW ---
-    public GameMap getGameMap() { return gameMap; }
-    public GameState getGameState() { return gameState; }
-    public double[][] getPlayerFov() { return playerFov; }
-    public boolean isAlive(Character character) { return characterService.isAlive(character);}
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public double[][] getPlayerFov() {
+        return playerFov;
+    }
+
+    public boolean isAlive(Character character) {
+        return characterService.isAlive(character);
+    }
+
     public void setGameUpdateListener(GameUpdateListener listener) {
         this.gameUpdateListener = listener;
     }
 
-    /**
-     * Inizializza una nuova partita, generando mappa e stato del FOV.
-     */
+    /** Inizializza una nuova partita, generando mappa e stato del FOV. */
     public void startNewGame(int width, int height, int enemyCount, int itemCount) {
         this.gameMap = mapGenerator.generateMap(width, height, enemyCount, itemCount);
         this.player = gameMap.getPlayer();
@@ -103,9 +117,9 @@ public class GameController {
         }
     }
 
-
     /**
      * Gestisce un intero turno di gioco a partire dall'azione del giocatore.
+     *
      * @param direction L'input di movimento del giocatore.
      */
     public void handlePlayerTurn(Direction direction) {
@@ -119,9 +133,7 @@ public class GameController {
         }
     }
 
-    /**
-     * Esegue l'azione del giocatore e aggiorna il FOV.
-     */
+    /** Esegue l'azione del giocatore e aggiorna il FOV. */
     private void handlePlayerAction(Direction direction) {
         movePlayer(direction);
         if (characterService.isAlive(player)) {
@@ -129,9 +141,7 @@ public class GameController {
         }
     }
 
-    /**
-     * Esegue il turno per ogni nemico vivo, usando una mappa Dijkstra per il pathfinding.
-     */
+    /** Esegue il turno per ogni nemico vivo, usando una mappa Dijkstra per il pathfinding. */
     private void processEnemyTurns() {
         // Crea una mappa di costo per Dijkstra, dove l'obiettivo è il giocatore.
         DijkstraMap dijkstraMapToPlayer = enemyAIService.getDijkstraMap(gameMap);
@@ -140,7 +150,9 @@ public class GameController {
 
         // Fa agire ogni nemico e raccoglie i morti per la rimozione.
         List<Enemy> enemiesToRemove = new ArrayList<>();
-        for (Enemy enemy : new ArrayList<>(gameMap.getEnemies())) { // Itera su una copia per evitare ConcurrentModificationException
+        for (Enemy enemy :
+                new ArrayList<>(gameMap.getEnemies())) { // Itera su una copia per evitare
+            // ConcurrentModificationException
             if (characterService.isAlive(enemy)) {
                 enemyAIService.performTurn(enemy, gameMap, player, dijkstraMapToPlayer);
             } else {
@@ -150,22 +162,32 @@ public class GameController {
         gameMap.getEnemies().removeAll(enemiesToRemove);
     }
 
-    /**
-     * Gestisce il movimento del giocatore e le interazioni (attacco, raccolta oggetti).
-     */
+    /** Gestisce il movimento del giocatore e le interazioni (attacco, raccolta oggetti). */
     private void movePlayer(Direction direction) {
         int targetX = player.getX();
         int targetY = player.getY();
 
         switch (direction) {
-            case UP:    targetY--; break;
-            case DOWN:  targetY++; break;
-            case LEFT:  targetX--; break;
-            case RIGHT: targetX++; break;
+            case UP:
+                targetY--;
+                break;
+            case DOWN:
+                targetY++;
+                break;
+            case LEFT:
+                targetX--;
+                break;
+            case RIGHT:
+                targetX++;
+                break;
         }
 
         // Controlla se la mossa è valida.
-        if (targetX < 0 || targetX >= gameMap.getWidth() || targetY < 0 || targetY >= gameMap.getHeight() || !gameMap.getTile(targetX, targetY).isWalkable()) {
+        if (targetX < 0
+                || targetX >= gameMap.getWidth()
+                || targetY < 0
+                || targetY >= gameMap.getHeight()
+                || !gameMap.getTile(targetX, targetY).isWalkable()) {
             return; // Urta un muro o esce dalla mappa.
         }
 
@@ -187,9 +209,7 @@ public class GameController {
         player.setPosition(targetX, targetY);
     }
 
-    /**
-     * Cerca un nemico vivo in una data coordinata.
-     */
+    /** Cerca un nemico vivo in una data coordinata. */
     private Enemy getEnemyAt(int x, int y) {
         for (Enemy enemy : gameMap.getEnemies()) {
             if (characterService.isAlive(enemy) && enemy.getX() == x && enemy.getY() == y) {
@@ -216,10 +236,7 @@ public class GameController {
         }
     }
 
-
-    /**
-     * Cerca un oggetto in una data coordinata.
-     */
+    /** Cerca un oggetto in una data coordinata. */
     private Item getItemAt(int x, int y) {
         for (Item item : gameMap.getItems()) {
             if (item.getX() == x && item.getY() == y) {
@@ -229,9 +246,7 @@ public class GameController {
         return null;
     }
 
-    /**
-     * Controlla lo stato di fine partita.
-     */
+    /** Controlla lo stato di fine partita. */
     private void checkEndGameConditions() {
         if (!characterService.isAlive(player)) {
             gameState = GameState.GAME_OVER;
@@ -240,16 +255,14 @@ public class GameController {
         // TODO: Aggiungere condizione di vittoria (es. nemici sconfitti, oggetto trovato, etc.)
     }
 
-    /**
-     * Ricalcola il campo visivo del giocatore.
-     */
+    /** Ricalcola il campo visivo del giocatore. */
     private void calculateFov() {
         FOV.reuseFOV(resistanceMap, playerFov, player.getX(), player.getY(), PLAYER_VISION_RADIUS);
     }
 
     /**
-     * Gestisce la richiesta di aprire l'inventario.
-     * È responsabilità del controller decidere se mettere in pausa il gioco.
+     * Gestisce la richiesta di aprire l'inventario. È responsabilità del controller decidere se
+     * mettere in pausa il gioco.
      */
     public void requestOpenInventory() {
         // Il controller ha l'autorità di cambiare il proprio stato.
@@ -257,9 +270,7 @@ public class GameController {
         // In futuro, potremmo anche fare altro qui, come fermare i timer, ecc.
     }
 
-    /**
-     * Gestisce la richiesta di chiudere l'inventario, spesso dopo un'azione.
-     */
+    /** Gestisce la richiesta di chiudere l'inventario, spesso dopo un'azione. */
     public void requestCloseInventory() {
         setGameState(GameState.PLAYING);
         // Potremmo anche forzare un aggiornamento della UI qui, se necessario.
@@ -271,5 +282,4 @@ public class GameController {
     private void setGameState(GameState gameState) {
         this.gameState = gameState;
     }
-
 }

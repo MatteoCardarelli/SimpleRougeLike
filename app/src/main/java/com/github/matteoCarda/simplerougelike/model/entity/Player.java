@@ -3,10 +3,7 @@ package com.github.matteoCarda.simplerougelike.model.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Rappresenta il giocatore.
- * Estende {@link Character} con statistiche fisse e un inventario.
- */
+/** Rappresenta il giocatore. Estende {@link Character} con statistiche fisse e un inventario. */
 public class Player extends Character {
 
     // Inventario per gli oggetti raccolti.
@@ -15,9 +12,9 @@ public class Player extends Character {
     private int experience;
     private int experienceToNextLevel;
 
-
     /**
      * Costruttore.
+     *
      * @param x Coordinata x iniziale.
      * @param y Coordinata y iniziale.
      */
@@ -54,9 +51,7 @@ public class Player extends Character {
         this.experienceToNextLevel = experienceToNextLevel;
     }
 
-    /**
-     * Ritorna l'inventario del giocatore.
-     */
+    /** Ritorna l'inventario del giocatore. */
     public List<Item> getInventory() {
         return inventory;
     }

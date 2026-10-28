@@ -1,15 +1,14 @@
 package com.github.matteoCarda.simplerougelike.model;
 
 import com.github.matteoCarda.simplerougelike.model.entity.Enemy;
-import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.model.entity.Item;
+import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.model.tile.Tile;
-
 import java.util.List;
 
 /**
- * Contenitore per lo stato completo di un livello di gioco.
- * Aggrega la griglia delle tile e le liste di entità dinamiche.
+ * Contenitore per lo stato completo di un livello di gioco. Aggrega la griglia delle tile e le
+ * liste di entità dinamiche.
  */
 public class GameMap {
 
@@ -27,6 +26,7 @@ public class GameMap {
 
     /**
      * Costruttore principale.
+     *
      * @param grid La griglia di Tile generata.
      * @param player L'oggetto Player.
      * @param enemies La lista dei nemici.
@@ -45,6 +45,7 @@ public class GameMap {
 
     /**
      * Ritorna la Tile a una data coordinata, con controllo dei limiti.
+     *
      * @return La Tile, o null se le coordinate sono fuori mappa.
      */
     public Tile getTile(int x, int y) {

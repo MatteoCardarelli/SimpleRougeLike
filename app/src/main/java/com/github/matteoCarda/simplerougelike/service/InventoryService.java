@@ -4,9 +4,7 @@ import com.github.matteoCarda.simplerougelike.model.entity.Item;
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.model.entity.PotionItem;
 
-/**
- * Servizio che gestisce la logica di utilizzo degli oggetti dall'inventario.
- */
+/** Servizio che gestisce la logica di utilizzo degli oggetti dall'inventario. */
 public class InventoryService {
 
     private final CharacterService characterService;
@@ -17,6 +15,7 @@ public class InventoryService {
 
     /**
      * Applica l'effetto di un oggetto al giocatore e lo rimuove se è consumabile.
+     *
      * @param player Il giocatore che usa l'oggetto.
      * @param item L'oggetto da utilizzare.
      * @return true se l'oggetto è stato usato con successo, false altrimenti.
@@ -38,7 +37,6 @@ public class InventoryService {
         // else if (item instanceof ScrollOfTeleportation) { ... logica per il teletrasporto ... }
         // else if (item instanceof MagicMissileWand) { ... logica per il danno ... }
 
-
         // Se l'oggetto è stato usato con successo e se è consumabile, rimuovilo.
         if (success && isConsumable(item)) {
             player.getInventory().remove(item);
@@ -49,6 +47,7 @@ public class InventoryService {
 
     /**
      * Metodo helper per determinare se un oggetto scompare dopo l'uso.
+     *
      * @param item L'oggetto da controllare.
      * @return true se l'oggetto è consumabile.
      */
@@ -57,4 +56,3 @@ public class InventoryService {
         return item instanceof PotionItem;
     }
 }
-    

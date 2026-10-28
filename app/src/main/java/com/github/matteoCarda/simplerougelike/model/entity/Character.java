@@ -1,8 +1,8 @@
 package com.github.matteoCarda.simplerougelike.model.entity;
 
 /**
- * Classe base astratta per tutte le entità "viventi" del gioco (es. Player, Enemy).
- * Contiene le statistiche fondamentali come salute e potenza d'attacco.
+ * Classe base astratta per tutte le entità "viventi" del gioco (es. Player, Enemy). Contiene le
+ * statistiche fondamentali come salute e potenza d'attacco.
  */
 public abstract class Character extends GameObject {
     protected int health;
@@ -11,6 +11,7 @@ public abstract class Character extends GameObject {
 
     /**
      * Costruttore.
+     *
      * @param x Coordinata x iniziale.
      * @param y Coordinata y iniziale.
      * @param health Salute iniziale (e massima).
@@ -25,10 +26,27 @@ public abstract class Character extends GameObject {
 
     // --- Getters e Setters ---
 
-    public int getHealth() { return this.health; }
-    public void setHealth(int health) { this.health = health; }
-    public int getMaxHealth() { return this.maxHealth; }
-    public void setMaxHealth(int maxHealth) { this.maxHealth = maxHealth; }
-    public double getAttackPower() { return this.attackPower; }
-    public void setAttackPower(double attackPower) { this.attackPower = attackPower; }
+    public int getHealth() {
+        return this.health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getMaxHealth() {
+        return this.maxHealth;
+    }
+
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+    }
+
+    public double getAttackPower() {
+        return this.attackPower;
+    }
+
+    public void setAttackPower(double attackPower) {
+        this.attackPower = attackPower;
+    }
 }

@@ -2,13 +2,12 @@ package com.github.matteoCarda.simplerougelike.service;
 
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 
-/**
- * Servizio per gestire la logica specifica del giocatore, come la progressione di livello.
- */
+/** Servizio per gestire la logica specifica del giocatore, come la progressione di livello. */
 public class PlayerService {
 
     /**
      * Aggiunge esperienza al giocatore e gestisce il passaggio di livello.
+     *
      * @param player Il giocatore che guadagna esperienza.
      * @param experienceGained La quantità di esperienza guadagnata.
      */
@@ -17,7 +16,8 @@ public class PlayerService {
 
         int newExperience = player.getExperience() + experienceGained;
 
-        // Controlla se il giocatore è salito di livello (potrebbe salire anche di più livelli in un colpo solo)
+        // Controlla se il giocatore è salito di livello (potrebbe salire anche di più livelli in un
+        // colpo solo)
         while (newExperience >= player.getExperienceToNextLevel()) {
             newExperience -= player.getExperienceToNextLevel();
             levelUp(player);
@@ -29,6 +29,7 @@ public class PlayerService {
 
     /**
      * Gestisce la logica del passaggio di livello.
+     *
      * @param player Il giocatore che sale di livello.
      */
     private void levelUp(Player player) {
@@ -36,8 +37,8 @@ public class PlayerService {
         player.setLevel(player.getLevel() + 1);
 
         // Aumenta la salute massima e la salute attuale dello stesso importo
-        player.setMaxHealth(player.getMaxHealth() + 20); 
-        player.setHealth(player.getHealth() + 20); 
+        player.setMaxHealth(player.getMaxHealth() + 20);
+        player.setHealth(player.getHealth() + 20);
 
         // Aumenta la potenza d'attacco
         player.setAttackPower(player.getAttackPower() + 2);

@@ -1,5 +1,7 @@
 package com.github.matteoCarda.simplerougelike.service;
 
+import static org.mockito.Mockito.*;
+
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.model.entity.PotionItem;
 import org.junit.Before;
@@ -8,19 +10,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.*;
-
 public class ItemServiceTest {
 
     // --- Mock delle dipendenze ---
     // ItemService dipende da CharacterService per aggiungere oggetti all'inventario.
-    @Mock
-    private CharacterService mockCharacterService;
+    @Mock private CharacterService mockCharacterService;
 
     // --- Classe sotto test ---
     // Crea un'istanza reale di ItemService e inietta il mockCharacterService.
-    @InjectMocks
-    private ItemService itemService;
+    @InjectMocks private ItemService itemService;
 
     // --- Oggetti di gioco ---
     private Player player;
