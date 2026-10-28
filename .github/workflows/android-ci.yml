@@ -1,48 +1,44 @@
-# Workflow di Integrazione Continua (CI) per l'app Android.
+# Integrazione continua: il job veloce gira su ogni push e su ogni pull request, di qualunque branch,
+# così una branch rotta si scopre subito e non solo quando arriva su master.
 name: Android CI
 
-# Trigger: Esegui ad ogni push o pull request sul branch 'main'.
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ "master" ]
 
 jobs:
-  # Job principale che compila il codice ed esegue i test.
-  build:
-    # Eseguito su un'immagine standard di Ubuntu.
+  fast:
+    name: Job veloce
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout del codice sorgente del repository.
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      # 2. Setup del JDK corretto (versione 17, Temurin).
-      # La cache di Gradle viene abilitata per velocizzare le esecuzioni successive.
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: JDK 21
+        uses: actions/setup-java@v6
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
-          cache: 'gradle'
 
-      # 3. Il Gradle Wrapper ha bisogno dei permessi di esecuzione per funzionare su sistemi Linux/macOS.
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      # 4. Esegue tutti i test unitari del modulo 'app'.
-      # Questo comando compila il progetto ed esegue i test locati in `src/test`.
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
-
-      # 5. Carica i report dei test come "artifact" su GitHub.
-      # Viene eseguito solo se lo step precedente fallisce (`if: failure()`), 
-      # così da poter analizzare gli errori comodamente.
-      - name: Upload test reports on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
+      # Verifica anche che gradle-wrapper.jar sia una distribuzione ufficiale di Gradle:
+      # un wrapper modificato eseguirebbe codice qualunque sulla macchina della CI.
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v6
         with:
-          name: unit-test-reports # Nome dell'artifact scaricabile.
-          path: app/build/reports/tests/testDebugUnitTest/
+          validate-wrappers: true
+
+      # Le dipendenze scaricate sono confrontate con gradle/verification-metadata.xml:
+      # un artefatto diverso da quello atteso ferma la build.
+      - name: Formattazione, Lint, test, build
+        run: ./gradlew spotlessCheck lint test assembleDebug
+
+      - name: Report in caso di errore
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: report
+          path: |
+            app/build/reports/
+            build/reports/

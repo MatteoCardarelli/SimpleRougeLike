@@ -6,8 +6,10 @@ import static org.mockito.Mockito.*;
 import com.github.matteoCarda.simplerougelike.model.GameMap;
 import com.github.matteoCarda.simplerougelike.model.entity.Enemy;
 import com.github.matteoCarda.simplerougelike.model.entity.Player;
-import com.github.matteoCarda.simplerougelike.util.MapGenerator;
+import com.github.matteoCarda.simplerougelike.model.tile.FloorTile;
+import com.github.matteoCarda.simplerougelike.model.tile.Tile;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,16 +39,19 @@ public class EnemyAIServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Per i test dell'IA, abbiamo bisogno di una mappa valida.
-        // Usiamo il nostro MapGenerator per crearne una.
-        // Nota: MapGenerator non è una dipendenza di EnemyAIService, quindi possiamo usare
-        // l'oggetto reale.
-        MapGenerator mapGenerator = new MapGenerator();
-        gameMap = mapGenerator.generateMap(20, 20, 1, 0); // Mappa piccola con 1 nemico e 0 oggetti
-
-        // Prendiamo le istanze reali di player e enemy generate sulla mappa
-        player = gameMap.getPlayer();
-        enemy = gameMap.getEnemies().get(0);
+        // Una mappa fissa, tutta pavimento: con una mappa generata a caso la cella verso cui
+        // il nemico deve muoversi poteva essere un muro, e il test falliva a caso.
+        Tile[][] grid = new Tile[20][20];
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
+                grid[x][y] = new FloorTile(x, y);
+            }
+        }
+        player = new Player(0, 0);
+        enemy = new Enemy(5, 5);
+        List<Enemy> enemies = new ArrayList<>();
+        enemies.add(enemy);
+        gameMap = new GameMap(grid, player, enemies, new ArrayList<>());
 
         // Istruzione di default: per la maggior parte dei test, il nemico è vivo.
         when(mockCharacterService.isAlive(enemy)).thenReturn(true);

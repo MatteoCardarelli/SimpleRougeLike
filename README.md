@@ -50,7 +50,7 @@ flowchart LR
 
 ## Qualità
 
-Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI esegue i test unitari della prima versione.
+Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI, su ogni push e pull request, controlla la formattazione, esegue Lint e i test unitari della prima versione e verifica i checksum delle dipendenze.
 
 - **Regole d'architettura verificate dai test** con ArchUnit: dipendenze tra moduli e package, niente Android nel dominio, niente sorgenti casuali che rompano il determinismo.
 - **Test sulla JVM** con JUnit 5 e AssertJ, senza mock nel dominio: i test giocano su mappe disegnate in ASCII.
@@ -58,7 +58,7 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI esegue i test u
 - **Test di contratto:** ogni adapter e ogni implementazione finta usata nei test passano gli stessi test.
 - **Test golden:** una partita registrata deve produrre lo stesso risultato sulla JVM e su un dispositivo Android.
 - **Copertura e mutation testing** con soglie minime (JaCoCo e PIT).
-- **Stile e controlli statici** bloccanti: Spotless, Android Lint, NullAway.
+- **Stile e controlli statici** bloccanti: Spotless, Android Lint, NullAway, Animal Sniffer (nessuna API Java assente da Android 11 nei moduli Java).
 - **GitHub Actions** su ogni push e pull request, con i test strumentati su un emulatore prima del merge nella branch principale.
 
 ## Roadmap
@@ -74,18 +74,19 @@ Dopo la v1: animazioni, poi nuovi contenuti.
 
 ## Compilare ed eseguire
 
-Servono Android Studio, il JDK 17 e un dispositivo o un emulatore con Android 11 (API 30) o successivo. Si apre la cartella del progetto in Android Studio e si avvia la configurazione `app`, oppure da terminale:
+Servono Android Studio, il JDK 21 e un dispositivo o un emulatore con Android 11 (API 30) o successivo. Si apre la cartella del progetto in Android Studio e si avvia la configurazione `app`, oppure da terminale:
 
 ```bash
 ./gradlew assembleDebug        # compila l'APK di debug
 ./gradlew testDebugUnitTest    # esegue i test unitari
+./gradlew spotlessApply        # formatta il codice
 ```
 
 Su Windows si usa `gradlew.bat` al posto di `./gradlew`.
 
 ## Tecnologie
 
-Java · Android SDK (minimo API 30) · AndroidX e Material Components · [SquidLib](https://github.com/yellowstonegames/SquidLib) per generazione delle mappe, percorsi e campo visivo · GitHub Actions. Con il refactoring: Hilt, JUnit 5, ArchUnit, jqwik, PIT, JaCoCo, Spotless, NullAway.
+Java 21 · Android SDK (minimo API 30) · AndroidX e Material Components · [SquidLib](https://github.com/yellowstonegames/SquidLib) per generazione delle mappe, percorsi e campo visivo · GitHub Actions. Con il refactoring: Hilt, JUnit 5, ArchUnit, jqwik, PIT, JaCoCo, Spotless, NullAway, Animal Sniffer.
 
 ## Autore
 
