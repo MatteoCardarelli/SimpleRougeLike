@@ -1,5 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
@@ -20,12 +22,15 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import io.github.matteocardarelli.simpleroguelike.ai.EnemyIntent;
+import io.github.matteocardarelli.simpleroguelike.ai.StepIntent;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Actor;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Inventory;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
+import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -126,6 +131,84 @@ class ArchitectureTest {
                     "random");
 
     @ArchTest
+    static final ArchRule portsUseOnlyTileTypeAndKernel =
+            classes()
+                    .that()
+                    .resideInAPackage(BASE + ".port..")
+                    .should()
+                    .onlyDependOnClassesThat(
+                            resideInAnyPackage(
+                                            "java..",
+                                            "org.jspecify.annotations..",
+                                            BASE + ".port..",
+                                            BASE + ".model..",
+                                            BASE + ".random..")
+                                    .or(equivalentTo(TileType.class)))
+                    .because(
+                            "le porte scambiano solo valori: un adapter non deve vedere il piano né"
+                                    + " gli attori, così cambiare libreria non tocca le regole");
+
+    @ArchTest
+    static final ArchRule generationUsesOnlyPortsDungeonAndKernel =
+            onlyDependOn(
+                    "generation",
+                    "la generazione chiede il terreno a una porta e popola il piano, senza"
+                            + " conoscere regole o contenuti concreti",
+                    "port",
+                    "dungeon",
+                    "model",
+                    "event",
+                    "random");
+
+    @ArchTest
+    static final ArchRule aiUsesOnlyPortsDungeonAndKernel =
+            onlyDependOn(
+                    "ai",
+                    "le strategie dei nemici decidono e basta: non conoscono le regole che"
+                            + " eseguono le loro intenzioni",
+                    "port",
+                    "dungeon",
+                    "model",
+                    "event",
+                    "random");
+
+    @ArchTest
+    static final ArchRule runUsesOnlyGenerationDungeonAndKernel =
+            onlyDependOn(
+                    "run",
+                    "la partita tiene lo stato e crea il piano, le regole del turno stanno"
+                            + " altrove",
+                    "generation",
+                    "dungeon",
+                    "model",
+                    "event",
+                    "random");
+
+    @ArchTest
+    static final ArchRule aiSeesOnlyTheReadOnlyFloor =
+            noClasses()
+                    .that()
+                    .resideInAnyPackage(BASE + ".ai..", BASE + ".port..")
+                    .should()
+                    .dependOnClassesThat()
+                    .belongToAnyOf(Floor.class)
+                    .because(
+                            "le strategie ricevono FloorView, di sola lettura: una strategia che"
+                                    + " sposta o colpisce da sola aggirerebbe le regole");
+
+    @ArchTest
+    static final ArchRule intentsInterpretedOnlyBySession =
+            noClasses()
+                    .that()
+                    .resideOutsideOfPackage(BASE + ".session..")
+                    .should()
+                    .callMethod(StepIntent.class, "direction")
+                    .because(
+                            "un'intenzione si esegue in un solo punto, con uno switch esaustivo che"
+                                    + " il compilatore controlla: interpretarla altrove"
+                                    + " duplicherebbe la regola");
+
+    @ArchTest
     static final ArchRule noFrameworks =
             noClasses()
                     .should()
@@ -170,11 +253,12 @@ class ArchitectureTest {
     @ArchTest
     static final ArchRule noInstanceofOnPolymorphicHierarchies =
             classes()
-                    .should(notCheckInstanceofOf(GameEvent.class, Actor.class))
+                    .should(notCheckInstanceofOf(GameEvent.class, Actor.class, EnemyIntent.class))
                     .because(
-                            "gli eventi si interpretano con un registro per classe e gli attori"
-                                    + " con i loro metodi: un instanceof andrebbe aggiornato a"
-                                    + " ogni tipo nuovo, e il compilatore non lo segnalerebbe");
+                            "gli eventi si interpretano con un registro per classe, gli attori con"
+                                    + " i loro metodi e le intenzioni con uno switch esaustivo: un"
+                                    + " instanceof andrebbe aggiornato a ogni tipo nuovo, e il"
+                                    + " compilatore non lo segnalerebbe");
 
     @ArchTest
     static final ArchRule damageOnlyFromDungeonAndRules =
@@ -256,11 +340,13 @@ class ArchitectureTest {
                     .that()
                     .implement(GameEvent.class)
                     .or()
+                    .implement(EnemyIntent.class)
+                    .or()
                     .haveSimpleNameEndingWith("Definition")
                     .should(beRecordOrEnumOr())
                     .because(
-                            "eventi e definizioni sono condivisi tra turni e oggetti diversi:"
-                                    + " devono essere immutabili");
+                            "eventi, intenzioni e definizioni sono condivisi tra turni e oggetti"
+                                    + " diversi: devono essere immutabili");
 
     @ArchTest
     static final ArchRule everyPackageIsNullMarked =
