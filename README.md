@@ -66,7 +66,7 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI, su ogni push e
 - [x] **0. Preparazione:** configurazione di build condivisa, dipendenze ripulite, formattazione automatica, CI su tutte le branch.
 - [x] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
 - [x] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
-- [ ] **4. `:application`:** turni completi, comandi, stati della partita.
+- [x] **4. `:application`:** turni completi, comandi, stati della partita.
 - [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore, poi Hilt e MVVM, il nuovo rendering e le funzionalità nuove.
 - [ ] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
