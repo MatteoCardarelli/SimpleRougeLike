@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Le note di collaudo si scrivono solo nelle build di debug: vedi src/debug -->
+    <bool name="feedback_enabled">false</bool>
+</resources>

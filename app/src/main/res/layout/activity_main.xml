@@ -44,6 +44,20 @@
 
     </LinearLayout>
 
+    <!-- Il pulsante delle note di collaudo: visibile solo nelle build di debug -->
+    <Button
+        android:id="@+id/feedback_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:text="@string/feedback_button"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <!-- Il messaggio di fine partita: un doppio tap ne inizia un'altra -->
     <TextView
         android:id="@+id/end_message"

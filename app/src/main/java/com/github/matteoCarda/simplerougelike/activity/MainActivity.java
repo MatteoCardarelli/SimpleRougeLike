@@ -1,21 +1,26 @@
 package com.github.matteoCarda.simplerougelike.activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import com.github.matteoCarda.simplerougelike.BuildConfig;
 import com.github.matteoCarda.simplerougelike.R;
 import com.github.matteoCarda.simplerougelike.view.GameView;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
+import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackEntry;
+import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
@@ -24,14 +29,25 @@ import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
+import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackDialog;
+import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackHost;
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Activity principale dell'app. Ospita la GameView, trasforma gli swipe in comandi per la sessione
  * di gioco e mostra il risultato di ogni turno. La partita sta nel {@link SessionViewModel}, che
  * sopravvive alla rotazione.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FeedbackHost {
+
+    private static final String TAG = "MainActivity";
+    private static final DateTimeFormatter NOTE_TIME =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT);
 
     private SessionViewModel viewModel;
     private GameView gameView;
@@ -57,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
         endMessage = findViewById(R.id.end_message);
         inventoryLayout = findViewById(R.id.inventory_layout);
         inventoryItemList = findViewById(R.id.inventory_item_list);
+
+        // Le note di collaudo si scrivono solo nelle build di debug.
+        View feedbackButton = findViewById(R.id.feedback_button);
+        if (getResources().getBoolean(R.bool.feedback_enabled)) {
+            feedbackButton.setVisibility(View.VISIBLE);
+            feedbackButton.setOnClickListener(v -> showFeedbackDialog());
+        }
 
         // NUOVO SISTEMA PER GESTIRE IL TASTO "INDIETRO"
         getOnBackPressedDispatcher()
@@ -271,6 +294,39 @@ public class MainActivity extends AppCompatActivity {
 
         // Ridisegna la GameView
         gameView.show(snapshot);
+    }
+
+    /** Apre la finestra della nota, se non è già aperta: non consuma il turno. */
+    private void showFeedbackDialog() {
+        if (getSupportFragmentManager().findFragmentByTag(FeedbackDialog.TAG) == null) {
+            new FeedbackDialog().show(getSupportFragmentManager(), FeedbackDialog.TAG);
+        }
+    }
+
+    /**
+     * Salva la nota con la partita di adesso nella memoria privata dell'app, da dove si legge con
+     * ./gradlew :app:pullFeedback.
+     */
+    @Override
+    public void onFeedbackWritten(String text) {
+        String trimmed = text.trim();
+        if (trimmed.isEmpty()) {
+            Toast.makeText(this, R.string.feedback_empty, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        FeedbackEntry entry =
+                viewModel.feedback(
+                        trimmed,
+                        LocalDateTime.now().format(NOTE_TIME),
+                        BuildConfig.VERSION_NAME,
+                        BuildConfig.GIT_COMMIT);
+        try {
+            new FeedbackStore(new File(getFilesDir(), "feedback")).save(entry);
+            Toast.makeText(this, R.string.feedback_saved, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Log.e(TAG, "Nota di collaudo non salvata", e);
+            Toast.makeText(this, R.string.feedback_failed, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void showEndMessage(int message) {

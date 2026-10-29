@@ -4,4 +4,12 @@
     <string name="inventory_empty">Il tuo inventario è vuoto.</string>
     <string name="end_game_over">Sei morto.\nDoppio tap per una nuova partita.</string>
     <string name="end_victory">Hai sconfitto tutti i nemici!\nDoppio tap per una nuova partita.</string>
+    <string name="feedback_button">Nota</string>
+    <string name="feedback_title">Nota di collaudo</string>
+    <string name="feedback_hint">Cosa hai notato?</string>
+    <string name="feedback_save">Salva</string>
+    <string name="feedback_cancel">Annulla</string>
+    <string name="feedback_saved">Nota salvata</string>
+    <string name="feedback_empty">Nota vuota: non salvata</string>
+    <string name="feedback_failed">Impossibile salvare la nota</string>
 </resources>

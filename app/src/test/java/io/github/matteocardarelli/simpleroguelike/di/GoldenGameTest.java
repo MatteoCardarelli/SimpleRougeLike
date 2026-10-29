@@ -6,8 +6,8 @@ import io.github.matteocardarelli.simpleroguelike.command.Command;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.event.EventLogWriter;
+import io.github.matteocardarelli.simpleroguelike.feedback.CommandLogFormat;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
-import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
 import io.github.matteocardarelli.simpleroguelike.random.SeededRandomSource;
@@ -42,6 +42,7 @@ class GoldenGameTest {
     private static final long SEED = 20_261_029L;
     private static final int MAX_COMMANDS = 400;
     private static final String FILE = "standard-game.txt";
+    private static final CommandLogFormat FORMAT = new CommandLogFormat();
 
     @Test
     void standardGame_matchesGoldenLog() throws IOException {
@@ -122,9 +123,8 @@ class GoldenGameTest {
     private static Choice next(GameSnapshot snapshot, Direction heading, boolean stuck) {
         PlayerView player = snapshot.player();
         if (player.health() * 2 < player.maxHealth() && !snapshot.inventory().isEmpty()) {
-            EntityId item = snapshot.inventory().get(0).id();
-            return new Choice(
-                    new UseItemCommand(item), "use item=" + item.value(), Optional.empty());
+            UseItemCommand use = new UseItemCommand(snapshot.inventory().get(0).id());
+            return new Choice(use, FORMAT.line(use), Optional.empty());
         }
         Optional<ActorView> target =
                 snapshot.visibleEnemies().stream()
@@ -142,16 +142,10 @@ class GoldenGameTest {
         return Direction.values()[random.nextInt(Direction.values().length)];
     }
 
-    /** Il nome scritto a mano: quello di una costante può cambiare con R8 sul telefono. */
+    /** La riga è quella delle note di collaudo: lo stesso formato, scritto a mano. */
     private static Choice move(Direction direction) {
-        String name =
-                switch (direction) {
-                    case UP -> "up";
-                    case DOWN -> "down";
-                    case LEFT -> "left";
-                    case RIGHT -> "right";
-                };
-        return new Choice(new MoveCommand(direction), "move " + name, Optional.of(direction));
+        MoveCommand move = new MoveCommand(direction);
+        return new Choice(move, FORMAT.line(move), Optional.of(direction));
     }
 
     private static Direction towards(Position from, Position to) {

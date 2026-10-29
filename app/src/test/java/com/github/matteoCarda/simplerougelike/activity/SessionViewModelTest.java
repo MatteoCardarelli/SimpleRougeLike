@@ -6,13 +6,21 @@ import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.di.GameConfig;
 import io.github.matteocardarelli.simpleroguelike.di.GameSessionFactory;
+import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackEntry;
+import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackReplay;
+import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
 import io.github.matteocardarelli.simpleroguelike.generation.FixedFloorSource;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class SessionViewModelTest {
 
@@ -138,6 +146,40 @@ class SessionViewModelTest {
         viewModel.newGame();
 
         assertThat(viewModel.isInventoryOpen()).isFalse();
+    }
+
+    /** Una nota salvata e riletta basta a rigiocare la partita fino allo stesso stato. */
+    @Test
+    void feedback_savedAndReplayed_reachesTheSameState(@TempDir Path directory) throws IOException {
+        SessionViewModel viewModel = viewModel();
+        for (Direction direction :
+                List.of(Direction.UP, Direction.UP, Direction.RIGHT, Direction.DOWN)) {
+            viewModel.handle(new MoveCommand(direction));
+        }
+        viewModel.toggleInventory();
+
+        FeedbackEntry note = viewModel.feedback("prova", "2026-10-29T10:15:03", "1.0", "abc");
+        File file = new FeedbackStore(directory.toFile()).save(note);
+        FeedbackReplay.Result replay = FeedbackReplay.play(FeedbackStore.read(file));
+
+        assertThat(note.seed()).isEqualTo(100);
+        assertThat(note.commands())
+                .containsExactly("move up", "move up", "move right", "move down");
+        assertThat(note.inventoryOpen()).isTrue();
+        assertThat(FeedbackReplay.differences(note, replay.last().snapshot())).isEmpty();
+    }
+
+    @Test
+    void feedback_afterNewGame_hasOnlyTheNewGame() {
+        SessionViewModel viewModel = viewModel();
+        viewModel.handle(new MoveCommand(Direction.UP));
+
+        viewModel.newGame();
+        FeedbackEntry note = viewModel.feedback("prova", "t", "1.0", "abc");
+
+        assertThat(note.seed()).isEqualTo(101);
+        assertThat(note.commands()).isEmpty();
+        assertThat(note.turn()).isEqualTo(1);
     }
 
     private SessionViewModel drawn(String... rows) {
