@@ -20,4 +20,20 @@ android {
         // Errori del codice scritto prima del refactoring: il file sparisce con quel codice.
         baseline = file("lint-baseline.xml")
     }
+    testOptions {
+        // I test sulla JVM usano JUnit 5, come nei moduli Java: basta la piattaforma di JUnit,
+        // senza plugin. I test strumentati restano su JUnit 4, come vuole AndroidX Test.
+        unitTests.all { it.useJUnitPlatform() }
+    }
+}
+
+val libs = the<VersionCatalogsExtension>().named("libs")
+fun lib(alias: String) = libs.findLibrary(alias).get()
+
+dependencies {
+    testImplementation(platform(lib("junit-bom")))
+    testImplementation(lib("junit-jupiter"))
+    testImplementation(lib("assertj-core"))
+    testImplementation(lib("archunit-junit5"))
+    testRuntimeOnly(lib("junit-platform-launcher"))
 }
