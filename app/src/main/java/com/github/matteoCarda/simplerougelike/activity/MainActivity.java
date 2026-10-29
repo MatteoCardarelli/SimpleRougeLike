@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.github.matteoCarda.simplerougelike.R;
@@ -16,6 +17,7 @@ import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                                 // Qui mettiamo la stessa logica di prima:
                                 // controlliamo se l'inventario è visibile.
 
-                                if (inventoryLayout.getVisibility() == View.VISIBLE) {
+                                if (viewModel.isInventoryOpen()) {
                                     // Se l'inventario è aperto, lo chiudiamo.
                                     closeInventory();
                                 } else {
@@ -87,10 +89,14 @@ public class MainActivity extends AppCompatActivity {
         render(viewModel.current());
     }
 
+    /**
+     * Passa ogni tocco al gestore dei gesti prima che arrivi alle viste: con l'inventario aperto la
+     * lista scorrevole consumerebbe i tocchi, e il doppio tap non arriverebbe mai.
+     */
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // Passa l'evento al gestore di swipe.
-        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        boolean gesture = gestureDetector.onTouchEvent(event);
+        return super.dispatchTouchEvent(event) || gesture;
     }
 
     /** Configura il GestureDetector per tradurre gli swipe in comandi di gioco. */
@@ -134,14 +140,31 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public boolean onDoubleTap(MotionEvent e) {
                                 // A partita finita il doppio tap ne inizia una nuova; durante la
-                                // partita apre o chiude l'inventario.
+                                // partita apre o chiude l'inventario, anche sopra la lista.
                                 if (viewModel.current().snapshot().phase() != Phase.PLAYING) {
                                     render(viewModel.newGame());
-                                } else if (inventoryLayout.getVisibility() == View.VISIBLE) {
-                                    closeInventory();
                                 } else {
-                                    openInventory();
+                                    viewModel.toggleInventory();
+                                    render(viewModel.current());
                                 }
+                                return true;
+                            }
+
+                            /**
+                             * Un oggetto si usa con un tocco singolo confermato, che arriva solo
+                             * quando il tempo del doppio tap è scaduto: un doppio tap sopra una
+                             * pozione chiude l'inventario senza usarla.
+                             */
+                            @Override
+                            public boolean onSingleTapConfirmed(MotionEvent e) {
+                                if (!viewModel.isInventoryOpen()) {
+                                    return false;
+                                }
+                                EntityId item = itemAt(e.getRawX(), e.getRawY());
+                                if (item == null) {
+                                    return false;
+                                }
+                                render(viewModel.handle(new UseItemCommand(item)));
                                 return true;
                             }
                         });
@@ -149,16 +172,41 @@ public class MainActivity extends AppCompatActivity {
 
     /** Con l'inventario aperto la partita è in pausa: gli swipe non fanno niente. */
     private void move(Direction direction) {
-        if (inventoryLayout.getVisibility() != View.VISIBLE) {
+        if (!viewModel.isInventoryOpen()) {
             render(viewModel.handle(new MoveCommand(direction)));
         }
     }
 
-    private void openInventory() {
+    /** L'oggetto della lista sotto il punto toccato, in coordinate dello schermo. */
+    private @Nullable EntityId itemAt(float screenX, float screenY) {
+        int[] origin = new int[2];
+        for (int i = 0; i < inventoryItemList.getChildCount(); i++) {
+            View child = inventoryItemList.getChildAt(i);
+            if (child.getTag() instanceof EntityId id) {
+                child.getLocationOnScreen(origin);
+                if (screenX >= origin[0]
+                        && screenX < origin[0] + child.getWidth()
+                        && screenY >= origin[1]
+                        && screenY < origin[1] + child.getHeight()) {
+                    return id;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Mostra l'inventario con gli oggetti dello snapshot, oppure lo nasconde. */
+    private void showInventory(GameSnapshot snapshot) {
+        if (!viewModel.isInventoryOpen()) {
+            // Aprirlo e chiuderlo non tocca la partita.
+            inventoryLayout.setVisibility(View.GONE);
+            return;
+        }
+
         // Pulisci la lista da eventuali oggetti precedenti
         inventoryItemList.removeAllViews();
 
-        List<InventoryEntry> inventory = viewModel.current().snapshot().inventory();
+        List<InventoryEntry> inventory = snapshot.inventory();
 
         if (inventory.isEmpty()) {
             // Se l'inventario è vuoto, mostra un semplice testo
@@ -167,22 +215,17 @@ public class MainActivity extends AppCompatActivity {
             emptyText.setTextColor(getColor(android.R.color.white));
             inventoryItemList.addView(emptyText);
         } else {
-            // Popola la lista creando un TextView per ogni oggetto
+            // Popola la lista creando un TextView per ogni oggetto. Il tocco lo riconosce il
+            // gestore dei gesti dall'id nel tag: un OnClickListener scatterebbe anche al primo
+            // tocco di un doppio tap.
             for (InventoryEntry entry : inventory) {
                 TextView itemView = new TextView(this);
                 itemView.setText(itemName(entry.kind()));
                 itemView.setTextColor(getColor(android.R.color.white));
                 itemView.setTextSize(20);
                 itemView.setPadding(0, 8, 0, 8);
-                itemView.setBackgroundResource(
-                        android.R.drawable.btn_default); // Semplice sfondo cliccabile
-
-                // Imposta l'azione al click: usare un oggetto consuma il turno
-                itemView.setOnClickListener(
-                        v -> {
-                            closeInventory(); // Chiudi l'inventario dopo aver usato l'oggetto
-                            render(viewModel.handle(new UseItemCommand(entry.id())));
-                        });
+                itemView.setBackgroundResource(android.R.drawable.btn_default);
+                itemView.setTag(entry.id());
 
                 inventoryItemList.addView(itemView);
             }
@@ -193,8 +236,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void closeInventory() {
-        // Nascondi la schermata dell'inventario: aprirla e chiuderla non tocca la partita.
-        inventoryLayout.setVisibility(View.GONE);
+        viewModel.closeInventory();
+        render(viewModel.current());
     }
 
     private String itemName(Kind kind) {
@@ -204,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
         return kind.value();
     }
 
-    /** Aggiorna tutta la UI con il risultato di un turno. */
+    /** Aggiorna tutta la UI con il risultato di un turno e con lo stato dell'inventario. */
     private void render(TurnResult result) {
         GameSnapshot snapshot = result.snapshot();
         PlayerView player = snapshot.player();
@@ -223,12 +266,14 @@ public class MainActivity extends AppCompatActivity {
             case VICTORY -> showEndMessage(R.string.end_victory);
         }
 
+        // L'inventario segue il ViewModel: dopo una rotazione si riapre da solo.
+        showInventory(snapshot);
+
         // Ridisegna la GameView
         gameView.show(snapshot);
     }
 
     private void showEndMessage(int message) {
-        closeInventory();
         endMessage.setText(message);
         endMessage.setVisibility(View.VISIBLE);
     }

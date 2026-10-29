@@ -3,10 +3,14 @@ package com.github.matteoCarda.simplerougelike.activity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
+import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.di.GameConfig;
 import io.github.matteocardarelli.simpleroguelike.di.GameSessionFactory;
+import io.github.matteocardarelli.simpleroguelike.generation.FixedFloorSource;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
+import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 
@@ -59,5 +63,86 @@ class SessionViewModelTest {
 
         assertThat(result.snapshot().seed()).isEqualTo(101);
         assertThat(result.snapshot().turn()).isEqualTo(1);
+    }
+
+    @Test
+    void toggleInventory_opensThenCloses() {
+        SessionViewModel viewModel = viewModel();
+
+        viewModel.toggleInventory();
+        boolean afterFirst = viewModel.isInventoryOpen();
+        viewModel.toggleInventory();
+
+        assertThat(afterFirst).isTrue();
+        assertThat(viewModel.isInventoryOpen()).isFalse();
+    }
+
+    /** L'inventario resta aperto dopo l'uso di un oggetto, con la lista aggiornata. */
+    @Test
+    void handle_usingAPotion_keepsTheInventoryOpen() {
+        // Senza nemici la partita sarebbe già vinta: il goblin la tiene aperta.
+        SessionViewModel viewModel = drawn("############", "#@!.......g#", "############");
+        viewModel.handle(new MoveCommand(Direction.RIGHT));
+        EntityId potion = viewModel.current().snapshot().inventory().get(0).id();
+        viewModel.toggleInventory();
+
+        TurnResult result = viewModel.handle(new UseItemCommand(potion));
+
+        assertThat(viewModel.isInventoryOpen()).isTrue();
+        assertThat(result.snapshot().inventory()).isEmpty();
+    }
+
+    /** Bug #16: lo stato aperto è del ViewModel, quindi una rotazione non lo perde. */
+    @Test
+    void isInventoryOpen_isKeptByTheViewModelAcrossReads() {
+        SessionViewModel viewModel = viewModel();
+        viewModel.toggleInventory();
+
+        TurnResult again = viewModel.current();
+
+        assertThat(viewModel.isInventoryOpen()).isTrue();
+        assertThat(again.snapshot().phase()).isEqualTo(Phase.PLAYING);
+    }
+
+    @Test
+    void handle_whenThePlayerDies_closesTheInventory() {
+        SessionViewModel viewModel = drawn("#####", "#g@g#", "##g##", "#####");
+        viewModel.toggleInventory();
+
+        // Contro il muro il player aspetta, e i tre goblin attaccano a ogni turno.
+        for (int i = 0; i < 50 && viewModel.current().snapshot().phase() == Phase.PLAYING; i++) {
+            viewModel.handle(new MoveCommand(Direction.UP));
+        }
+
+        assertThat(viewModel.current().snapshot().phase()).isEqualTo(Phase.GAME_OVER);
+        assertThat(viewModel.isInventoryOpen()).isFalse();
+    }
+
+    @Test
+    void toggleInventory_afterTheGameEnded_staysClosed() {
+        SessionViewModel viewModel = drawn("#####", "#g@g#", "##g##", "#####");
+        for (int i = 0; i < 50 && viewModel.current().snapshot().phase() == Phase.PLAYING; i++) {
+            viewModel.handle(new MoveCommand(Direction.UP));
+        }
+
+        viewModel.toggleInventory();
+
+        assertThat(viewModel.isInventoryOpen()).isFalse();
+    }
+
+    @Test
+    void newGame_closesTheInventory() {
+        SessionViewModel viewModel = viewModel();
+        viewModel.toggleInventory();
+
+        viewModel.newGame();
+
+        assertThat(viewModel.isInventoryOpen()).isFalse();
+    }
+
+    private SessionViewModel drawn(String... rows) {
+        return new SessionViewModel(
+                GameSessionFactory.create(GameConfig.standard(), new FixedFloorSource(rows)),
+                seeds::getAndIncrement);
     }
 }
