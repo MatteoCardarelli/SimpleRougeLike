@@ -33,13 +33,17 @@ public final class FloorFixtures {
     }
 
     public static Floor parse(int inventoryCapacity, String... rows) {
+        return parse(new EntityIdSequence(), inventoryCapacity, rows);
+    }
+
+    /** Come {@link #parse(String...)}, prendendo gli id da una sequenza esistente. */
+    public static Floor parse(EntityIdSequence ids, int inventoryCapacity, String... rows) {
         if (rows.length == 0) {
             throw new IllegalArgumentException("Serve almeno una riga");
         }
         int width = rows[0].length();
         int height = rows.length;
         List<TileType> tiles = new ArrayList<>(width * height);
-        EntityIdSequence ids = new EntityIdSequence();
         FloorBuilder builder = new FloorBuilder();
         for (int y = 0; y < height; y++) {
             if (rows[y].length() != width) {
