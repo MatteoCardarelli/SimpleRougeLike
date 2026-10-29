@@ -9,45 +9,50 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import com.github.matteoCarda.simplerougelike.R;
-import com.github.matteoCarda.simplerougelike.controller.GameController;
-import com.github.matteoCarda.simplerougelike.controller.GameUpdateListener;
-import com.github.matteoCarda.simplerougelike.model.entity.Item;
-import com.github.matteoCarda.simplerougelike.model.entity.Player;
 import com.github.matteoCarda.simplerougelike.view.GameView;
+import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
+import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
+import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
+import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.model.Kind;
+import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
+import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
+import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
+import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
+import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import java.util.List;
 
 /**
- * Activity principale dell'app. Ospita la GameView e cattura l'input dell'utente (swipe) per
- * passarlo al GameController.
+ * Activity principale dell'app. Ospita la GameView, trasforma gli swipe in comandi per la sessione
+ * di gioco e mostra il risultato di ogni turno. La partita sta nel {@link SessionViewModel}, che
+ * sopravvive alla rotazione.
  */
-public class MainActivity extends AppCompatActivity implements GameUpdateListener {
+public class MainActivity extends AppCompatActivity {
 
-    private GameController gameController;
+    private SessionViewModel viewModel;
     private GameView gameView;
     private GestureDetector gestureDetector;
     private ProgressBar healthBar;
     private ProgressBar xpBar;
+    private TextView endMessage;
     private LinearLayout inventoryLayout;
     private LinearLayout inventoryItemList;
-    private static final int MAP_WIDTH = 50;
-    private static final int MAP_HEIGHT = 50;
-    private static final int ENEMY_COUNT = 20;
-    private static final int ITEM_COUNT = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inizializzazione dei componenti principali
-        gameController = GameController.getInstance();
-        gameController.setGameUpdateListener(this);
+        // La partita è del ViewModel: dopo una rotazione si riprende quella in corso.
+        viewModel = new ViewModelProvider(this).get(SessionViewModel.class);
         gameView = findViewById(R.id.gameView);
 
-        // Trova le barre di stato nel layout e le passa al controller
+        // Trova le barre di stato nel layout
         healthBar = findViewById(R.id.healthBar);
         xpBar = findViewById(R.id.xpBar);
+        endMessage = findViewById(R.id.end_message);
         inventoryLayout = findViewById(R.id.inventory_layout);
         inventoryItemList = findViewById(R.id.inventory_item_list);
 
@@ -77,17 +82,9 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
                             }
                         });
 
-        if (savedInstanceState == null
-                || gameController.getGameState() != GameController.GameState.PLAYING) {
-            // Inizia una NUOVA partita SOLO se:
-            // 1. L'app è stata appena avviata.
-            // 2. O se la partita precedente era finita.
-            gameController.startNewGame(MAP_WIDTH, MAP_HEIGHT, ENEMY_COUNT, ITEM_COUNT);
-        }
-
         // Imposta il listener per gli swipe.
         setupGestureDetector();
-        onGameUpdated();
+        render(viewModel.current());
     }
 
     @Override
@@ -120,26 +117,14 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
                                     // Swipe orizzontale
                                     if (Math.abs(diffX) > SWIPE_THRESHOLD
                                             && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                                        if (diffX > 0) {
-                                            gameController.handlePlayerTurn(
-                                                    GameController.Direction.RIGHT);
-                                        } else {
-                                            gameController.handlePlayerTurn(
-                                                    GameController.Direction.LEFT);
-                                        }
+                                        move(diffX > 0 ? Direction.RIGHT : Direction.LEFT);
                                         return true;
                                     }
                                 } else {
                                     // Swipe verticale
                                     if (Math.abs(diffY) > SWIPE_THRESHOLD
                                             && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                                        if (diffY > 0) {
-                                            gameController.handlePlayerTurn(
-                                                    GameController.Direction.DOWN);
-                                        } else {
-                                            gameController.handlePlayerTurn(
-                                                    GameController.Direction.UP);
-                                        }
+                                        move(diffY > 0 ? Direction.DOWN : Direction.UP);
                                         return true;
                                     }
                                 }
@@ -148,52 +133,55 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
 
                             @Override
                             public boolean onDoubleTap(MotionEvent e) {
-                                // L'utente ha espresso l'intento di "interagire con l'inventario"
-                                if (gameController.getGameState()
-                                        == GameController.GameState.PLAYING) {
-                                    openInventory(); // openInventory ora chiama
-                                    // requestOpenInventory()
-                                } else if (gameController.getGameState()
-                                        == GameController.GameState.PAUSED) {
-                                    closeInventory(); // closeInventory ora chiama
-                                    // requestCloseInventory()
+                                // A partita finita il doppio tap ne inizia una nuova; durante la
+                                // partita apre o chiude l'inventario.
+                                if (viewModel.current().snapshot().phase() != Phase.PLAYING) {
+                                    render(viewModel.newGame());
+                                } else if (inventoryLayout.getVisibility() == View.VISIBLE) {
+                                    closeInventory();
+                                } else {
+                                    openInventory();
                                 }
                                 return true;
                             }
                         });
     }
 
-    private void openInventory() {
-        // Mettiamo in pausa il gioco
-        gameController.requestOpenInventory();
+    /** Con l'inventario aperto la partita è in pausa: gli swipe non fanno niente. */
+    private void move(Direction direction) {
+        if (inventoryLayout.getVisibility() != View.VISIBLE) {
+            render(viewModel.handle(new MoveCommand(direction)));
+        }
+    }
 
+    private void openInventory() {
         // Pulisci la lista da eventuali oggetti precedenti
         inventoryItemList.removeAllViews();
 
-        List<Item> inventory = gameController.getGameMap().getPlayer().getInventory();
+        List<InventoryEntry> inventory = viewModel.current().snapshot().inventory();
 
         if (inventory.isEmpty()) {
             // Se l'inventario è vuoto, mostra un semplice testo
             TextView emptyText = new TextView(this);
-            emptyText.setText("Il tuo inventario è vuoto.");
-            emptyText.setTextColor(getResources().getColor(android.R.color.white, null));
+            emptyText.setText(R.string.inventory_empty);
+            emptyText.setTextColor(getColor(android.R.color.white));
             inventoryItemList.addView(emptyText);
         } else {
             // Popola la lista creando un TextView per ogni oggetto
-            for (Item item : inventory) {
+            for (InventoryEntry entry : inventory) {
                 TextView itemView = new TextView(this);
-                itemView.setText(item.getName());
-                itemView.setTextColor(getResources().getColor(android.R.color.white));
+                itemView.setText(itemName(entry.kind()));
+                itemView.setTextColor(getColor(android.R.color.white));
                 itemView.setTextSize(20);
                 itemView.setPadding(0, 8, 0, 8);
                 itemView.setBackgroundResource(
                         android.R.drawable.btn_default); // Semplice sfondo cliccabile
 
-                // Imposta l'azione al click
+                // Imposta l'azione al click: usare un oggetto consuma il turno
                 itemView.setOnClickListener(
                         v -> {
-                            gameController.useItemFromInventory(item);
                             closeInventory(); // Chiudi l'inventario dopo aver usato l'oggetto
+                            render(viewModel.handle(new UseItemCommand(entry.id())));
                         });
 
                 inventoryItemList.addView(itemView);
@@ -205,27 +193,43 @@ public class MainActivity extends AppCompatActivity implements GameUpdateListene
     }
 
     private void closeInventory() {
-        // Nascondi la schermata dell'inventario
+        // Nascondi la schermata dell'inventario: aprirla e chiuderla non tocca la partita.
         inventoryLayout.setVisibility(View.GONE);
-        // Riprendi il gioco
-        gameController.requestCloseInventory();
     }
 
-    @Override
-    public void onGameUpdated() {
-        // Questa funzione ora centralizza TUTTI gli aggiornamenti della UI// 1. Recupera i dati più
-        // recenti dal controller
-        Player player = gameController.getGameMap().getPlayer();
-        if (player == null) return; // Sicurezza
+    private String itemName(Kind kind) {
+        if (kind.equals(StandardItemCatalog.POTION)) {
+            return getString(R.string.kind_potion_name);
+        }
+        return kind.value();
+    }
 
-        // 2. Aggiorna le ProgressBar
-        healthBar.setMax(player.getMaxHealth());
-        healthBar.setProgress(player.getHealth());
+    /** Aggiorna tutta la UI con il risultato di un turno. */
+    private void render(TurnResult result) {
+        GameSnapshot snapshot = result.snapshot();
+        PlayerView player = snapshot.player();
 
-        xpBar.setMax(player.getExperienceToNextLevel());
-        xpBar.setProgress(player.getExperience());
+        // Aggiorna le ProgressBar
+        healthBar.setMax(player.maxHealth());
+        healthBar.setProgress(player.health());
 
-        // 3. Ridisegna la GameView
-        gameView.invalidate();
+        xpBar.setMax(player.experienceToNextLevel());
+        xpBar.setProgress(player.experience());
+
+        // A partita finita resta solo il messaggio, finché un doppio tap non ne inizia un'altra.
+        switch (snapshot.phase()) {
+            case PLAYING -> endMessage.setVisibility(View.GONE);
+            case GAME_OVER -> showEndMessage(R.string.end_game_over);
+            case VICTORY -> showEndMessage(R.string.end_victory);
+        }
+
+        // Ridisegna la GameView
+        gameView.show(snapshot);
+    }
+
+    private void showEndMessage(int message) {
+        closeInventory();
+        endMessage.setText(message);
+        endMessage.setVisibility(View.VISIBLE);
     }
 }

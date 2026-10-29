@@ -79,17 +79,6 @@
     </issue>
 
     <issue
-        id="SetTextI18n"
-        message="String literal in `setText` can not be translated. Use Android resources instead."
-        errorLine1="            emptyText.setText(&quot;Il tuo inventario è vuoto.&quot;);"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/github/matteoCarda/simplerougelike/activity/MainActivity.java"
-            line="178"
-            column="31"/>
-    </issue>
-
-    <issue
         id="HardcodedText"
         message="Hardcoded string &quot;Inventario&quot;, should use `@string` resource"
         errorLine1="        android:text=&quot;Inventario&quot;"

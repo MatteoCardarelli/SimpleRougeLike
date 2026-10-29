@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SimpleRougeLike</string>
+    <string name="kind_potion_name">Pozione</string>
+    <string name="inventory_empty">Il tuo inventario è vuoto.</string>
+    <string name="end_game_over">Sei morto.\nDoppio tap per una nuova partita.</string>
+    <string name="end_victory">Hai sconfitto tutti i nemici!\nDoppio tap per una nuova partita.</string>
 </resources>
