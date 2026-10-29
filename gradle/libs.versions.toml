@@ -3,6 +3,7 @@ agp = "8.13.1"
 appcompat = "1.6.1"
 material = "1.10.0"
 lifecycle = "2.6.1"
+fragment = "1.3.6"
 squidlib = "3.0.6"
 junit4 = "4.13.2"
 mockito = "5.11.0"
@@ -28,6 +29,7 @@ pitest-junit5-plugin = "1.2.3"
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 squidlib-util = { module = "com.squidpony:squidlib-util", version.ref = "squidlib" }
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }

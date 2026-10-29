@@ -4,9 +4,15 @@ import androidx.lifecycle.ViewModel;
 import io.github.matteocardarelli.simpleroguelike.command.Command;
 import io.github.matteocardarelli.simpleroguelike.di.GameConfig;
 import io.github.matteocardarelli.simpleroguelike.di.GameSessionFactory;
+import io.github.matteocardarelli.simpleroguelike.feedback.CommandJournal;
+import io.github.matteocardarelli.simpleroguelike.feedback.CommandLogFormat;
+import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackEntry;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
+import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.function.LongSupplier;
 
@@ -25,6 +31,8 @@ public final class SessionViewModel extends ViewModel {
 
     private final GameSession session;
     private final LongSupplier seeds;
+    private final CommandJournal journal = new CommandJournal();
+    private final CommandLogFormat format = new CommandLogFormat();
     private boolean inventoryOpen;
 
     public SessionViewModel() {
@@ -39,7 +47,7 @@ public final class SessionViewModel extends ViewModel {
     SessionViewModel(GameSession session, LongSupplier seeds) {
         this.session = session;
         this.seeds = seeds;
-        session.newGame(seeds.getAsLong());
+        start();
     }
 
     /** L'ultimo risultato, senza giocare niente. */
@@ -52,6 +60,7 @@ public final class SessionViewModel extends ViewModel {
      * resta aperto, anche dopo aver usato un oggetto, finché la partita non finisce.
      */
     public TurnResult handle(Command command) {
+        journal.record(command);
         TurnResult result = session.handle(command);
         if (result.snapshot().phase() != Phase.PLAYING) {
             inventoryOpen = false;
@@ -62,7 +71,38 @@ public final class SessionViewModel extends ViewModel {
     /** Inizia una partita nuova con il seed successivo, con l'inventario chiuso. */
     public TurnResult newGame() {
         inventoryOpen = false;
-        return session.newGame(seeds.getAsLong());
+        return start();
+    }
+
+    /**
+     * Una nota di collaudo con il testo del giocatore e la partita di adesso: seed, comandi giocati
+     * dall'inizio, stato del player e dell'inventario.
+     */
+    public FeedbackEntry feedback(String text, String createdAt, String appVersion, String commit) {
+        TurnResult current = session.current();
+        GameSnapshot snapshot = current.snapshot();
+        List<String> commands = new ArrayList<>();
+        for (Command command : journal.commands()) {
+            commands.add(format.line(command));
+        }
+        return new FeedbackEntry(
+                createdAt,
+                appVersion,
+                commit,
+                journal.seed(),
+                snapshot.turn(),
+                current.revision(),
+                snapshot.phase(),
+                snapshot.player(),
+                inventoryOpen,
+                text,
+                commands);
+    }
+
+    private TurnResult start() {
+        long seed = seeds.getAsLong();
+        journal.start(seed);
+        return session.newGame(seed);
     }
 
     public boolean isInventoryOpen() {

@@ -1,9 +1,11 @@
 package io.github.matteocardarelli.simpleroguelike;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.InstanceofCheck;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaCodeUnit;
@@ -95,10 +97,50 @@ class AppArchitectureTest {
                     .because(
                             "adapter, contenuti, regole e handler si collegano in un solo posto:"
                                     + " l'interfaccia parla solo con la sessione, così una libreria"
-                                    + " o una regola si sostituisce senza toccarla")
-                    // Oggi il codice nuovo di :app è solo di: la regola vale per l'interfaccia
-                    // che lo raggiungerà.
-                    .allowEmptyShould(true);
+                                    + " o una regola si sostituisce senza toccarla");
+
+    @ArchTest
+    static final ArchRule feedbackUsesOnlyCommandSnapshotAndSession =
+            classes()
+                    .that()
+                    .resideInAPackage(BASE + ".feedback..")
+                    .should()
+                    .onlyDependOnClassesThat()
+                    .resideInAnyPackage(
+                            "java..",
+                            "org.jspecify.annotations..",
+                            BASE + ".feedback..",
+                            BASE + ".model..",
+                            BASE + ".event..",
+                            BASE + ".random..",
+                            BASE + ".command..",
+                            BASE + ".snapshot..",
+                            BASE + ".session..")
+                    .because(
+                            "le note di collaudo si scrivono e si rigiocano anche sulla JVM: niente"
+                                    + " Android, e della partita solo comandi, fotografia e"
+                                    + " risultati");
+
+    @ArchTest
+    static final ArchRule uiFeedbackUsesOnlyAndroidAndTheKernel =
+            classes()
+                    .that()
+                    .resideInAPackage(BASE + ".ui.feedback..")
+                    .should()
+                    .onlyDependOnClassesThat(
+                            resideInAnyPackage(
+                                            "java..",
+                                            "android..",
+                                            "androidx..",
+                                            "com.google.android.material..",
+                                            "org.jspecify.annotations..",
+                                            BASE + ".ui.feedback..",
+                                            BASE + ".model..",
+                                            BASE + ".event..")
+                                    .or(theRClass()))
+                    .because(
+                            "la finestra della nota raccoglie solo un testo: chi lo salva con la"
+                                    + " partita è l'Activity, attraverso FeedbackHost");
 
     @ArchTest
     static final ArchRule noInstanceofOnHierarchies =
@@ -137,6 +179,12 @@ class AppArchitectureTest {
                     .resideInAPackage(BASE + "..")
                     .should(resideInANullMarkedPackage())
                     .because("con @NullMarked un tipo senza annotazione non è mai null");
+
+    /** Le risorse generate da Android, che stanno nel package dell'app. */
+    private static DescribedPredicate<JavaClass> theRClass() {
+        return DescribedPredicate.describe(
+                "the generated R class", type -> type.getName().matches(".*\\.R(\\$.*)?"));
+    }
 
     private static ArchCondition<JavaClass> notCheckInstanceofOf(Class<?>... hierarchies) {
         return new ArchCondition<>("not check instanceof on closed or open hierarchies") {

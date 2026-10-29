@@ -4,6 +4,17 @@ plugins {
     id("srl.spotless")
 }
 
+// Il commit da cui è compilata l'app, con -dirty se ci sono modifiche non committate: una nota di
+// collaudo lo salva, e una partita si rigioca identica solo con lo stesso codice.
+val gitCommit = providers.exec {
+    commandLine("git", "rev-parse", "--short", "HEAD")
+    isIgnoreExitValue = true
+}.standardOutput.asText.map { it.trim().ifEmpty { "unknown" } }
+val gitDirty = providers.exec {
+    commandLine("git", "status", "--porcelain", "--untracked-files=no")
+    isIgnoreExitValue = true
+}.standardOutput.asText.map { it.isNotBlank() }
+
 android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -11,6 +22,11 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
+    }
+    defaultConfig {
+        val commit = gitCommit.get() + if (gitDirty.get()) "-dirty" else ""
+        buildConfigField("String", "GIT_COMMIT", "\"$commit\"")
     }
     lint {
         abortOnError = true
