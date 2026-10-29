@@ -3,7 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.run;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EntityIdSequence;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorView;
-import io.github.matteocardarelli.simpleroguelike.generation.FloorFactory;
+import io.github.matteocardarelli.simpleroguelike.generation.FloorSource;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorSpec;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
 import io.github.matteocardarelli.simpleroguelike.random.SeededRandomSource;
@@ -33,7 +33,7 @@ public final class Run {
     }
 
     /** Inizia una partita: dallo stesso seed esce sempre la stessa. */
-    public static Run start(long seed, FloorSpec spec, FloorFactory floors) {
+    public static Run start(long seed, FloorSpec spec, FloorSource floors) {
         SeededRandomSource root = new SeededRandomSource(seed);
         RandomSource generation = root.split();
         RandomSource gameplay = root.split();

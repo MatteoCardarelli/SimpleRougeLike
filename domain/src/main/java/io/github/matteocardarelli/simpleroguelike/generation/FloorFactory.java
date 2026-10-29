@@ -12,7 +12,7 @@ import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
  * ne genera un altro dallo stesso flusso casuale, fino a {@code maxAttempts} tentativi: i tentativi
  * restano deterministici.
  */
-public final class FloorFactory {
+public final class FloorFactory implements FloorSource {
 
     private final TerrainGenerator terrain;
     private final FloorPopulator populator;
@@ -28,6 +28,7 @@ public final class FloorFactory {
      * @throws FloorGenerationException se nessun terreno, in {@code maxAttempts} tentativi, basta
      *     per la specifica; la causa è l'errore dell'ultimo tentativo
      */
+    @Override
     public Floor create(FloorSpec spec, RandomSource random, EntityIdSequence ids) {
         FloorGenerationException last = null;
         for (int attempt = 0; attempt < spec.maxAttempts(); attempt++) {
