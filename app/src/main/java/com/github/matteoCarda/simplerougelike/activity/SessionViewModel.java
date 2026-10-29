@@ -6,6 +6,7 @@ import io.github.matteocardarelli.simpleroguelike.di.GameConfig;
 import io.github.matteocardarelli.simpleroguelike.di.GameSessionFactory;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
+import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import java.util.Random;
 import java.util.function.LongSupplier;
 
@@ -14,13 +15,17 @@ import java.util.function.LongSupplier;
  * telefono non fa più partire una partita nuova. Al posto del Singleton di prima, la partita sta
  * qui e nessun oggetto statico tiene un riferimento all'Activity, che può essere liberata.
  *
- * <p>È il ViewModel minimo che serve a portare l'app di oggi sul nuovo motore: lo stato
- * dell'inventario e l'osservazione con LiveData arriveranno con il ViewModel definitivo.
+ * <p>Tiene anche l'inventario aperto, che è stato dell'interfaccia e non della partita: così resta
+ * aperto dopo una rotazione.
+ *
+ * <p>È il ViewModel minimo che serve a portare l'app di oggi sul nuovo motore: l'osservazione con
+ * LiveData arriverà con il ViewModel definitivo.
  */
 public final class SessionViewModel extends ViewModel {
 
     private final GameSession session;
     private final LongSupplier seeds;
+    private boolean inventoryOpen;
 
     public SessionViewModel() {
         this(GameConfig.standard());
@@ -42,14 +47,36 @@ public final class SessionViewModel extends ViewModel {
         return session.current();
     }
 
-    /** Esegue un comando del player: se la partita è finita non succede niente. */
+    /**
+     * Esegue un comando del player: se la partita è finita non succede niente. L'inventario aperto
+     * resta aperto, anche dopo aver usato un oggetto, finché la partita non finisce.
+     */
     public TurnResult handle(Command command) {
-        return session.handle(command);
+        TurnResult result = session.handle(command);
+        if (result.snapshot().phase() != Phase.PLAYING) {
+            inventoryOpen = false;
+        }
+        return result;
     }
 
-    /** Inizia una partita nuova con il seed successivo. */
+    /** Inizia una partita nuova con il seed successivo, con l'inventario chiuso. */
     public TurnResult newGame() {
+        inventoryOpen = false;
         return session.newGame(seeds.getAsLong());
+    }
+
+    public boolean isInventoryOpen() {
+        return inventoryOpen;
+    }
+
+    /** Apre l'inventario se è chiuso e lo chiude se è aperto; a partita finita resta chiuso. */
+    public void toggleInventory() {
+        inventoryOpen = !inventoryOpen && session.current().snapshot().phase() == Phase.PLAYING;
+    }
+
+    /** Chiude l'inventario senza toccare la partita. */
+    public void closeInventory() {
+        inventoryOpen = false;
     }
 
     /** Il seed lo sceglie l'app: il dominio non usa mai sorgenti non deterministiche. */

@@ -5,7 +5,9 @@ import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.run.Run;
 
 /**
- * Un passo del player, con la stessa regola dei nemici. Il turno passa solo se il passo avviene.
+ * Un passo del player, con la stessa regola dei nemici. Il turno passa sempre, anche se il passo è
+ * bloccato da un muro: il player resta fermo e i nemici agiscono, così si può aspettare un turno
+ * spingendo contro un muro.
  */
 public final class MoveHandler implements CommandHandler<MoveCommand> {
 
@@ -24,6 +26,6 @@ public final class MoveHandler implements CommandHandler<MoveCommand> {
     public CommandOutcome handle(MoveCommand command, Run run) {
         ActionResult result =
                 actions.step(run.floor(), run.floor().playerId(), command.direction());
-        return new CommandOutcome(result.events(), result.performed());
+        return new CommandOutcome(result.events(), true);
     }
 }

@@ -12,6 +12,7 @@ import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.content.StandardPlayer;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorFactory;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorPopulator;
+import io.github.matteocardarelli.simpleroguelike.generation.FloorSource;
 import io.github.matteocardarelli.simpleroguelike.pathfinding.BreadthFirstPathfinder;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
@@ -31,21 +32,29 @@ public final class GameSessionFactory {
 
     private GameSessionFactory() {}
 
-    /** Una sessione nuova, ancora senza partita. */
+    /** Una sessione nuova, ancora senza partita, con i piani generati da SquidLib. */
     public static GameSession create(GameConfig config) {
+        return create(
+                config,
+                new FloorFactory(
+                        new SquidTerrainGenerator(),
+                        new FloorPopulator(
+                                new StandardItemCatalog(),
+                                new StandardEnemyCatalog(),
+                                StandardPlayer.DEFINITION)));
+    }
+
+    /**
+     * Una sessione nuova con i piani di {@code floors} e tutto il resto vero: nei test, un piano
+     * disegnato al posto di quello generato.
+     */
+    public static GameSession create(GameConfig config, FloorSource floors) {
         // Ogni livello dà 20 di salute e 2 di attacco, e la soglia successiva cresce del 50%,
         // come nel gioco di prima.
         LevelingRules leveling = new LevelingRules(20, 2, 150);
         ActionRules actions = new ActionRules(new CombatRules(new DamageRules(leveling)));
         StandardEnemyCatalog enemyCatalog = new StandardEnemyCatalog();
 
-        FloorFactory floors =
-                new FloorFactory(
-                        new SquidTerrainGenerator(),
-                        new FloorPopulator(
-                                new StandardItemCatalog(),
-                                enemyCatalog,
-                                StandardPlayer.DEFINITION));
         BehaviorBinding chaseOrWander =
                 new BehaviorBinding(
                         StandardEnemyCatalog.CHASE_OR_WANDER,
