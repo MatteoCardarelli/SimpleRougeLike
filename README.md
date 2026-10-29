@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: refactoring in corso.** Il codice attuale è la prima versione del gioco, in un solo modulo. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e la vecchia sparisce solo quando la nuova fa tutto quello che faceva lei (vedi [Roadmap](#roadmap)).
+> **Stato: refactoring in corso.** L'app gioca già sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con l'interfaccia della prima versione. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e il codice vecchio sparisce solo quando la nuova app fa tutto quello che faceva lui (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -15,7 +15,9 @@ Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il pro
 - **Swipe** per muoversi; muoversi verso un nemico vuol dire attaccarlo.
 - **Esperienza e livelli:** ogni nemico sconfitto dà esperienza, ogni livello aumenta salute e attacco.
 - **Pozioni** da raccogliere sulla mappa e usare dall'inventario, che si apre con un doppio tap.
-- **In arrivo con la v1:** nebbia di guerra che ricorda le zone esplorate, registro dei messaggi, schermata di fine partita, accessibilità di base.
+- **Nebbia di guerra:** si vede solo quello che è nel campo visivo, e la mappa ricorda le zone già esplorate.
+- **Vittoria e sconfitta:** si vince sconfiggendo tutti i nemici; a fine partita un doppio tap ne inizia un'altra.
+- **In arrivo con la v1:** registro dei messaggi, schermata di fine partita, accessibilità di base.
 
 ## Architettura
 
@@ -50,7 +52,7 @@ flowchart LR
 
 ## Qualità
 
-Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI, su ogni push e pull request, controlla la formattazione, esegue Lint e i test unitari della prima versione e verifica i checksum delle dipendenze.
+Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quello che riguarda i moduli Java (`:domain`, `:infrastructure`, `:application`): la CI, su ogni push e pull request, controlla formattazione, Lint, NullAway e Animal Sniffer, esegue i test (unitari, di proprietà, di contratto, ArchUnit) con le soglie di copertura e verifica i checksum delle dipendenze; sulle pull request verso la branch principale esegue anche PIT. Nell'app Android girano già ArchUnit e il test golden sulla JVM; il golden sul dispositivo e gli altri test strumentati arriveranno con la nuova interfaccia.
 
 - **Regole d'architettura verificate dai test** con ArchUnit: dipendenze tra moduli e package, niente Android nel dominio, niente sorgenti casuali che rompano il determinismo.
 - **Test sulla JVM** con JUnit 5 e AssertJ, senza mock nel dominio: i test giocano su mappe disegnate in ASCII.
@@ -67,7 +69,7 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi la CI, su ogni push e
 - [x] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
 - [x] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
 - [x] **4. `:application`:** turni completi, comandi, stati della partita.
-- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore, poi Hilt e MVVM, il nuovo rendering e le funzionalità nuove.
+- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore (fatto), poi Hilt e MVVM, il nuovo rendering e le funzionalità nuove.
 - [ ] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
 Dopo la v1: animazioni, poi nuovi contenuti.
