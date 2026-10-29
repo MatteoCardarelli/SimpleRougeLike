@@ -1,0 +1,807 @@
+seed=20261029
+t1 phase=playing player=37,36 hp=100/100 level=1 xp=0/100 enemies=0 items=0 inventory=0
+t1 > move left
+t1 Moved actor=1 kind=player from=37,36 to=36,36
+t2 > move left
+t2 Moved actor=1 kind=player from=36,36 to=35,36
+t3 > move left
+t3 Moved actor=1 kind=player from=35,36 to=34,36
+t4 > move left
+t4 Moved actor=1 kind=player from=34,36 to=33,36
+t5 > move left
+t5 Moved actor=1 kind=player from=33,36 to=32,36
+t6 > move left
+t6 Moved actor=1 kind=player from=32,36 to=31,36
+t7 > move left
+t7 Moved actor=1 kind=player from=31,36 to=30,36
+t8 > move left
+t8 Moved actor=1 kind=player from=30,36 to=29,36
+t9 > move left
+t9 Moved actor=1 kind=player from=29,36 to=28,36
+t10 > move left
+t10 Moved actor=1 kind=player from=28,36 to=27,36
+t11 > move left
+t11 Moved actor=1 kind=player from=27,36 to=26,36
+t12 > move left
+t12 > move right
+t12 Moved actor=1 kind=player from=26,36 to=27,36
+t13 > move right
+t13 Moved actor=1 kind=player from=27,36 to=28,36
+t14 > move right
+t14 Moved actor=1 kind=player from=28,36 to=29,36
+t15 > move right
+t15 Moved actor=1 kind=player from=29,36 to=30,36
+t16 > move right
+t16 Moved actor=1 kind=player from=30,36 to=31,36
+t17 > move right
+t17 Moved actor=1 kind=player from=31,36 to=32,36
+t18 > move right
+t18 Moved actor=1 kind=player from=32,36 to=33,36
+t19 > move right
+t19 Moved actor=1 kind=player from=33,36 to=34,36
+t20 > move right
+t20 Moved actor=1 kind=player from=34,36 to=35,36
+t21 > move right
+t21 Moved actor=1 kind=player from=35,36 to=36,36
+t22 > move right
+t22 Moved actor=1 kind=player from=36,36 to=37,36
+t23 > move right
+t23 > move left
+t23 Moved actor=1 kind=player from=37,36 to=36,36
+t24 > move left
+t24 Moved actor=1 kind=player from=36,36 to=35,36
+t25 > move left
+t25 Moved actor=1 kind=player from=35,36 to=34,36
+t26 > move left
+t26 Moved actor=1 kind=player from=34,36 to=33,36
+t27 > move left
+t27 Moved actor=1 kind=player from=33,36 to=32,36
+t28 > move left
+t28 Moved actor=1 kind=player from=32,36 to=31,36
+t29 > move left
+t29 Moved actor=1 kind=player from=31,36 to=30,36
+t30 > move left
+t30 Moved actor=1 kind=player from=30,36 to=29,36
+t31 > move left
+t31 Moved actor=1 kind=player from=29,36 to=28,36
+t32 > move left
+t32 Moved actor=1 kind=player from=28,36 to=27,36
+t33 > move left
+t33 Moved actor=1 kind=player from=27,36 to=26,36
+t34 > move left
+t34 > move right
+t34 Moved actor=1 kind=player from=26,36 to=27,36
+t35 > move right
+t35 Moved actor=1 kind=player from=27,36 to=28,36
+t36 > move right
+t36 Moved actor=1 kind=player from=28,36 to=29,36
+t37 > move right
+t37 Moved actor=1 kind=player from=29,36 to=30,36
+t38 > move right
+t38 Moved actor=1 kind=player from=30,36 to=31,36
+t39 > move right
+t39 Moved actor=1 kind=player from=31,36 to=32,36
+t40 > move right
+t40 Moved actor=1 kind=player from=32,36 to=33,36
+t41 > move right
+t41 Moved actor=1 kind=player from=33,36 to=34,36
+t42 > move right
+t42 Moved actor=1 kind=player from=34,36 to=35,36
+t43 > move right
+t43 Moved actor=1 kind=player from=35,36 to=36,36
+t44 > move right
+t44 Moved actor=1 kind=player from=36,36 to=37,36
+t45 > move right
+t45 > move up
+t45 Moved actor=1 kind=player from=37,36 to=37,35
+t46 > move up
+t46 Moved actor=1 kind=player from=37,35 to=37,34
+t47 > move up
+t47 Moved actor=1 kind=player from=37,34 to=37,33
+t48 > move up
+t48 Moved actor=1 kind=player from=37,33 to=37,32
+t49 > move up
+t49 Moved actor=1 kind=player from=37,32 to=37,31
+t50 > move up
+t50 > move up
+t50 > move right
+t50 Moved actor=1 kind=player from=37,31 to=38,31
+t51 > move right
+t51 Moved actor=1 kind=player from=38,31 to=39,31
+t52 > move right
+t52 Moved actor=1 kind=player from=39,31 to=40,31
+t53 > move right
+t53 Moved actor=1 kind=player from=40,31 to=41,31
+t54 > move right
+t54 Moved actor=1 kind=player from=41,31 to=42,31
+t55 > move right
+t55 Moved actor=1 kind=player from=42,31 to=43,31
+t56 > move right
+t56 Moved actor=1 kind=player from=43,31 to=44,31
+t57 > move right
+t57 > move up
+t57 > move right
+t57 > move down
+t57 Moved actor=1 kind=player from=44,31 to=44,32
+t58 > move down
+t58 Moved actor=1 kind=player from=44,32 to=44,33
+t59 > move down
+t59 Moved actor=1 kind=player from=44,33 to=44,34
+t60 > move down
+t60 Moved actor=1 kind=player from=44,34 to=44,35
+t61 > move down
+t61 Moved actor=1 kind=player from=44,35 to=44,36
+t62 > move down
+t62 > move right
+t62 Moved actor=1 kind=player from=44,36 to=45,36
+t63 > move right
+t63 Moved actor=1 kind=player from=45,36 to=46,36
+t64 > move right
+t64 Moved actor=1 kind=player from=46,36 to=47,36
+t65 > move right
+t65 Moved actor=1 kind=player from=47,36 to=48,36
+t66 > move right
+t66 > move left
+t66 Moved actor=1 kind=player from=48,36 to=47,36
+t67 > move left
+t67 Moved actor=1 kind=player from=47,36 to=46,36
+t68 > move left
+t68 Moved actor=1 kind=player from=46,36 to=45,36
+t69 > move left
+t69 Moved actor=1 kind=player from=45,36 to=44,36
+t70 > move left
+t70 Moved actor=1 kind=player from=44,36 to=43,36
+t71 > move left
+t71 Moved actor=1 kind=player from=43,36 to=42,36
+t72 > move left
+t72 > move right
+t72 Moved actor=1 kind=player from=42,36 to=43,36
+t73 > move right
+t73 Moved actor=1 kind=player from=43,36 to=44,36
+t74 > move right
+t74 Moved actor=1 kind=player from=44,36 to=45,36
+t75 > move right
+t75 Moved actor=1 kind=player from=45,36 to=46,36
+t76 > move right
+t76 Moved actor=1 kind=player from=46,36 to=47,36
+t77 > move right
+t77 Moved actor=1 kind=player from=47,36 to=48,36
+t78 > move right
+t78 > move right
+t78 > move up
+t78 Moved actor=1 kind=player from=48,36 to=48,35
+t79 > move up
+t79 Moved actor=1 kind=player from=48,35 to=48,34
+t80 > move up
+t80 Moved actor=1 kind=player from=48,34 to=48,33
+t81 > move up
+t81 Moved actor=1 kind=player from=48,33 to=48,32
+t82 > move up
+t82 > move right
+t82 > move left
+t82 Moved actor=1 kind=player from=48,32 to=47,32
+t83 > move left
+t83 Moved actor=1 kind=player from=47,32 to=46,32
+t84 > move left
+t84 Moved actor=1 kind=player from=46,32 to=45,32
+t85 > move left
+t85 Moved actor=1 kind=player from=45,32 to=44,32
+t86 > move left
+t86 Moved actor=1 kind=player from=44,32 to=43,32
+t87 > move left
+t87 Moved actor=1 kind=player from=43,32 to=42,32
+t88 > move left
+t88 Moved actor=1 kind=player from=42,32 to=41,32
+t89 > move left
+t89 Moved actor=1 kind=player from=41,32 to=40,32
+t90 > move left
+t90 Moved actor=1 kind=player from=40,32 to=39,32
+t91 > move left
+t91 Moved actor=1 kind=player from=39,32 to=38,32
+t92 > move left
+t92 Moved actor=1 kind=player from=38,32 to=37,32
+t93 > move left
+t93 Moved actor=1 kind=player from=37,32 to=36,32
+t94 > move left
+t94 > move left
+t94 > move up
+t94 Moved actor=1 kind=player from=36,32 to=36,31
+t95 > move up
+t95 > move down
+t95 Moved actor=1 kind=player from=36,31 to=36,32
+t96 > move down
+t96 Moved actor=1 kind=player from=36,32 to=36,33
+t97 > move down
+t97 Moved actor=1 kind=player from=36,33 to=36,34
+t98 > move down
+t98 Moved actor=1 kind=player from=36,34 to=36,35
+t99 > move down
+t99 Moved actor=1 kind=player from=36,35 to=36,36
+t100 > move down
+t100 > move up
+t100 Moved actor=1 kind=player from=36,36 to=36,35
+t101 > move up
+t101 Moved actor=1 kind=player from=36,35 to=36,34
+t101 Moved actor=20 kind=goblin from=33,39 to=33,38
+t102 > move down
+t102 Moved actor=1 kind=player from=36,34 to=36,35
+t102 Moved actor=20 kind=goblin from=33,38 to=33,37
+t103 > move left
+t103 Moved actor=1 kind=player from=36,35 to=35,35
+t103 Moved actor=20 kind=goblin from=33,37 to=33,36
+t104 > move left
+t104 Moved actor=1 kind=player from=35,35 to=34,35
+t104 Moved actor=20 kind=goblin from=33,36 to=33,35
+t105 > move left
+t105 Attacked attacker=1 target=20 from=34,35 at=33,35
+t105 Damaged target=20 at=33,35 amount=10 hp=20
+t105 Attacked attacker=20 target=1 from=33,35 at=34,35
+t105 Damaged target=1 at=34,35 amount=5 hp=95
+t106 > move left
+t106 Attacked attacker=1 target=20 from=34,35 at=33,35
+t106 Damaged target=20 at=33,35 amount=10 hp=10
+t106 Attacked attacker=20 target=1 from=33,35 at=34,35
+t106 Damaged target=1 at=34,35 amount=5 hp=90
+t107 > move left
+t107 Attacked attacker=1 target=20 from=34,35 at=33,35
+t107 Damaged target=20 at=33,35 amount=10 hp=0
+t107 Died actor=20 kind=goblin at=33,35
+t107 ExperienceGained at=34,35 amount=25
+t108 > move up
+t108 > move right
+t108 Moved actor=1 kind=player from=34,35 to=35,35
+t109 > move right
+t109 Moved actor=1 kind=player from=35,35 to=36,35
+t110 > move right
+t110 Moved actor=1 kind=player from=36,35 to=37,35
+t111 > move right
+t111 > move right
+t111 > move right
+t111 > move left
+t111 Moved actor=1 kind=player from=37,35 to=36,35
+t112 > move left
+t112 Moved actor=1 kind=player from=36,35 to=35,35
+t113 > move left
+t113 Moved actor=1 kind=player from=35,35 to=34,35
+t114 > move left
+t114 Moved actor=1 kind=player from=34,35 to=33,35
+t115 > move left
+t115 Moved actor=1 kind=player from=33,35 to=32,35
+t116 > move left
+t116 Moved actor=1 kind=player from=32,35 to=31,35
+t117 > move left
+t117 Moved actor=1 kind=player from=31,35 to=30,35
+t118 > move left
+t118 Moved actor=1 kind=player from=30,35 to=29,35
+t119 > move left
+t119 Moved actor=1 kind=player from=29,35 to=28,35
+t120 > move left
+t120 Moved actor=1 kind=player from=28,35 to=27,35
+t121 > move left
+t121 Moved actor=1 kind=player from=27,35 to=26,35
+t122 > move left
+t122 > move left
+t122 > move up
+t122 Moved actor=1 kind=player from=26,35 to=26,34
+t122 ItemPickedUp item=28 kind=potion at=26,34
+t123 > move up
+t123 Moved actor=1 kind=player from=26,34 to=26,33
+t124 > move up
+t124 Moved actor=1 kind=player from=26,33 to=26,32
+t125 > move up
+t125 Moved actor=1 kind=player from=26,32 to=26,31
+t126 > move up
+t126 Moved actor=1 kind=player from=26,31 to=26,30
+t127 > move up
+t127 Moved actor=1 kind=player from=26,30 to=26,29
+t128 > move up
+t128 > move up
+t128 > move right
+t128 > move left
+t128 Moved actor=1 kind=player from=26,29 to=25,29
+t129 > move left
+t129 Moved actor=1 kind=player from=25,29 to=24,29
+t130 > move left
+t130 Moved actor=1 kind=player from=24,29 to=23,29
+t131 > move left
+t131 Moved actor=1 kind=player from=23,29 to=22,29
+t132 > move left
+t132 > move up
+t132 Moved actor=1 kind=player from=22,29 to=22,28
+t133 > move up
+t133 Moved actor=1 kind=player from=22,28 to=22,27
+t134 > move up
+t134 Moved actor=1 kind=player from=22,27 to=22,26
+t135 > move up
+t135 Moved actor=1 kind=player from=22,26 to=22,25
+t136 > move up
+t136 Moved actor=1 kind=player from=22,25 to=22,24
+t137 > move up
+t137 Moved actor=1 kind=player from=22,24 to=22,23
+t138 > move up
+t138 Moved actor=1 kind=player from=22,23 to=22,22
+t139 > move up
+t139 Moved actor=1 kind=player from=22,22 to=22,21
+t140 > move up
+t140 Moved actor=1 kind=player from=22,21 to=22,20
+t141 > move up
+t141 Moved actor=1 kind=player from=22,20 to=22,19
+t142 > move up
+t142 Moved actor=1 kind=player from=22,19 to=22,18
+t143 > move up
+t143 Moved actor=1 kind=player from=22,18 to=22,17
+t143 Moved actor=5 kind=goblin from=24,13 to=23,13
+t144 > move up
+t144 Moved actor=1 kind=player from=22,17 to=22,16
+t144 Moved actor=5 kind=goblin from=23,13 to=22,13
+t145 > move up
+t145 Moved actor=1 kind=player from=22,16 to=22,15
+t145 Moved actor=5 kind=goblin from=22,13 to=22,14
+t146 > move up
+t146 Attacked attacker=1 target=5 from=22,15 at=22,14
+t146 Damaged target=5 at=22,14 amount=10 hp=20
+t146 Attacked attacker=5 target=1 from=22,14 at=22,15
+t146 Damaged target=1 at=22,15 amount=5 hp=85
+t147 > move up
+t147 Attacked attacker=1 target=5 from=22,15 at=22,14
+t147 Damaged target=5 at=22,14 amount=10 hp=10
+t147 Attacked attacker=5 target=1 from=22,14 at=22,15
+t147 Damaged target=1 at=22,15 amount=5 hp=80
+t148 > move up
+t148 Attacked attacker=1 target=5 from=22,15 at=22,14
+t148 Damaged target=5 at=22,14 amount=10 hp=0
+t148 Died actor=5 kind=goblin at=22,14
+t148 ExperienceGained at=22,15 amount=25
+t149 > move up
+t149 Moved actor=1 kind=player from=22,15 to=22,14
+t150 > move up
+t150 Moved actor=1 kind=player from=22,14 to=22,13
+t150 Moved actor=4 kind=goblin from=31,14 to=30,14
+t151 > move right
+t151 Moved actor=1 kind=player from=22,13 to=23,13
+t151 Moved actor=4 kind=goblin from=30,14 to=30,13
+t152 > move right
+t152 Moved actor=1 kind=player from=23,13 to=24,13
+t152 Moved actor=4 kind=goblin from=30,13 to=29,13
+t153 > move right
+t153 Moved actor=1 kind=player from=24,13 to=25,13
+t153 Moved actor=4 kind=goblin from=29,13 to=28,13
+t154 > move right
+t154 Moved actor=1 kind=player from=25,13 to=26,13
+t154 Moved actor=4 kind=goblin from=28,13 to=27,13
+t155 > move right
+t155 Attacked attacker=1 target=4 from=26,13 at=27,13
+t155 Damaged target=4 at=27,13 amount=10 hp=20
+t155 Attacked attacker=4 target=1 from=27,13 at=26,13
+t155 Damaged target=1 at=26,13 amount=5 hp=75
+t156 > move right
+t156 Attacked attacker=1 target=4 from=26,13 at=27,13
+t156 Damaged target=4 at=27,13 amount=10 hp=10
+t156 Attacked attacker=4 target=1 from=27,13 at=26,13
+t156 Damaged target=1 at=26,13 amount=5 hp=70
+t157 > move right
+t157 Attacked attacker=1 target=4 from=26,13 at=27,13
+t157 Damaged target=4 at=27,13 amount=10 hp=0
+t157 Died actor=4 kind=goblin at=27,13
+t157 ExperienceGained at=26,13 amount=25
+t158 > move up
+t158 Moved actor=1 kind=player from=26,13 to=26,12
+t159 > move up
+t159 Moved actor=1 kind=player from=26,12 to=26,11
+t160 > move up
+t160 Moved actor=1 kind=player from=26,11 to=26,10
+t160 Moved actor=16 kind=goblin from=20,4 to=20,3
+t161 > move up
+t161 Moved actor=1 kind=player from=26,10 to=26,9
+t161 Moved actor=16 kind=goblin from=20,3 to=20,2
+t162 > move up
+t162 Moved actor=1 kind=player from=26,9 to=26,8
+t162 Moved actor=16 kind=goblin from=20,2 to=21,2
+t163 > move up
+t163 Moved actor=1 kind=player from=26,8 to=26,7
+t163 Moved actor=16 kind=goblin from=21,2 to=21,3
+t164 > move up
+t164 Moved actor=1 kind=player from=26,7 to=26,6
+t165 > move up
+t165 Moved actor=1 kind=player from=26,6 to=26,5
+t166 > move up
+t166 Moved actor=1 kind=player from=26,5 to=26,4
+t167 > move up
+t167 > move right
+t167 Moved actor=1 kind=player from=26,4 to=27,4
+t168 > move right
+t168 Moved actor=1 kind=player from=27,4 to=28,4
+t169 > move right
+t169 > move left
+t169 Moved actor=1 kind=player from=28,4 to=27,4
+t170 > move left
+t170 Moved actor=1 kind=player from=27,4 to=26,4
+t171 > move left
+t171 > move down
+t171 Moved actor=1 kind=player from=26,4 to=26,5
+t172 > move down
+t172 Moved actor=1 kind=player from=26,5 to=26,6
+t172 Moved actor=16 kind=goblin from=23,7 to=24,7
+t173 > move left
+t173 > move down
+t173 Moved actor=1 kind=player from=26,6 to=26,7
+t173 Moved actor=16 kind=goblin from=24,7 to=25,7
+t174 > move left
+t174 Attacked attacker=1 target=16 from=26,7 at=25,7
+t174 Damaged target=16 at=25,7 amount=10 hp=20
+t174 Attacked attacker=16 target=1 from=25,7 at=26,7
+t174 Damaged target=1 at=26,7 amount=5 hp=65
+t175 > move left
+t175 Attacked attacker=1 target=16 from=26,7 at=25,7
+t175 Damaged target=16 at=25,7 amount=10 hp=10
+t175 Attacked attacker=16 target=1 from=25,7 at=26,7
+t175 Damaged target=1 at=26,7 amount=5 hp=60
+t176 > move left
+t176 Attacked attacker=1 target=16 from=26,7 at=25,7
+t176 Damaged target=16 at=25,7 amount=10 hp=0
+t176 Died actor=16 kind=goblin at=25,7
+t176 ExperienceGained at=26,7 amount=25
+t176 LeveledUp at=26,7 level=2
+t177 > move down
+t177 Moved actor=1 kind=player from=26,7 to=26,8
+t178 > move down
+t178 Moved actor=1 kind=player from=26,8 to=26,9
+t179 > move down
+t179 Moved actor=1 kind=player from=26,9 to=26,10
+t180 > move down
+t180 Moved actor=1 kind=player from=26,10 to=26,11
+t181 > move down
+t181 Moved actor=1 kind=player from=26,11 to=26,12
+t182 > move down
+t182 Moved actor=1 kind=player from=26,12 to=26,13
+t183 > move down
+t183 > move up
+t183 Moved actor=1 kind=player from=26,13 to=26,12
+t184 > move up
+t184 Moved actor=1 kind=player from=26,12 to=26,11
+t185 > move up
+t185 Moved actor=1 kind=player from=26,11 to=26,10
+t186 > move up
+t186 Moved actor=1 kind=player from=26,10 to=26,9
+t187 > move up
+t187 Moved actor=1 kind=player from=26,9 to=26,8
+t187 Moved actor=9 kind=goblin from=17,4 to=18,4
+t188 > move left
+t188 Moved actor=1 kind=player from=26,8 to=25,8
+t188 Moved actor=9 kind=goblin from=18,4 to=19,4
+t189 > move left
+t189 Moved actor=1 kind=player from=25,8 to=24,8
+t189 Moved actor=9 kind=goblin from=19,4 to=19,3
+t190 > move left
+t190 Moved actor=1 kind=player from=24,8 to=23,8
+t190 Moved actor=9 kind=goblin from=19,3 to=19,4
+t191 > move left
+t191 Moved actor=1 kind=player from=23,8 to=22,8
+t191 Moved actor=9 kind=goblin from=19,4 to=19,5
+t192 > move left
+t192 Moved actor=1 kind=player from=22,8 to=21,8
+t192 Moved actor=9 kind=goblin from=19,5 to=19,6
+t193 > move up
+t193 Moved actor=1 kind=player from=21,8 to=21,7
+t193 Moved actor=9 kind=goblin from=19,6 to=20,6
+t194 > move left
+t194 > move left
+t194 > move down
+t194 Moved actor=1 kind=player from=21,7 to=21,8
+t194 Moved actor=9 kind=goblin from=20,6 to=21,6
+t195 > move up
+t195 Moved actor=1 kind=player from=21,8 to=21,7
+t195 Attacked attacker=9 target=1 from=21,6 at=21,7
+t195 Damaged target=1 at=21,7 amount=5 hp=75
+t196 > move up
+t196 Attacked attacker=1 target=9 from=21,7 at=21,6
+t196 Damaged target=9 at=21,6 amount=12 hp=18
+t196 Attacked attacker=9 target=1 from=21,6 at=21,7
+t196 Damaged target=1 at=21,7 amount=5 hp=70
+t197 > move up
+t197 Attacked attacker=1 target=9 from=21,7 at=21,6
+t197 Damaged target=9 at=21,6 amount=12 hp=6
+t197 Attacked attacker=9 target=1 from=21,6 at=21,7
+t197 Damaged target=1 at=21,7 amount=5 hp=65
+t198 > move up
+t198 Attacked attacker=1 target=9 from=21,7 at=21,6
+t198 Damaged target=9 at=21,6 amount=6 hp=0
+t198 Died actor=9 kind=goblin at=21,6
+t198 ExperienceGained at=21,7 amount=25
+t199 > move down
+t199 Moved actor=1 kind=player from=21,7 to=21,8
+t200 > move down
+t200 > move left
+t200 > move down
+t200 > move left
+t200 > move down
+t200 > move up
+t200 Moved actor=1 kind=player from=21,8 to=21,7
+t201 > move up
+t201 Moved actor=1 kind=player from=21,7 to=21,6
+t202 > move up
+t202 Moved actor=1 kind=player from=21,6 to=21,5
+t203 > move up
+t203 Moved actor=1 kind=player from=21,5 to=21,4
+t204 > move up
+t204 Moved actor=1 kind=player from=21,4 to=21,3
+t205 > move up
+t205 Moved actor=1 kind=player from=21,3 to=21,2
+t206 > move up
+t206 > move up
+t206 > move down
+t206 Moved actor=1 kind=player from=21,2 to=21,3
+t207 > move down
+t207 Moved actor=1 kind=player from=21,3 to=21,4
+t208 > move down
+t208 Moved actor=1 kind=player from=21,4 to=21,5
+t209 > move down
+t209 Moved actor=1 kind=player from=21,5 to=21,6
+t210 > move down
+t210 Moved actor=1 kind=player from=21,6 to=21,7
+t211 > move down
+t211 Moved actor=1 kind=player from=21,7 to=21,8
+t212 > move down
+t212 > move down
+t212 > move left
+t212 > move up
+t212 Moved actor=1 kind=player from=21,8 to=21,7
+t213 > move up
+t213 Moved actor=1 kind=player from=21,7 to=21,6
+t213 Moved actor=17 kind=goblin from=14,4 to=14,3
+t214 > move left
+t214 Moved actor=1 kind=player from=21,6 to=20,6
+t214 Moved actor=17 kind=goblin from=14,3 to=14,4
+t215 > move left
+t215 Moved actor=1 kind=player from=20,6 to=19,6
+t215 Moved actor=17 kind=goblin from=14,4 to=14,5
+t216 > move left
+t216 Moved actor=1 kind=player from=19,6 to=18,6
+t216 Moved actor=17 kind=goblin from=14,5 to=15,5
+t217 > move up
+t217 Moved actor=1 kind=player from=18,6 to=18,5
+t217 Moved actor=17 kind=goblin from=15,5 to=16,5
+t218 > move left
+t218 Moved actor=1 kind=player from=18,5 to=17,5
+t218 Attacked attacker=17 target=1 from=16,5 at=17,5
+t218 Damaged target=1 at=17,5 amount=5 hp=60
+t219 > move left
+t219 Attacked attacker=1 target=17 from=17,5 at=16,5
+t219 Damaged target=17 at=16,5 amount=12 hp=18
+t219 Attacked attacker=17 target=1 from=16,5 at=17,5
+t219 Damaged target=1 at=17,5 amount=5 hp=55
+t220 > use item=28
+t220 ItemUsed item=28 kind=potion at=17,5
+t220 Healed target=1 at=17,5 amount=25
+t220 Attacked attacker=17 target=1 from=16,5 at=17,5
+t220 Damaged target=1 at=17,5 amount=5 hp=75
+t221 > move left
+t221 Attacked attacker=1 target=17 from=17,5 at=16,5
+t221 Damaged target=17 at=16,5 amount=12 hp=6
+t221 Attacked attacker=17 target=1 from=16,5 at=17,5
+t221 Damaged target=1 at=17,5 amount=5 hp=70
+t222 > move left
+t222 Attacked attacker=1 target=17 from=17,5 at=16,5
+t222 Damaged target=17 at=16,5 amount=6 hp=0
+t222 Died actor=17 kind=goblin at=16,5
+t222 ExperienceGained at=17,5 amount=25
+t223 > move up
+t223 Moved actor=1 kind=player from=17,5 to=17,4
+t224 > move up
+t224 Moved actor=1 kind=player from=17,4 to=17,3
+t225 > move up
+t225 Moved actor=1 kind=player from=17,3 to=17,2
+t226 > move up
+t226 Moved actor=1 kind=player from=17,2 to=17,1
+t227 > move up
+t227 > move up
+t227 > move down
+t227 Moved actor=1 kind=player from=17,1 to=17,2
+t228 > move down
+t228 Moved actor=1 kind=player from=17,2 to=17,3
+t229 > move down
+t229 Moved actor=1 kind=player from=17,3 to=17,4
+t230 > move down
+t230 Moved actor=1 kind=player from=17,4 to=17,5
+t231 > move down
+t231 > move down
+t231 > move right
+t231 Moved actor=1 kind=player from=17,5 to=18,5
+t232 > move right
+t232 Moved actor=1 kind=player from=18,5 to=19,5
+t233 > move right
+t233 Moved actor=1 kind=player from=19,5 to=20,5
+t234 > move right
+t234 Moved actor=1 kind=player from=20,5 to=21,5
+t235 > move right
+t235 Moved actor=1 kind=player from=21,5 to=22,5
+t236 > move right
+t236 Moved actor=1 kind=player from=22,5 to=23,5
+t237 > move right
+t237 > move down
+t237 Moved actor=1 kind=player from=23,5 to=23,6
+t238 > move down
+t238 Moved actor=1 kind=player from=23,6 to=23,7
+t239 > move down
+t239 Moved actor=1 kind=player from=23,7 to=23,8
+t240 > move down
+t240 Moved actor=1 kind=player from=23,8 to=23,9
+t241 > move down
+t241 > move right
+t241 Moved actor=1 kind=player from=23,9 to=24,9
+t242 > move right
+t242 Moved actor=1 kind=player from=24,9 to=25,9
+t243 > move right
+t243 Moved actor=1 kind=player from=25,9 to=26,9
+t244 > move right
+t244 Moved actor=1 kind=player from=26,9 to=27,9
+t245 > move right
+t245 > move left
+t245 Moved actor=1 kind=player from=27,9 to=26,9
+t246 > move left
+t246 Moved actor=1 kind=player from=26,9 to=25,9
+t247 > move left
+t247 Moved actor=1 kind=player from=25,9 to=24,9
+t248 > move left
+t248 Moved actor=1 kind=player from=24,9 to=23,9
+t249 > move left
+t249 > move right
+t249 Moved actor=1 kind=player from=23,9 to=24,9
+t250 > move right
+t250 Moved actor=1 kind=player from=24,9 to=25,9
+t251 > move right
+t251 Moved actor=1 kind=player from=25,9 to=26,9
+t252 > move right
+t252 Moved actor=1 kind=player from=26,9 to=27,9
+t253 > move right
+t253 > move right
+t253 > move up
+t253 Moved actor=1 kind=player from=27,9 to=27,8
+t254 > move up
+t254 Moved actor=1 kind=player from=27,8 to=27,7
+t255 > move up
+t255 Moved actor=1 kind=player from=27,7 to=27,6
+t256 > move up
+t256 Moved actor=1 kind=player from=27,6 to=27,5
+t257 > move up
+t257 Moved actor=1 kind=player from=27,5 to=27,4
+t258 > move up
+t258 > move up
+t258 > move right
+t258 Moved actor=1 kind=player from=27,4 to=28,4
+t259 > move right
+t259 > move left
+t259 Moved actor=1 kind=player from=28,4 to=27,4
+t260 > move left
+t260 Moved actor=1 kind=player from=27,4 to=26,4
+t261 > move left
+t261 > move up
+t261 > move right
+t261 Moved actor=1 kind=player from=26,4 to=27,4
+t262 > move right
+t262 Moved actor=1 kind=player from=27,4 to=28,4
+t263 > move right
+t263 > move right
+t263 > move left
+t263 Moved actor=1 kind=player from=28,4 to=27,4
+t264 > move left
+t264 Moved actor=1 kind=player from=27,4 to=26,4
+t265 > move left
+t265 > move up
+t265 > move left
+t265 > move right
+t265 Moved actor=1 kind=player from=26,4 to=27,4
+t266 > move right
+t266 Moved actor=1 kind=player from=27,4 to=28,4
+t267 > move right
+t267 > move down
+t267 Moved actor=1 kind=player from=28,4 to=28,5
+t268 > move down
+t268 Moved actor=1 kind=player from=28,5 to=28,6
+t269 > move down
+t269 Moved actor=1 kind=player from=28,6 to=28,7
+t270 > move down
+t270 Moved actor=1 kind=player from=28,7 to=28,8
+t271 > move down
+t271 > move up
+t271 Moved actor=1 kind=player from=28,8 to=28,7
+t272 > move up
+t272 Moved actor=1 kind=player from=28,7 to=28,6
+t273 > move up
+t273 Moved actor=1 kind=player from=28,6 to=28,5
+t274 > move up
+t274 Moved actor=1 kind=player from=28,5 to=28,4
+t275 > move up
+t275 > move down
+t275 Moved actor=1 kind=player from=28,4 to=28,5
+t276 > move down
+t276 Moved actor=1 kind=player from=28,5 to=28,6
+t277 > move down
+t277 Moved actor=1 kind=player from=28,6 to=28,7
+t278 > move down
+t278 Moved actor=1 kind=player from=28,7 to=28,8
+t279 > move down
+t279 > move up
+t279 Moved actor=1 kind=player from=28,8 to=28,7
+t280 > move up
+t280 Moved actor=1 kind=player from=28,7 to=28,6
+t281 > move up
+t281 Moved actor=1 kind=player from=28,6 to=28,5
+t282 > move up
+t282 Moved actor=1 kind=player from=28,5 to=28,4
+t283 > move up
+t283 > move right
+t283 > move up
+t283 > move left
+t283 Moved actor=1 kind=player from=28,4 to=27,4
+t284 > move left
+t284 Moved actor=1 kind=player from=27,4 to=26,4
+t285 > move left
+t285 > move up
+t285 > move up
+t285 > move right
+t285 Moved actor=1 kind=player from=26,4 to=27,4
+t286 > move right
+t286 Moved actor=1 kind=player from=27,4 to=28,4
+t287 > move right
+t287 > move right
+t287 > move up
+t287 > move down
+t287 Moved actor=1 kind=player from=28,4 to=28,5
+t288 > move down
+t288 Moved actor=1 kind=player from=28,5 to=28,6
+t289 > move down
+t289 Moved actor=1 kind=player from=28,6 to=28,7
+t290 > move down
+t290 Moved actor=1 kind=player from=28,7 to=28,8
+t291 > move down
+t291 > move down
+t291 > move right
+t291 > move left
+t291 Moved actor=1 kind=player from=28,8 to=27,8
+t292 > move left
+t292 Moved actor=1 kind=player from=27,8 to=26,8
+t293 > move left
+t293 Moved actor=1 kind=player from=26,8 to=25,8
+t294 > move left
+t294 Moved actor=1 kind=player from=25,8 to=24,8
+t295 > move left
+t295 Moved actor=1 kind=player from=24,8 to=23,8
+t296 > move left
+t296 Moved actor=1 kind=player from=23,8 to=22,8
+t297 > move left
+t297 Moved actor=1 kind=player from=22,8 to=21,8
+t298 > move left
+t298 > move down
+t298 > move right
+t298 Moved actor=1 kind=player from=21,8 to=22,8
+t299 > move right
+t299 Moved actor=1 kind=player from=22,8 to=23,8
+t300 > move right
+t300 Moved actor=1 kind=player from=23,8 to=24,8
+t301 > move right
+t301 Moved actor=1 kind=player from=24,8 to=25,8
+t302 > move right
+t302 Moved actor=1 kind=player from=25,8 to=26,8
+t303 > move right
+t303 Moved actor=1 kind=player from=26,8 to=27,8
+t304 > move right
+t304 Moved actor=1 kind=player from=27,8 to=28,8
+t305 > move right
+t305 > move down
+t305 > move down
+t305 > move up
+t305 Moved actor=1 kind=player from=28,8 to=28,7
+t306 > move up
+t306 Moved actor=1 kind=player from=28,7 to=28,6
+t307 > move up
+t307 Moved actor=1 kind=player from=28,6 to=28,5
+t308 > move up
+t308 Moved actor=1 kind=player from=28,5 to=28,4
+t309 > move up
+t309 > move left
+t309 Moved actor=1 kind=player from=28,4 to=27,4
+t310 > move left
+t310 Moved actor=1 kind=player from=27,4 to=26,4
+t311 > move left
+t311 phase=playing player=26,4 hp=70/120 level=2 xp=50/150 enemies=0 items=0 inventory=0
