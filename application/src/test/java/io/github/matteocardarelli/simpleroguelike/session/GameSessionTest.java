@@ -68,8 +68,9 @@ class GameSessionTest {
         assertThat(session.current()).isSameAs(moved);
     }
 
+    /** Un passo contro un muro è il modo di aspettare un turno: il player resta fermo. */
     @Test
-    void handle_intoAWall_turnDoesNotPass() {
+    void handle_intoAWall_playerStaysStill_andEnemiesAct() {
         GameSession session = session(new FixedFloorSource("#####", "#@..#", "#..g#", "#####"));
         session.newGame(1);
 
@@ -77,11 +78,12 @@ class GameSessionTest {
 
         assertThat(result.accepted()).isTrue();
         assertThat(result.revision()).isEqualTo(2);
-        assertThat(result.events()).isEmpty();
-        assertThat(result.snapshot().turn()).isEqualTo(1);
+        assertThat(result.snapshot().turn()).isEqualTo(2);
+        assertThat(result.snapshot().player().position()).isEqualTo(new Position(1, 1));
+        assertThat(result.events()).singleElement().isInstanceOf(Moved.class);
         assertThat(result.snapshot().visibleEnemies())
                 .extracting(ActorView::position)
-                .containsExactly(new Position(3, 2));
+                .doesNotContain(new Position(3, 2));
     }
 
     @Test

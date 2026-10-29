@@ -93,8 +93,9 @@ class GoldenGameTest {
             log.add("t" + before.turn() + " > " + choice.description());
             result = session.handle(choice.command());
             log.addAll(writer.lines(before.turn(), result.events()));
-            // Un passo che non fa passare il turno ha urtato un muro: si cambia direzione.
-            stuck = result.snapshot().turn() == before.turn();
+            // Un passo contro un muro lascia il player fermo, anche se il turno passa: si cambia
+            // direzione.
+            stuck = choice.intoWallOf(before);
             if (stuck) {
                 heading = randomDirection(wandering);
             }
@@ -103,14 +104,27 @@ class GoldenGameTest {
         return log;
     }
 
-    /** Un comando con la sua riga nel registro, scritta quando lo si sceglie. */
-    private record Choice(Command command, String description) {}
+    /**
+     * Un comando con la sua riga nel registro, scritta quando lo si sceglie.
+     *
+     * @param direction la direzione del passo; vuota se il comando non è un passo
+     */
+    private record Choice(Command command, String description, Optional<Direction> direction) {
+
+        boolean intoWallOf(GameSnapshot snapshot) {
+            return direction
+                    .map(d -> snapshot.player().position().translate(d))
+                    .map(cell -> snapshot.cells().get(cell).wall())
+                    .orElse(false);
+        }
+    }
 
     private static Choice next(GameSnapshot snapshot, Direction heading, boolean stuck) {
         PlayerView player = snapshot.player();
         if (player.health() * 2 < player.maxHealth() && !snapshot.inventory().isEmpty()) {
             EntityId item = snapshot.inventory().get(0).id();
-            return new Choice(new UseItemCommand(item), "use item=" + item.value());
+            return new Choice(
+                    new UseItemCommand(item), "use item=" + item.value(), Optional.empty());
         }
         Optional<ActorView> target =
                 snapshot.visibleEnemies().stream()
@@ -137,7 +151,7 @@ class GoldenGameTest {
                     case LEFT -> "left";
                     case RIGHT -> "right";
                 };
-        return new Choice(new MoveCommand(direction), "move " + name);
+        return new Choice(new MoveCommand(direction), "move " + name, Optional.of(direction));
     }
 
     private static Direction towards(Position from, Position to) {

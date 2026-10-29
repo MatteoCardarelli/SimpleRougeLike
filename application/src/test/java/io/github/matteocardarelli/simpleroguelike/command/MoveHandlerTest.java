@@ -37,12 +37,13 @@ class MoveHandlerTest {
     }
 
     @Test
-    void move_intoAWall_doesNotConsumeTheTurn() {
+    void move_intoAWall_staysStillAndConsumesTheTurn() {
         Run run = run("#@g");
 
         CommandOutcome outcome = MOVE.handle(new MoveCommand(Direction.LEFT), run);
 
-        assertThat(outcome).isEqualTo(new CommandOutcome(List.of(), false));
+        assertThat(outcome).isEqualTo(new CommandOutcome(List.of(), true));
+        assertThat(run.floor().positionOf(PLAYER)).isEqualTo(new Position(1, 0));
     }
 
     @Test
