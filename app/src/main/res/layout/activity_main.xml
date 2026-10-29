@@ -44,6 +44,20 @@
 
     </LinearLayout>
 
+    <!-- Il messaggio di fine partita: un doppio tap ne inizia un'altra -->
+    <TextView
+        android:id="@+id/end_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="24dp"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:visibility="gone"
+        tools:text="@string/end_game_over"
+        tools:visibility="visible" />
+
     <LinearLayout
         android:id="@+id/inventory_layout"
         android:layout_width="match_parent"
