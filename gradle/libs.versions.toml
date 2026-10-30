@@ -7,6 +7,7 @@ lifecycle = "2.6.1"
 fragment = "1.5.1"
 # 2.58 è l'ultima che supporta AGP 8: dalla 2.59 il plugin di Hilt richiede AGP 9.
 hilt = "2.58"
+recyclerview = "1.1.0"
 squidlib = "3.0.6"
 junit4 = "4.13.2"
 mockito = "5.11.0"
@@ -33,6 +34,7 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 material = { module = "com.google.android.material:material", version.ref = "material" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "lifecycle" }
 lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }

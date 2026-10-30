@@ -7,4 +7,19 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Le celle: visibile ed esplorata si distinguono per luminosità, non solo per tinta -->
+    <color name="tile_visible_floor">#FF444444</color>
+    <color name="tile_visible_wall">#FF8B4513</color>
+    <color name="tile_explored_floor">#FF282828</color>
+    <color name="tile_explored_wall">#FF321905</color>
+
+    <!-- Gli attori e gli oggetti, finché non arrivano le illustrazioni -->
+    <color name="kind_player">#FF00FF00</color>
+    <color name="kind_goblin">#FFFF0000</color>
+    <color name="kind_potion">#FF00FFFF</color>
+
+    <!-- L'inventario -->
+    <color name="inventory_cell">#FF2A2A2A</color>
+    <color name="inventory_cell_selected">#FFFFFFFF</color>
 </resources>

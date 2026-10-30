@@ -132,6 +132,49 @@ class GameViewModelTest {
         assertThat(viewModel.state().result().snapshot().inventory()).isEmpty();
     }
 
+    /** Un tocco seleziona e mostra la scheda; "Usa" consuma l'oggetto, che esce dalla selezione. */
+    @Test
+    void selectItem_thenChooseIt_usesThePotion_andClearsTheSelection() {
+        GameViewModel viewModel = drawn("############", "#@!.......g#", "############");
+        viewModel.submit(new MoveCommand(Direction.RIGHT));
+        EntityId potion = viewModel.state().result().snapshot().inventory().get(0).id();
+        viewModel.toggleInventory();
+
+        viewModel.selectItem(potion);
+        GameUiState selected = viewModel.state();
+        viewModel.chooseItem(potion);
+
+        assertThat(selected.selectedItem()).contains(potion);
+        assertThat(selected.result().snapshot().turn()).isEqualTo(2);
+        assertThat(viewModel.state().selectedItem()).isEmpty();
+        assertThat(viewModel.state().inventoryOpen()).isTrue();
+    }
+
+    @Test
+    void selectItem_notInTheInventory_isIgnored() {
+        GameViewModel viewModel = viewModel();
+
+        viewModel.selectItem(new EntityId(999));
+
+        assertThat(viewModel.state().selectedItem()).isEmpty();
+    }
+
+    /** Dopo una rotazione la nuova Activity non ripete le animazioni già mostrate. */
+    @Test
+    void claimPlayback_isTrueOnlyTheFirstTimeForARevision() {
+        GameViewModel viewModel = viewModel();
+        long revision = viewModel.state().result().revision();
+
+        boolean first = viewModel.claimPlayback(revision);
+        boolean again = viewModel.claimPlayback(revision);
+        viewModel.submit(new MoveCommand(Direction.UP));
+        boolean next = viewModel.claimPlayback(viewModel.state().result().revision());
+
+        assertThat(first).isTrue();
+        assertThat(again).isFalse();
+        assertThat(next).isTrue();
+    }
+
     @Test
     void closeInventory_closesIt() {
         GameViewModel viewModel = viewModel();

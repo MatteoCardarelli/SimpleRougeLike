@@ -5,49 +5,60 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.github.matteocardarelli.simpleroguelike.R;
-import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.databinding.ActivityGameBinding;
-import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
-import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
-import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackHost;
+import io.github.matteocardarelli.simpleroguelike.ui.input.SwipeInputMapper;
+import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryContent;
+import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryHost;
+import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventorySheet;
+import io.github.matteocardarelli.simpleroguelike.ui.playback.EventPlayer;
+import io.github.matteocardarelli.simpleroguelike.ui.playback.GatedPlayerInput;
+import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
+import io.github.matteocardarelli.simpleroguelike.ui.playback.TurnPlayback;
+import io.github.matteocardarelli.simpleroguelike.ui.render.Camera;
+import io.github.matteocardarelli.simpleroguelike.ui.render.TilePalette;
 import java.io.IOException;
-import java.util.List;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 
 /**
- * L'Activity del gioco: trasforma i gesti in azioni per il {@link GameViewModel} e disegna ogni
- * {@link GameUiState} che riceve. Non decide niente della partita: dopo una rotazione la nuova
- * Activity riceve lo stesso stato e lo ridisegna.
+ * L'Activity del gioco: trasforma i gesti in azioni e disegna ogni {@link GameUiState} che riceve.
+ * Non decide niente della partita: dopo una rotazione la nuova Activity riceve lo stesso stato, lo
+ * ridisegna senza ripetere le animazioni e lascia al sistema il compito di ricreare l'inventario.
+ *
+ * <p>Ogni azione di gioco, dalla mappa o dall'inventario, passa da {@link GatedPlayerInput}: mentre
+ * un turno viene riprodotto resta in coda solo l'ultima.
  */
 @AndroidEntryPoint
-public class GameActivity extends AppCompatActivity implements FeedbackHost {
+public class GameActivity extends AppCompatActivity implements InventoryHost, FeedbackHost {
 
     private static final String TAG = "GameActivity";
-    private static final int SWIPE_THRESHOLD_PX = 100;
-    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     @Inject ContentPresentation content;
+    @Inject EventPlayer eventPlayer;
+    @Inject Scene scene;
 
     private ActivityGameBinding binding;
     private GameViewModel viewModel;
+    private TurnPlayback playback;
+    private GatedPlayerInput input;
     private GestureDetector gestures;
-    private OnBackPressedCallback closeInventoryOnBack;
     private @Nullable Snackbar lostGameNotice;
 
     @Override
@@ -56,175 +67,102 @@ public class GameActivity extends AppCompatActivity implements FeedbackHost {
         binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(GameViewModel.class);
-        gestures = new GestureDetector(this, new Gestures());
 
-        // Le note di collaudo si scrivono solo nelle build di debug.
+        playback = new TurnPlayback(eventPlayer, scene);
+        input = new GatedPlayerInput(viewModel, playback);
+        playback.setOnIdle(input::flush);
+
+        binding.gameView.setUp(
+                new Camera(getResources().getDimension(R.dimen.cell_size)),
+                TilePalette.from(this),
+                content);
+        gestures =
+                new GestureDetector(
+                        this,
+                        new SwipeInputMapper(
+                                input, getResources().getDimension(R.dimen.swipe_min_distance)));
+        binding.newGameButton.setOnClickListener(v -> viewModel.newGame());
         if (getResources().getBoolean(R.bool.feedback_enabled)) {
             binding.feedbackButton.setVisibility(View.VISIBLE);
             binding.feedbackButton.setOnClickListener(v -> showFeedbackDialog());
         }
-
-        // Indietro chiude l'inventario solo se è aperto: con l'inventario chiuso il callback è
-        // spento, e indietro fa quello che fa sempre.
-        closeInventoryOnBack =
-                new OnBackPressedCallback(false) {
-                    @Override
-                    public void handleOnBackPressed() {
-                        viewModel.closeInventory();
-                    }
-                };
-        getOnBackPressedDispatcher().addCallback(this, closeInventoryOnBack);
+        keepTextAwayFromSystemBars();
 
         viewModel.uiState().observe(this, this::render);
     }
 
-    /**
-     * Passa ogni tocco al gestore dei gesti prima che arrivi alle viste: con l'inventario aperto la
-     * lista scorrevole consumerebbe i tocchi, e il doppio tap non arriverebbe mai.
-     */
+    /** I tocchi che nessuna vista ha consumato sono gesti sulla mappa. */
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        boolean gesture = gestures.onTouchEvent(event);
-        return super.dispatchTouchEvent(event) || gesture;
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestures.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
-    private final class Gestures extends GestureDetector.SimpleOnGestureListener {
-
-        @Override
-        public boolean onFling(
-                @Nullable MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (e1 == null) {
-                return false;
-            }
-            float diffX = e2.getX() - e1.getX();
-            float diffY = e2.getY() - e1.getY();
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > SWIPE_THRESHOLD_PX
-                        && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                    move(diffX > 0 ? Direction.RIGHT : Direction.LEFT);
-                    return true;
-                }
-            } else if (Math.abs(diffY) > SWIPE_THRESHOLD_PX
-                    && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                move(diffY > 0 ? Direction.DOWN : Direction.UP);
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * A partita finita il doppio tap ne inizia una nuova; durante la partita apre o chiude
-         * l'inventario, anche sopra la lista.
-         */
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            if (viewModel.state().result().snapshot().phase() != Phase.PLAYING) {
-                viewModel.newGame();
-            } else {
-                viewModel.toggleInventory();
-            }
-            return true;
-        }
-
-        /**
-         * Un oggetto si usa con un tocco singolo confermato, che arriva solo quando il tempo del
-         * doppio tap è scaduto: un doppio tap sopra una pozione chiude l'inventario senza usarla.
-         */
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            if (!viewModel.state().inventoryOpen()) {
-                return false;
-            }
-            EntityId item = itemAt(e.getRawX(), e.getRawY());
-            if (item == null) {
-                return false;
-            }
-            viewModel.chooseItem(item);
-            return true;
-        }
+    /**
+     * L'app è disegnata anche sotto le barre di sistema: la mappa ci sta, testo e pulsanti no. Gli
+     * insets di barre e ritaglio dello schermo diventano il margine interno del livello sopra la
+     * mappa.
+     */
+    private void keepTextAwayFromSystemBars() {
+        ViewCompat.setOnApplyWindowInsetsListener(
+                binding.hud,
+                (view, windowInsets) -> {
+                    Insets insets =
+                            windowInsets.getInsets(
+                                    WindowInsetsCompat.Type.systemBars()
+                                            | WindowInsetsCompat.Type.displayCutout());
+                    view.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+                    return windowInsets;
+                });
     }
 
-    /** Con l'inventario aperto la partita è in pausa: gli swipe non fanno niente. */
-    private void move(Direction direction) {
-        if (!viewModel.state().inventoryOpen()) {
-            viewModel.submit(new MoveCommand(direction));
-        }
-    }
-
-    /** L'oggetto della lista sotto il punto toccato, in coordinate dello schermo. */
-    private @Nullable EntityId itemAt(float screenX, float screenY) {
-        int[] origin = new int[2];
-        for (int i = 0; i < binding.inventoryItemList.getChildCount(); i++) {
-            View child = binding.inventoryItemList.getChildAt(i);
-            if (child.getTag() instanceof EntityId id) {
-                child.getLocationOnScreen(origin);
-                if (screenX >= origin[0]
-                        && screenX < origin[0] + child.getWidth()
-                        && screenY >= origin[1]
-                        && screenY < origin[1] + child.getHeight()) {
-                    return id;
-                }
-            }
-        }
-        return null;
-    }
-
-    /** Disegna lo stato: barre, messaggio di fine partita, inventario, mappa, avvisi. */
+    /** Disegna lo stato: riproduzione del turno, barre, fine partita, inventario, avvisi. */
     private void render(GameUiState state) {
         GameSnapshot snapshot = state.result().snapshot();
-        PlayerView player = snapshot.player();
+        playback.show(state.result(), viewModel.claimPlayback(state.result().revision()));
+        binding.gameView.show(snapshot, scene);
 
+        PlayerView player = snapshot.player();
         binding.healthBar.setMax(player.maxHealth());
         binding.healthBar.setProgress(player.health());
         binding.xpBar.setMax(player.experienceToNextLevel());
         binding.xpBar.setProgress(player.experience());
 
-        // A partita finita resta solo il messaggio, finché un doppio tap non ne inizia un'altra.
         switch (snapshot.phase()) {
-            case PLAYING -> binding.endMessage.setVisibility(View.GONE);
-            case GAME_OVER -> showEndMessage(R.string.end_game_over);
-            case VICTORY -> showEndMessage(R.string.end_victory);
+            case PLAYING -> binding.endPanel.setVisibility(View.GONE);
+            case GAME_OVER -> showEndPanel(R.string.end_game_over);
+            case VICTORY -> showEndPanel(R.string.end_victory);
         }
 
-        showInventory(snapshot, state.inventoryOpen());
-        closeInventoryOnBack.setEnabled(state.inventoryOpen());
+        syncInventorySheet(state);
         showLostGameNotice(state.previousGameLost());
-        binding.gameView.show(snapshot);
     }
 
-    private void showEndMessage(@StringRes int message) {
+    private void showEndPanel(@StringRes int message) {
         binding.endMessage.setText(message);
-        binding.endMessage.setVisibility(View.VISIBLE);
+        binding.endPanel.setVisibility(View.VISIBLE);
     }
 
-    /** Mostra l'inventario con gli oggetti dello snapshot, oppure lo nasconde. */
-    private void showInventory(GameSnapshot snapshot, boolean open) {
-        if (!open) {
-            binding.inventoryLayout.setVisibility(View.GONE);
-            return;
-        }
-        binding.inventoryItemList.removeAllViews();
-        List<InventoryEntry> inventory = snapshot.inventory();
-        if (inventory.isEmpty()) {
-            TextView empty = new TextView(this);
-            empty.setText(R.string.inventory_empty);
-            empty.setTextColor(getColor(android.R.color.white));
-            binding.inventoryItemList.addView(empty);
-        } else {
-            // Il tocco lo riconosce il gestore dei gesti dall'id nel tag: un OnClickListener
-            // scatterebbe anche al primo tocco di un doppio tap.
-            for (InventoryEntry entry : inventory) {
-                TextView item = new TextView(this);
-                item.setText(content.nameRes(entry.kind()));
-                item.setTextColor(getColor(android.R.color.white));
-                item.setTextSize(20);
-                item.setPadding(0, 8, 0, 8);
-                item.setBackgroundResource(android.R.drawable.btn_default);
-                item.setTag(entry.id());
-                binding.inventoryItemList.addView(item);
+    /**
+     * Lo sheet segue lo stato, non il contrario: se deve essere aperto e non c'è lo apre, se c'è
+     * gli passa il contenuto, se deve essere chiuso e c'è lo chiude. Dopo una rotazione il sistema
+     * ha già ricreato lo sheet, e il controllo evita il duplicato.
+     */
+    private void syncInventorySheet(GameUiState state) {
+        FragmentManager fragments = getSupportFragmentManager();
+        InventorySheet sheet = (InventorySheet) fragments.findFragmentByTag(InventorySheet.TAG);
+        if (state.inventoryOpen()) {
+            if (sheet == null) {
+                new InventorySheet().show(fragments, InventorySheet.TAG);
+            } else {
+                sheet.show(inventory(state));
             }
+        } else if (sheet != null) {
+            sheet.dismiss();
         }
-        binding.inventoryLayout.setVisibility(View.VISIBLE);
+    }
+
+    private static InventoryContent inventory(GameUiState state) {
+        return new InventoryContent(state.result().snapshot().inventory(), state.selectedItem());
     }
 
     /** L'avviso resta finché il giocatore non lo conferma, anche dopo una rotazione. */
@@ -242,6 +180,36 @@ public class GameActivity extends AppCompatActivity implements FeedbackHost {
             lostGameNotice.dismiss();
             lostGameNotice = null;
         }
+    }
+
+    @Override
+    public ContentPresentation content() {
+        return content;
+    }
+
+    @Override
+    public InventoryContent currentInventory() {
+        return inventory(viewModel.state());
+    }
+
+    @Override
+    public void onItemSelected(EntityId item) {
+        viewModel.selectItem(item);
+    }
+
+    @Override
+    public void onUseSelected() {
+        viewModel.state().selectedItem().ifPresent(input::chooseItem);
+    }
+
+    @Override
+    public void onInventoryToggled() {
+        input.toggleInventory();
+    }
+
+    @Override
+    public void onInventoryCancelled() {
+        viewModel.closeInventory();
     }
 
     /** Apre la finestra della nota, se non è già aperta: non consuma il turno. */

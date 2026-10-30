@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Il lato di una cella della mappa -->
+    <dimen name="cell_size">32dp</dimen>
+    <!-- La distanza minima perché un tocco trascinato sia uno swipe -->
+    <dimen name="swipe_min_distance">40dp</dimen>
+</resources>

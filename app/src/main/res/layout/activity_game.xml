@@ -5,103 +5,91 @@
     android:layout_height="match_parent"
     tools:context=".ui.game.GameActivity">
 
-    <!-- La mappa, sotto a tutto il resto -->
+    <!-- La mappa, anche sotto le barre di sistema -->
     <io.github.matteocardarelli.simpleroguelike.ui.render.GameView
         android:id="@+id/game_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Salute ed esperienza -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|start"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical">
-
-        <ProgressBar
-            android:id="@+id/health_bar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="150dp"
-            android:layout_height="20dp"
-            android:max="100"
-            android:progress="100"
-            android:progressTint="@android:color/holo_green_dark" />
-
-        <ProgressBar
-            android:id="@+id/xp_bar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="150dp"
-            android:layout_height="15dp"
-            android:layout_marginTop="4dp"
-            android:max="100"
-            android:progress="0"
-            android:progressTint="@android:color/holo_blue_light" />
-
-    </LinearLayout>
-
-    <!-- Il pulsante delle note di collaudo: visibile solo nelle build di debug -->
-    <Button
-        android:id="@+id/feedback_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:minWidth="48dp"
-        android:minHeight="48dp"
-        android:text="@string/feedback_button"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <!-- Il messaggio di fine partita: un doppio tap ne inizia un'altra -->
-    <TextView
-        android:id="@+id/end_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:padding="24dp"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:visibility="gone"
-        tools:text="@string/end_game_over"
-        tools:visibility="visible" />
-
-    <!-- L'inventario: una lista sopra la mappa, finché al passo 5c non diventa un bottom sheet -->
-    <LinearLayout
-        android:id="@+id/inventory_layout"
+    <!-- Testo e comandi, lontani dalle barre di sistema e dal ritaglio dello schermo -->
+    <FrameLayout
+        android:id="@+id/hud"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#A0444444"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="40dp"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:layout_height="match_parent">
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/inventory_title"
-            android:textColor="@android:color/white"
-            android:textSize="24sp" />
+            android:layout_gravity="top|start"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            <ProgressBar
+                android:id="@+id/health_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="150dp"
+                android:layout_height="20dp"
+                android:max="100"
+                android:progress="100"
+                android:progressTint="@android:color/holo_green_dark" />
 
-            <LinearLayout
-                android:id="@+id/inventory_item_list"
-                android:layout_width="match_parent"
+            <ProgressBar
+                android:id="@+id/xp_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="150dp"
+                android:layout_height="15dp"
+                android:layout_marginTop="4dp"
+                android:max="100"
+                android:progress="0"
+                android:progressTint="@android:color/holo_blue_light" />
+
+        </LinearLayout>
+
+        <!-- Il pulsante delle note di collaudo: visibile solo nelle build di debug -->
+        <Button
+            android:id="@+id/feedback_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:text="@string/feedback_button"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <!-- La fine della partita, provvisoria fino alla schermata di fine partita -->
+        <LinearLayout
+            android:id="@+id/end_panel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/end_message"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:gravity="center"
+                android:padding="16dp"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                tools:text="@string/end_game_over" />
 
-        </ScrollView>
+            <Button
+                android:id="@+id/new_game_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/new_game" />
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
 
 </FrameLayout>

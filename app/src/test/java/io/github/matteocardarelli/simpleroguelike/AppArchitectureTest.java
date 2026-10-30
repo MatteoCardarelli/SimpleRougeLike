@@ -175,6 +175,26 @@ class AppArchitectureTest {
                     "ui.content");
 
     @ArchTest
+    static final ArchRule uiPlaybackUsesSessionCommandSnapshotAndInput =
+            onlyDependOn(
+                    "ui.playback",
+                    "la riproduzione mostra i risultati della sessione e blocca l'input, senza"
+                            + " conoscere regole né contenuti",
+                    "session",
+                    "command",
+                    "snapshot",
+                    "ui.input");
+
+    @ArchTest
+    static final ArchRule uiInventoryUsesOnlySnapshotAndContent =
+            onlyDependOn(
+                    "ui.inventory",
+                    "l'inventario mostra gli oggetti dello snapshot e passa le scelte all'Activity:"
+                            + " non conosce il ViewModel",
+                    "snapshot",
+                    "ui.content");
+
+    @ArchTest
     static final ArchRule uiContentUsesOnlyTheKernel =
             onlyDependOn(
                     "ui.content",
@@ -260,7 +280,8 @@ class AppArchitectureTest {
                                 "org.jspecify.annotations..",
                                 BASE + "." + packageName + "..",
                                 BASE + ".model..",
-                                BASE + ".event.."));
+                                BASE + ".event..",
+                                BASE + ".databinding.."));
         for (String other : allowed) {
             packages.add(BASE + "." + other + "..");
         }
