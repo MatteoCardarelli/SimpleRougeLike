@@ -110,6 +110,12 @@ public final class ContentModule {
                         R.string.kind_potion_description,
                         R.color.kind_potion));
         styles.put(
+                StandardItemCatalog.GREATER_POTION,
+                new ContentPresentation.Style(
+                        R.string.kind_greater_potion_name,
+                        R.string.kind_greater_potion_description,
+                        R.color.kind_greater_potion));
+        styles.put(
                 StandardEnemyCatalog.GOBLIN,
                 new ContentPresentation.Style(
                         R.string.kind_goblin_name,

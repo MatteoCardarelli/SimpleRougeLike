@@ -5,6 +5,8 @@
     <string name="kind_player_description">L\'avventuriero che esplora il piano.</string>
     <string name="kind_potion_name">Pozione</string>
     <string name="kind_potion_description">Un liquido luminoso che rimargina le ferite: cura 25 punti di salute.</string>
+    <string name="kind_greater_potion_name">Pozione grande</string>
+    <string name="kind_greater_potion_description">Densa e amara, ma ne basta poca: cura 60 punti di salute.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -15,9 +17,24 @@
 
     <string name="end_game_over">Sei morto.</string>
     <string name="end_victory">Hai sconfitto tutti i nemici!</string>
+    <string name="end_stats">Turno %1$d · livello %2$d</string>
     <string name="new_game">Nuova partita</string>
     <string name="previous_game_lost">Android ha chiuso l\'app: la partita precedente è andata persa.</string>
     <string name="previous_game_lost_ok">OK</string>
+
+    <string name="log_died_player">Sei morto.</string>
+    <string name="log_died">%1$s muore.</string>
+    <string name="log_leveled_up">Sali al livello %1$d!</string>
+    <string name="log_item_picked_up">Raccogli: %1$s.</string>
+    <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
+    <string name="log_item_used">Usi: %1$s.</string>
+
+    <string name="a11y_health">Salute</string>
+    <string name="a11y_health_value">%1$d su %2$d</string>
+    <string name="a11y_experience">Esperienza</string>
+    <string name="a11y_experience_value">%1$d su %2$d, livello %3$d</string>
+
+    <string name="debug_info">seed %1$d · turno %2$d</string>
 
     <string name="feedback_button">Nota</string>
     <string name="feedback_title">Nota di collaudo</string>
@@ -27,4 +44,25 @@
     <string name="feedback_saved">Nota salvata</string>
     <string name="feedback_empty">Nota vuota: non salvata</string>
     <string name="feedback_failed">Impossibile salvare la nota</string>
+
+    <plurals name="log_damaged_player">
+        <item quantity="one">Subisci %1$d danno.</item>
+        <item quantity="other">Subisci %1$d danni.</item>
+    </plurals>
+    <plurals name="log_damaged_enemy">
+        <item quantity="one">Colpisci per %1$d danno.</item>
+        <item quantity="other">Colpisci per %1$d danni.</item>
+    </plurals>
+    <plurals name="log_healed_player">
+        <item quantity="one">Recuperi %1$d punto di salute.</item>
+        <item quantity="other">Recuperi %1$d punti di salute.</item>
+    </plurals>
+    <plurals name="log_healed_enemy">
+        <item quantity="one">Un nemico recupera %1$d punto di salute.</item>
+        <item quantity="other">Un nemico recupera %1$d punti di salute.</item>
+    </plurals>
+    <plurals name="log_experience">
+        <item quantity="one">Guadagni %1$d punto esperienza.</item>
+        <item quantity="other">Guadagni %1$d punti esperienza.</item>
+    </plurals>
 </resources>

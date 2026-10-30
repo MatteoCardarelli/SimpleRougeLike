@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.databinding.ActivityGameBinding;
+import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
@@ -27,6 +28,7 @@ import io.github.matteocardarelli.simpleroguelike.ui.input.SwipeInputMapper;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryContent;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryHost;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventorySheet;
+import io.github.matteocardarelli.simpleroguelike.ui.log.EventMessageFormatter;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.EventPlayer;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.GatedPlayerInput;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
@@ -34,6 +36,8 @@ import io.github.matteocardarelli.simpleroguelike.ui.playback.TurnPlayback;
 import io.github.matteocardarelli.simpleroguelike.ui.render.Camera;
 import io.github.matteocardarelli.simpleroguelike.ui.render.TilePalette;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 
@@ -53,6 +57,10 @@ public class GameActivity extends AppCompatActivity implements InventoryHost, Fe
     @Inject ContentPresentation content;
     @Inject EventPlayer eventPlayer;
     @Inject Scene scene;
+    @Inject EventMessageFormatter formatter;
+
+    /** Quante righe mostra il registro: le ultime, le più recenti in fondo. */
+    private static final int LOG_LINES = 4;
 
     private ActivityGameBinding binding;
     private GameViewModel viewModel;
@@ -126,20 +134,56 @@ public class GameActivity extends AppCompatActivity implements InventoryHost, Fe
         binding.healthBar.setProgress(player.health());
         binding.xpBar.setMax(player.experienceToNextLevel());
         binding.xpBar.setProgress(player.experience());
+        // TalkBack legge il nome della barra e il suo valore, non una percentuale.
+        binding.healthBar.setStateDescription(
+                getString(R.string.a11y_health_value, player.health(), player.maxHealth()));
+        binding.xpBar.setStateDescription(
+                getString(
+                        R.string.a11y_experience_value,
+                        player.experience(),
+                        player.experienceToNextLevel(),
+                        player.level()));
+
+        showLog(state);
+        if (getResources().getBoolean(R.bool.show_debug_info)) {
+            binding.debugInfo.setVisibility(View.VISIBLE);
+            binding.debugInfo.setText(
+                    getString(R.string.debug_info, snapshot.seed(), snapshot.turn()));
+        }
 
         switch (snapshot.phase()) {
             case PLAYING -> binding.endPanel.setVisibility(View.GONE);
-            case GAME_OVER -> showEndPanel(R.string.end_game_over);
-            case VICTORY -> showEndPanel(R.string.end_victory);
+            case GAME_OVER -> showEndPanel(R.string.end_game_over, snapshot);
+            case VICTORY -> showEndPanel(R.string.end_victory, snapshot);
         }
 
         syncInventorySheet(state);
         showLostGameNotice(state.previousGameLost());
     }
 
-    private void showEndPanel(@StringRes int message) {
+    /** La fine della partita: il risultato, fin dove si è arrivati, e "Nuova partita". */
+    private void showEndPanel(@StringRes int message, GameSnapshot snapshot) {
         binding.endMessage.setText(message);
+        binding.endStats.setText(
+                getString(R.string.end_stats, snapshot.turn(), snapshot.player().level()));
         binding.endPanel.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Le ultime righe del registro. È una regione live: TalkBack legge i messaggi nuovi mentre si
+     * gioca.
+     */
+    private void showLog(GameUiState state) {
+        EntityId player = state.result().snapshot().player().id();
+        List<String> lines = new ArrayList<>();
+        for (GameEvent event : state.log()) {
+            formatter.format(event, player).ifPresent(lines::add);
+        }
+        List<String> last = lines.subList(Math.max(0, lines.size() - LOG_LINES), lines.size());
+        String text = String.join("\n", last);
+        if (!text.contentEquals(binding.log.getText())) {
+            binding.log.setText(text);
+        }
     }
 
     /**

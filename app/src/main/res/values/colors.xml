@@ -18,6 +18,10 @@
     <color name="kind_player">#FF00FF00</color>
     <color name="kind_goblin">#FFFF0000</color>
     <color name="kind_potion">#FF00FFFF</color>
+    <color name="kind_greater_potion">#FF4D7CFF</color>
+
+    <!-- Il fondo del registro e della fine partita, sopra la mappa -->
+    <color name="overlay">#CC000000</color>
 
     <!-- L'inventario -->
     <color name="inventory_cell">#FF2A2A2A</color>

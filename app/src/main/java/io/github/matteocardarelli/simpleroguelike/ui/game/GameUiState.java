@@ -1,7 +1,9 @@
 package io.github.matteocardarelli.simpleroguelike.ui.game;
 
+import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -9,6 +11,7 @@ import java.util.Optional;
  * dell'interfaccia, che vive nel ViewModel e sopravvive alla rotazione.
  *
  * @param selectedItem l'oggetto dell'inventario di cui si vede la scheda
+ * @param log gli ultimi eventi visibili della partita, dal più vecchio: il registro dei messaggi
  * @param previousGameLost Android ha chiuso l'app durante una partita, che è andata persa: va detto
  *     al giocatore finché non lo conferma
  */
@@ -16,4 +19,10 @@ public record GameUiState(
         TurnResult result,
         boolean inventoryOpen,
         Optional<EntityId> selectedItem,
-        boolean previousGameLost) {}
+        List<GameEvent> log,
+        boolean previousGameLost) {
+
+    public GameUiState {
+        log = List.copyOf(log);
+    }
+}
