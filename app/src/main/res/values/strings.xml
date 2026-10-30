@@ -4,7 +4,7 @@
     <string name="kind_player_name">Tu</string>
     <string name="kind_player_description">L\'avventuriero che esplora il piano.</string>
     <string name="kind_potion_name">Pozione</string>
-    <string name="kind_potion_description">Un liquido rosso che rimargina le ferite: cura 25 punti di salute.</string>
+    <string name="kind_potion_description">Un liquido luminoso che rimargina le ferite: cura 25 punti di salute.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
