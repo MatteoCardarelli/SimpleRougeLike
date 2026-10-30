@@ -90,7 +90,7 @@ class FloorPopulatorTest {
         assertThat(floor.player().inventory().capacity()).isEqualTo(10);
         assertThat(floor.enemies().get(0).kind()).isEqualTo(StandardEnemyCatalog.GOBLIN);
         assertThat(floor.itemsOnGround().values().iterator().next().kind())
-                .isEqualTo(StandardItemCatalog.POTION);
+                .isIn(StandardItemCatalog.POTION, StandardItemCatalog.GREATER_POTION);
     }
 
     @Test

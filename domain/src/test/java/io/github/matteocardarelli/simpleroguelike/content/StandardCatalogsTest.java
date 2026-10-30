@@ -11,11 +11,13 @@ import org.junit.jupiter.api.Test;
 class StandardCatalogsTest {
 
     @Test
-    void items_containThePotion() {
+    void items_containThePotionAndTheGreaterPotion() {
         assertThat(new StandardItemCatalog().all())
                 .containsExactly(
                         new ItemDefinition(
-                                StandardItemCatalog.POTION, new HealEffect(25), true, 10));
+                                StandardItemCatalog.POTION, new HealEffect(25), true, 10),
+                        new ItemDefinition(
+                                StandardItemCatalog.GREATER_POTION, new HealEffect(60), true, 3));
     }
 
     @Test
