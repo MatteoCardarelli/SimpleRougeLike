@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.github.matteocardarelli.simpleroguelike.command.Command;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
+import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.feedback.BuildInfo;
 import io.github.matteocardarelli.simpleroguelike.feedback.CommandJournal;
 import io.github.matteocardarelli.simpleroguelike.feedback.CommandLogFormat;
@@ -50,6 +51,10 @@ import org.jspecify.annotations.Nullable;
 public final class GameViewModel extends ViewModel implements PlayerInput {
 
     private static final String GAME_IN_PROGRESS = "game_in_progress";
+
+    /** Quanti eventi tiene il registro: abbastanza per qualche turno, sempre pochi. */
+    static final int LOG_SIZE = 50;
+
     private static final DateTimeFormatter NOTE_TIME =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT);
 
@@ -62,6 +67,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private final CommandJournal journal = new CommandJournal();
     private final CommandLogFormat format = new CommandLogFormat();
     private final MutableLiveData<GameUiState> uiState = new MutableLiveData<>();
+    private final List<GameEvent> log = new ArrayList<>();
     private boolean inventoryOpen;
     private @Nullable EntityId selectedItem;
     private boolean previousGameLost;
@@ -119,6 +125,10 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         }
         if (!inInventory(result, selectedItem)) {
             selectedItem = null;
+        }
+        log.addAll(result.events());
+        if (log.size() > LOG_SIZE) {
+            log.subList(0, log.size() - LOG_SIZE).clear();
         }
         publish(result);
     }
@@ -207,6 +217,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         journal.start(seed);
         inventoryOpen = false;
         selectedItem = null;
+        log.clear();
         TurnResult result = session.newGame(seed);
         saved.set(GAME_IN_PROGRESS, true);
         publish(result);
@@ -218,6 +229,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
                         result,
                         inventoryOpen,
                         Optional.ofNullable(selectedItem),
+                        log,
                         previousGameLost));
     }
 

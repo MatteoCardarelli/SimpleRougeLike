@@ -2,4 +2,6 @@
 <resources>
     <!-- Le note di collaudo si scrivono solo nelle build di debug: vedi src/debug -->
     <bool name="feedback_enabled">false</bool>
+    <!-- Seed e turno a schermo, per riprodurre una partita: vedi src/debug -->
+    <bool name="show_debug_info">false</bool>
 </resources>

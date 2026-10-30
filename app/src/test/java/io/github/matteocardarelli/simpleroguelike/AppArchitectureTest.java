@@ -195,6 +195,13 @@ class AppArchitectureTest {
                     "ui.content");
 
     @ArchTest
+    static final ArchRule uiLogUsesOnlyContent =
+            onlyDependOn(
+                    "ui.log",
+                    "il testo di un evento dipende solo dall'evento e dal nome dei contenuti",
+                    "ui.content");
+
+    @ArchTest
     static final ArchRule uiContentUsesOnlyTheKernel =
             onlyDependOn(
                     "ui.content",

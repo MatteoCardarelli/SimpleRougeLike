@@ -175,6 +175,34 @@ class GameViewModelTest {
         assertThat(next).isTrue();
     }
 
+    /**
+     * Il registro tiene gli eventi visibili dei turni, sopravvive alla rotazione con il ViewModel.
+     */
+    @Test
+    void submit_addsTheVisibleEventsToTheLog_andNewGameClearsIt() {
+        GameViewModel viewModel = viewModel();
+
+        for (Direction direction : Direction.values()) {
+            viewModel.submit(new MoveCommand(direction));
+        }
+        int afterMoves = viewModel.state().log().size();
+        viewModel.newGame();
+
+        assertThat(afterMoves).isPositive();
+        assertThat(viewModel.state().log()).isEmpty();
+    }
+
+    @Test
+    void log_keepsOnlyTheLastEvents() {
+        GameViewModel viewModel = viewModel();
+
+        for (int i = 0; i < GameViewModel.LOG_SIZE; i++) {
+            viewModel.submit(new MoveCommand(i % 2 == 0 ? Direction.LEFT : Direction.RIGHT));
+        }
+
+        assertThat(viewModel.state().log()).hasSizeLessThanOrEqualTo(GameViewModel.LOG_SIZE);
+    }
+
     @Test
     void closeInventory_closesIt() {
         GameViewModel viewModel = viewModel();

@@ -2,4 +2,6 @@
 <resources>
     <!-- Nelle build di debug il pulsante "Nota" scrive le note di collaudo -->
     <bool name="feedback_enabled">true</bool>
+    <!-- Nelle build di debug seed e turno sono a schermo -->
+    <bool name="show_debug_info">true</bool>
 </resources>

@@ -27,6 +27,7 @@
 
             <ProgressBar
                 android:id="@+id/health_bar"
+                android:contentDescription="@string/a11y_health"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="150dp"
                 android:layout_height="20dp"
@@ -36,6 +37,7 @@
 
             <ProgressBar
                 android:id="@+id/xp_bar"
+                android:contentDescription="@string/a11y_experience"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="150dp"
                 android:layout_height="15dp"
@@ -60,12 +62,49 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <!-- La fine della partita, provvisoria fino alla schermata di fine partita -->
+        <!-- Il registro dei messaggi e, nelle build di debug, seed e turno -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/overlay"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityLiveRegion="polite"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="4"
+                android:minLines="4"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                tools:text="Colpisci per 10 danni.\nSubisci 5 danni." />
+
+            <TextView
+                android:id="@+id/debug_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="seed 42 · turno 7"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- La schermata di fine partita, sopra a tutto il resto -->
         <LinearLayout
             android:id="@+id/end_panel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/overlay"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone"
@@ -78,8 +117,17 @@
                 android:gravity="center"
                 android:padding="16dp"
                 android:textColor="@android:color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 tools:text="@string/end_game_over" />
+
+            <TextView
+                android:id="@+id/end_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:text="Turno 34 · livello 2" />
 
             <Button
                 android:id="@+id/new_game_button"
