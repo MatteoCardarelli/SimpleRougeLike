@@ -8,6 +8,7 @@ import io.github.matteocardarelli.simpleroguelike.command.Command;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyDefinition;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemDefinition;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.game.SeedSource;
@@ -25,7 +26,7 @@ class ModulesTest {
     @Test
     void everyKindOfTheCatalogs_hasANameToShow() {
         ContentPresentation content = ContentModule.contentPresentation();
-        List<Kind> kinds = new ArrayList<>();
+        List<Kind> kinds = new ArrayList<>(List.of(Player.KIND));
         for (ItemDefinition item : ContentModule.itemCatalog().all()) {
             kinds.add(item.kind());
         }

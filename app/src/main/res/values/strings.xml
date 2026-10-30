@@ -1,13 +1,24 @@
 <resources>
     <string name="app_name">SimpleRogueLike</string>
-    <string name="inventory_title">Inventario</string>
+
+    <string name="kind_player_name">Tu</string>
+    <string name="kind_player_description">L\'avventuriero che esplora il piano.</string>
     <string name="kind_potion_name">Pozione</string>
+    <string name="kind_potion_description">Un liquido luminoso che rimargina le ferite: cura 25 punti di salute.</string>
     <string name="kind_goblin_name">Goblin</string>
+    <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
+
+    <string name="inventory_title">Inventario</string>
+    <string name="inventory_empty">Il tuo inventario è vuoto.</string>
+    <string name="inventory_select">Tocca un oggetto per vederne la scheda.</string>
+    <string name="inventory_use">Usa</string>
+
+    <string name="end_game_over">Sei morto.</string>
+    <string name="end_victory">Hai sconfitto tutti i nemici!</string>
+    <string name="new_game">Nuova partita</string>
     <string name="previous_game_lost">Android ha chiuso l\'app: la partita precedente è andata persa.</string>
     <string name="previous_game_lost_ok">OK</string>
-    <string name="inventory_empty">Il tuo inventario è vuoto.</string>
-    <string name="end_game_over">Sei morto.\nDoppio tap per una nuova partita.</string>
-    <string name="end_victory">Hai sconfitto tutti i nemici!\nDoppio tap per una nuova partita.</string>
+
     <string name="feedback_button">Nota</string>
     <string name="feedback_title">Nota di collaudo</string>
     <string name="feedback_hint">Cosa hai notato?</string>

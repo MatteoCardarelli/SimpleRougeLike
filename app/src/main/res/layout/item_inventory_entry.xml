@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Una casella della griglia dell'inventario: forma colorata al posto dell'illustrazione, e nome -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:background="@drawable/bg_inventory_cell"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_horizontal"
+    android:minHeight="72dp"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <View
+        android:id="@+id/art"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/shape_item_art"
+        android:importantForAccessibility="no" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:importantForAccessibility="no"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceCaption" />
+
+</LinearLayout>

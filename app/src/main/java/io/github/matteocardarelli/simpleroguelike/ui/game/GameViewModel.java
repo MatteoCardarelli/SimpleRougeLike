@@ -16,6 +16,7 @@ import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
+import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.ui.input.PlayerInput;
 import java.io.IOException;
@@ -26,15 +27,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import javax.inject.Inject;
+import org.jspecify.annotations.Nullable;
 
 /**
  * La partita e lo stato dell'interfaccia: sopravvivono alla rotazione, a differenza dell'Activity.
  * Un solo flusso: le azioni arrivano come {@link PlayerInput}, lo stato esce come {@link
  * GameUiState}.
  *
- * <p>L'inventario aperto è stato dell'interfaccia, non della partita: resta aperto dopo l'uso di un
- * oggetto e si chiude da solo a fine partita. Il registro dei comandi serve alle note di collaudo.
+ * <p>L'inventario aperto e l'oggetto selezionato sono stato dell'interfaccia, non della partita:
+ * l'inventario resta aperto dopo l'uso di un oggetto e si chiude da solo a fine partita. Il
+ * registro dei comandi serve alle note di collaudo.
+ *
+ * <p>Ogni risultato si riproduce una volta sola: {@link #claimPlayback} lo segna, così dopo una
+ * rotazione la nuova Activity mostra lo stato finale senza ripetere le animazioni.
  *
  * <p>Se Android chiude l'app la partita non si salva: alla ripartenza {@link SavedStateHandle} ha
  * ancora il segno di una partita in corso, la sessione è nuova, e il giocatore viene avvisato.
@@ -56,7 +63,9 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private final CommandLogFormat format = new CommandLogFormat();
     private final MutableLiveData<GameUiState> uiState = new MutableLiveData<>();
     private boolean inventoryOpen;
+    private @Nullable EntityId selectedItem;
     private boolean previousGameLost;
+    private long lastClaimedRevision;
 
     /** Inizia subito una partita, e ricorda se Android aveva chiuso l'app durante quella prima. */
     @Inject
@@ -86,6 +95,20 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         return Objects.requireNonNull(uiState.getValue());
     }
 
+    /**
+     * Segna che un risultato sta per essere riprodotto.
+     *
+     * @return vero solo la prima volta per quella revisione: le volte dopo, per esempio dopo una
+     *     rotazione, la scena si allinea senza animazioni
+     */
+    public boolean claimPlayback(long revision) {
+        if (revision <= lastClaimedRevision) {
+            return false;
+        }
+        lastClaimedRevision = revision;
+        return true;
+    }
+
     /** Esegue un comando: se la partita è finita non succede niente. */
     @Override
     public void submit(Command command) {
@@ -94,6 +117,9 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         if (result.snapshot().phase() != Phase.PLAYING) {
             inventoryOpen = false;
         }
+        if (!inInventory(result, selectedItem)) {
+            selectedItem = null;
+        }
         publish(result);
     }
 
@@ -101,7 +127,18 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     @Override
     public void toggleInventory() {
         inventoryOpen = !inventoryOpen && session.current().snapshot().phase() == Phase.PLAYING;
+        if (!inventoryOpen) {
+            selectedItem = null;
+        }
         publish(session.current());
+    }
+
+    /** Seleziona un oggetto dell'inventario e ne mostra la scheda, senza usarlo. */
+    public void selectItem(EntityId item) {
+        if (inInventory(session.current(), item)) {
+            selectedItem = item;
+            publish(session.current());
+        }
     }
 
     /** Usa un oggetto dell'inventario, che resta aperto con la lista aggiornata. */
@@ -113,6 +150,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     /** Chiude l'inventario senza toccare la partita. */
     public void closeInventory() {
         inventoryOpen = false;
+        selectedItem = null;
         publish(session.current());
     }
 
@@ -168,12 +206,30 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         long seed = seeds.nextSeed();
         journal.start(seed);
         inventoryOpen = false;
+        selectedItem = null;
         TurnResult result = session.newGame(seed);
         saved.set(GAME_IN_PROGRESS, true);
         publish(result);
     }
 
     private void publish(TurnResult result) {
-        uiState.setValue(new GameUiState(result, inventoryOpen, previousGameLost));
+        uiState.setValue(
+                new GameUiState(
+                        result,
+                        inventoryOpen,
+                        Optional.ofNullable(selectedItem),
+                        previousGameLost));
+    }
+
+    private static boolean inInventory(TurnResult result, @Nullable EntityId item) {
+        if (item == null) {
+            return false;
+        }
+        for (InventoryEntry entry : result.snapshot().inventory()) {
+            if (entry.id().equals(item)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

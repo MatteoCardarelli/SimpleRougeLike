@@ -118,6 +118,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.savedstate)
     implementation(libs.lifecycle.livedata)
     implementation(libs.fragment)
+    implementation(libs.recyclerview)
     implementation(libs.squidlib.util)
 
     testImplementation(testFixtures(project(":domain")))

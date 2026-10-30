@@ -13,6 +13,7 @@ import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.content.StandardPlayer;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemCatalog;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.PlayerDefinition;
 import io.github.matteocardarelli.simpleroguelike.feedback.BuildInfo;
 import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
@@ -88,14 +89,33 @@ public final class ContentModule {
         return StandardPlayer.DEFINITION;
     }
 
-    /** Il nome di ogni contenuto dei cataloghi: un contenuto nuovo aggiunge qui la sua riga. */
+    /**
+     * Nome, descrizione e colore del player e di ogni contenuto dei cataloghi: un contenuto nuovo
+     * aggiunge qui la sua riga.
+     */
     @Provides
     @Singleton
     static ContentPresentation contentPresentation() {
-        Map<Kind, Integer> names = new LinkedHashMap<>();
-        names.put(StandardItemCatalog.POTION, R.string.kind_potion_name);
-        names.put(StandardEnemyCatalog.GOBLIN, R.string.kind_goblin_name);
-        return new ContentPresentation(names);
+        Map<Kind, ContentPresentation.Style> styles = new LinkedHashMap<>();
+        styles.put(
+                Player.KIND,
+                new ContentPresentation.Style(
+                        R.string.kind_player_name,
+                        R.string.kind_player_description,
+                        R.color.kind_player));
+        styles.put(
+                StandardItemCatalog.POTION,
+                new ContentPresentation.Style(
+                        R.string.kind_potion_name,
+                        R.string.kind_potion_description,
+                        R.color.kind_potion));
+        styles.put(
+                StandardEnemyCatalog.GOBLIN,
+                new ContentPresentation.Style(
+                        R.string.kind_goblin_name,
+                        R.string.kind_goblin_description,
+                        R.color.kind_goblin));
+        return new ContentPresentation(styles);
     }
 
     /** Il seed lo sceglie l'app: quello fisso della configurazione, se c'è, altrimenti a caso. */
