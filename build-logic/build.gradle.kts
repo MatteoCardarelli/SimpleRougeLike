@@ -9,4 +9,5 @@ dependencies {
     implementation(libs.errorprone.gradle.plugin)
     implementation(libs.animalsniffer.gradle.plugin)
     implementation(libs.pitest.gradle.plugin)
+    implementation(libs.hilt.gradle.plugin)
 }

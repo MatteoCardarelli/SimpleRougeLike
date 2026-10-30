@@ -3,7 +3,10 @@ agp = "8.13.1"
 appcompat = "1.6.1"
 material = "1.10.0"
 lifecycle = "2.6.1"
-fragment = "1.3.6"
+# Hilt 2.58 chiede almeno la 1.5.1: si dichiara quella che si usa davvero.
+fragment = "1.5.1"
+# 2.58 è l'ultima che supporta AGP 8: dalla 2.59 il plugin di Hilt richiede AGP 9.
+hilt = "2.58"
 squidlib = "3.0.6"
 junit4 = "4.13.2"
 mockito = "5.11.0"
@@ -30,6 +33,10 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 material = { module = "com.google.android.material:material", version.ref = "material" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
+lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "lifecycle" }
+lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 squidlib-util = { module = "com.squidpony:squidlib-util", version.ref = "squidlib" }
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
@@ -53,3 +60,4 @@ spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradl
 errorprone-gradle-plugin = { module = "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin", version.ref = "errorprone-gradle-plugin" }
 animalsniffer-gradle-plugin = { module = "ru.vyarus.animalsniffer:ru.vyarus.animalsniffer.gradle.plugin", version.ref = "animalsniffer-gradle-plugin" }
 pitest-gradle-plugin = { module = "info.solidsoft.pitest:info.solidsoft.pitest.gradle.plugin", version.ref = "pitest-gradle-plugin" }
+hilt-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }

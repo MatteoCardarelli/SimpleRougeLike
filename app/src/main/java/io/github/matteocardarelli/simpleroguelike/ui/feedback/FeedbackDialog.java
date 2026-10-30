@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import com.github.matteoCarda.simplerougelike.R;
+import io.github.matteocardarelli.simpleroguelike.R;
 import org.jspecify.annotations.Nullable;
 
 /**

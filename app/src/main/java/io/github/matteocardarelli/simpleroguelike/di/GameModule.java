@@ -1,0 +1,123 @@
+package io.github.matteocardarelli.simpleroguelike.di;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.components.ViewModelComponent;
+import dagger.hilt.android.scopes.ViewModelScoped;
+import dagger.multibindings.IntoSet;
+import dagger.multibindings.Multibinds;
+import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
+import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
+import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
+import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
+import io.github.matteocardarelli.simpleroguelike.command.MoveHandler;
+import io.github.matteocardarelli.simpleroguelike.command.UseItemHandler;
+import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
+import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyCatalog;
+import io.github.matteocardarelli.simpleroguelike.dungeon.ItemCatalog;
+import io.github.matteocardarelli.simpleroguelike.dungeon.PlayerDefinition;
+import io.github.matteocardarelli.simpleroguelike.generation.FloorFactory;
+import io.github.matteocardarelli.simpleroguelike.generation.FloorPopulator;
+import io.github.matteocardarelli.simpleroguelike.generation.FloorSource;
+import io.github.matteocardarelli.simpleroguelike.pathfinding.BreadthFirstPathfinder;
+import io.github.matteocardarelli.simpleroguelike.port.FieldOfView;
+import io.github.matteocardarelli.simpleroguelike.port.Pathfinder;
+import io.github.matteocardarelli.simpleroguelike.port.TerrainGenerator;
+import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
+import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
+import io.github.matteocardarelli.simpleroguelike.session.GameSession;
+import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
+import io.github.matteocardarelli.simpleroguelike.squidlib.SquidFieldOfView;
+import io.github.matteocardarelli.simpleroguelike.squidlib.SquidTerrainGenerator;
+import java.util.Set;
+
+/**
+ * Adapter, strategie dei nemici, handler, hook e sessione: servizi senza stato di partita, che
+ * vivono quanto il ViewModel. Lo stato di una partita sta nella sessione, che lo ricrea a ogni
+ * partita nuova. I metodi sono statici: i test costruiscono la stessa sessione chiamandoli.
+ *
+ * <p>Un'estensione si aggiunge con un metodo nuovo: una strategia con {@code @IntoSet} che
+ * restituisce un {@link BehaviorBinding}, un comando con il suo handler, una regola di fine turno.
+ */
+@Module
+@InstallIn(ViewModelComponent.class)
+public abstract class GameModule {
+
+    private GameModule() {}
+
+    @Provides
+    static TerrainGenerator terrainGenerator() {
+        return new SquidTerrainGenerator();
+    }
+
+    @Provides
+    static Pathfinder pathfinder() {
+        return new BreadthFirstPathfinder();
+    }
+
+    @Provides
+    static FieldOfView fieldOfView() {
+        return new SquidFieldOfView();
+    }
+
+    @Provides
+    static FloorSource floorSource(
+            TerrainGenerator terrain,
+            ItemCatalog items,
+            EnemyCatalog enemies,
+            PlayerDefinition player) {
+        return new FloorFactory(terrain, new FloorPopulator(items, enemies, player));
+    }
+
+    /** Il goblin insegue il player quando è abbastanza vicino, altrimenti vaga. */
+    @Provides
+    @IntoSet
+    static BehaviorBinding chaseOrWander(Pathfinder pathfinder) {
+        return new BehaviorBinding(
+                StandardEnemyCatalog.CHASE_OR_WANDER,
+                new AggroBehavior(new ChaseBehavior(pathfinder), new WanderBehavior()));
+    }
+
+    @Provides
+    @IntoSet
+    static CommandHandler<?> moveHandler(ActionRules actions) {
+        return new MoveHandler(actions);
+    }
+
+    @Provides
+    @IntoSet
+    static CommandHandler<?> useItemHandler() {
+        return new UseItemHandler();
+    }
+
+    /** Le regole di fine turno: oggi nessuna, e l'insieme vuoto è ammesso. */
+    @Multibinds
+    abstract Set<TurnHook> hooks();
+
+    @Provides
+    static EnemyTurnRunner enemyTurnRunner(
+            Set<BehaviorBinding> behaviors, EnemyCatalog enemies, ActionRules actions) {
+        return new EnemyTurnRunner(behaviors, enemies, actions);
+    }
+
+    @Provides
+    static CommandDispatcher commandDispatcher(Set<CommandHandler<?>> handlers) {
+        return new CommandDispatcher(handlers);
+    }
+
+    @Provides
+    @ViewModelScoped
+    static GameSession gameSession(
+            FloorSource floors,
+            CommandDispatcher commands,
+            EnemyTurnRunner enemies,
+            FieldOfView fov,
+            Set<TurnHook> hooks,
+            GameConfig config) {
+        return new GameSession(
+                floors, commands, enemies, fov, hooks, config.floorSpec(), config.visionRadius());
+    }
+}

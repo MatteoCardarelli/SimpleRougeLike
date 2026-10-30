@@ -23,6 +23,8 @@ import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Actor;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.state.GameState;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
@@ -64,6 +66,11 @@ class AppArchitectureTest {
             fields().that()
                     .areDeclaredInClassesThat()
                     .resideOutsideOfPackages(OLD_ENGINE)
+                    // Hilt genera queste classi con campi statici non final che servono solo a
+                    // R8 per conservare le chiavi dei ViewModel: non sono stato del gioco.
+                    .and()
+                    .areDeclaredInClassesThat()
+                    .haveSimpleNameNotEndingWith("_LazyMapKey")
                     .and()
                     .areStatic()
                     .should()
@@ -122,6 +129,59 @@ class AppArchitectureTest {
                                     + " risultati");
 
     @ArchTest
+    static final ArchRule uiGameUsesSessionCommandSnapshotAndTheUi =
+            classes()
+                    .that()
+                    .resideInAPackage(BASE + ".ui.game..")
+                    .should()
+                    .onlyDependOnClassesThat(
+                            resideInAnyPackage(
+                                            "java..",
+                                            "android..",
+                                            "androidx..",
+                                            "com.google.android.material..",
+                                            "dagger..",
+                                            "javax.inject..",
+                                            "org.jspecify.annotations..",
+                                            BASE + ".ui..",
+                                            BASE + ".session..",
+                                            BASE + ".command..",
+                                            BASE + ".snapshot..",
+                                            BASE + ".feedback..",
+                                            BASE + ".databinding..",
+                                            BASE + ".model..",
+                                            BASE + ".event..")
+                                    .or(theRClass()))
+                    .because(
+                            "l'Activity e il ViewModel parlano con la sessione e con il resto"
+                                    + " dell'interfaccia: adapter, regole e contenuti li collega"
+                                    + " solo di");
+
+    @ArchTest
+    static final ArchRule uiInputUsesOnlyCommands =
+            onlyDependOn(
+                    "ui.input",
+                    "un gesto diventa un comando: l'input non conosce la partita né Android",
+                    "command");
+
+    @ArchTest
+    static final ArchRule uiRenderUsesOnlySnapshotPlaybackAndContent =
+            onlyDependOn(
+                    "ui.render",
+                    "il disegno legge la fotografia della partita, già filtrata dalla nebbia di"
+                            + " guerra, e niente altro",
+                    "snapshot",
+                    "ui.playback",
+                    "ui.content");
+
+    @ArchTest
+    static final ArchRule uiContentUsesOnlyTheKernel =
+            onlyDependOn(
+                    "ui.content",
+                    "nome e aspetto dipendono solo dalla chiave del contenuto: i valori li sceglie"
+                            + " di, insieme ai cataloghi");
+
+    @ArchTest
     static final ArchRule uiFeedbackUsesOnlyAndroidAndTheKernel =
             classes()
                     .that()
@@ -177,8 +237,41 @@ class AppArchitectureTest {
             classes()
                     .that()
                     .resideInAPackage(BASE + "..")
+                    // Le classi che genera Android: la configurazione della build e View Binding.
+                    .and()
+                    .resideOutsideOfPackage(BASE + ".databinding..")
+                    .and()
+                    .doNotHaveSimpleName("BuildConfig")
                     .should(resideInANullMarkedPackage())
                     .because("con @NullMarked un tipo senza annotazione non è mai null");
+
+    /**
+     * Un package di {@code ui} che usa solo Android, il kernel dell'interfaccia ({@code model} ed
+     * {@code event}), i package indicati e le risorse.
+     */
+    private static ArchRule onlyDependOn(String packageName, String reason, String... allowed) {
+        List<String> packages =
+                new ArrayList<>(
+                        List.of(
+                                "java..",
+                                "android..",
+                                "androidx..",
+                                "com.google.android.material..",
+                                "org.jspecify.annotations..",
+                                BASE + "." + packageName + "..",
+                                BASE + ".model..",
+                                BASE + ".event.."));
+        for (String other : allowed) {
+            packages.add(BASE + "." + other + "..");
+        }
+        return classes()
+                .that()
+                .resideInAPackage(BASE + "." + packageName + "..")
+                .should()
+                .onlyDependOnClassesThat(
+                        resideInAnyPackage(packages.toArray(String[]::new)).or(theRClass()))
+                .because(reason);
+    }
 
     /** Le risorse generate da Android, che stanno nel package dell'app. */
     private static DescribedPredicate<JavaClass> theRClass() {

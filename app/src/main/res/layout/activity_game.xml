@@ -3,27 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MainActivity"
-    android:background="#000000">
+    tools:context=".ui.game.GameActivity">
 
-    <!-- La nostra vista di gioco, che sta sotto -->
-    <com.github.matteoCarda.simplerougelike.view.GameView
-        android:id="@+id/gameView"
+    <!-- La mappa, sotto a tutto il resto -->
+    <io.github.matteocardarelli.simpleroguelike.ui.render.GameView
+        android:id="@+id/game_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Un contenitore per la nostra UI (vita e esperienza) -->
+    <!-- Salute ed esperienza -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_gravity="top|start"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
 
-        <!-- La barra della vita (HP) -->
         <ProgressBar
-            android:id="@+id/healthBar"
+            android:id="@+id/health_bar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="150dp"
             android:layout_height="20dp"
@@ -31,9 +29,8 @@
             android:progress="100"
             android:progressTint="@android:color/holo_green_dark" />
 
-        <!-- La barra dell'esperienza (XP) -->
         <ProgressBar
-            android:id="@+id/xpBar"
+            android:id="@+id/xp_bar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="150dp"
             android:layout_height="15dp"
@@ -72,40 +69,39 @@
         tools:text="@string/end_game_over"
         tools:visibility="visible" />
 
+    <!-- L'inventario: una lista sopra la mappa, finché al passo 5c non diventa un bottom sheet -->
     <LinearLayout
         android:id="@+id/inventory_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="#A0444444"
         android:gravity="center"
+        android:orientation="vertical"
         android:padding="40dp"
         android:visibility="gone"
         tools:visibility="visible">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Inventario"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Questo è un contenitore scrollabile per la lista degli oggetti -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <!-- Questo LinearLayout verrà popolato dinamicamente con gli oggetti -->
-        <LinearLayout
-            android:id="@+id/inventory_item_list"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"/>
+            android:layout_marginBottom="16dp"
+            android:text="@string/inventory_title"
+            android:textColor="@android:color/white"
+            android:textSize="24sp" />
 
-    </ScrollView>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-</LinearLayout>
+            <LinearLayout
+                android:id="@+id/inventory_item_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </ScrollView>
+
+    </LinearLayout>
 
 </FrameLayout>

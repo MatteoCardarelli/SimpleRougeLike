@@ -1,4 +1,4 @@
-package com.github.matteoCarda.simplerougelike.view;
+package io.github.matteocardarelli.simpleroguelike.ui.render;
 
 import android.content.Context;
 import android.graphics.Canvas;
