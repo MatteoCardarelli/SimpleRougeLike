@@ -1,6 +1,7 @@
 // Configurazione comune del modulo :app.
 plugins {
     id("com.android.application")
+    id("com.google.dagger.hilt.android")
     id("srl.spotless")
 }
 
@@ -47,6 +48,10 @@ val libs = the<VersionCatalogsExtension>().named("libs")
 fun lib(alias: String) = libs.findLibrary(alias).get()
 
 dependencies {
+    // Hilt collega gli oggetti dell'app: solo in :app, i moduli Java restano senza framework.
+    implementation(lib("hilt-android"))
+    "annotationProcessor"(lib("hilt-compiler"))
+
     testImplementation(platform(lib("junit-bom")))
     testImplementation(lib("junit-jupiter"))
     testImplementation(lib("assertj-core"))

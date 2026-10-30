@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.github.matteoCarda.simplerougelike"
+    namespace = "io.github.matteocardarelli.simpleroguelike"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.github.matteoCarda.simplerougelike"
+        applicationId = "io.github.matteocardarelli.simpleroguelike"
         minSdk = 30
         targetSdk = 36
         versionCode = 1
@@ -115,6 +115,8 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.viewmodel.savedstate)
+    implementation(libs.lifecycle.livedata)
     implementation(libs.fragment)
     implementation(libs.squidlib.util)
 

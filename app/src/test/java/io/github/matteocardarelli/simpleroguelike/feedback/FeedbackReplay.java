@@ -1,7 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.feedback;
 
 import io.github.matteocardarelli.simpleroguelike.di.GameConfig;
-import io.github.matteocardarelli.simpleroguelike.di.GameSessionFactory;
+import io.github.matteocardarelli.simpleroguelike.di.TestGraph;
 import io.github.matteocardarelli.simpleroguelike.event.EventLogWriter;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
@@ -22,7 +22,7 @@ public final class FeedbackReplay {
     private FeedbackReplay() {}
 
     public static Result play(FeedbackEntry note) {
-        GameSession session = GameSessionFactory.create(GameConfig.standard());
+        GameSession session = TestGraph.session(GameConfig.standard());
         CommandLogFormat format = new CommandLogFormat();
         EventLogWriter writer = new EventLogWriter();
         List<String> log = new ArrayList<>();

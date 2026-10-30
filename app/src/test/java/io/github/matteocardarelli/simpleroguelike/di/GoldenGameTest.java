@@ -78,7 +78,7 @@ class GoldenGameTest {
      * da un flusso casuale con un seed fisso.
      */
     private static List<String> play() {
-        GameSession session = GameSessionFactory.create(GameConfig.standard());
+        GameSession session = TestGraph.session(GameConfig.standard());
         EventLogWriter writer = new EventLogWriter();
         RandomSource wandering = new SeededRandomSource(SEED);
         List<String> log = new ArrayList<>();

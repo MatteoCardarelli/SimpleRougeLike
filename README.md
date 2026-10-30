@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: refactoring in corso.** L'app gioca già sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con l'interfaccia della prima versione. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e il codice vecchio sparisce solo quando la nuova app fa tutto quello che faceva lui (vedi [Roadmap](#roadmap)).
+> **Stato: refactoring in corso.** L'app gioca già sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e con la grafica e i comandi della prima versione. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e il codice vecchio sparisce solo quando la nuova app fa tutto quello che faceva lui (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -17,7 +17,8 @@ Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il pro
 - **Pozioni** da raccogliere sulla mappa e usare dall'inventario, che si apre con un doppio tap.
 - **Nebbia di guerra:** si vede solo quello che è nel campo visivo, e la mappa ricorda le zone già esplorate.
 - **Vittoria e sconfitta:** si vince sconfiggendo tutti i nemici; a fine partita un doppio tap ne inizia un'altra.
-- **In arrivo con la v1:** registro dei messaggi, schermata di fine partita, accessibilità di base.
+- **Note di collaudo:** nelle build di debug un pulsante "Nota" salva un'osservazione insieme a tutto quello che serve a rigiocare la partita fino a quel momento.
+- **In arrivo con la v1:** nuova grafica della mappa, inventario a griglia con la scheda di ogni oggetto, registro dei messaggi, schermata di fine partita, accessibilità di base.
 
 ## Architettura
 
@@ -69,10 +70,10 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quell
 - [x] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
 - [x] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
 - [x] **4. `:application`:** turni completi, comandi, stati della partita.
-- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore (fatto), poi Hilt e MVVM, il nuovo rendering e le funzionalità nuove.
+- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore (fatto), con le correzioni del primo collaudo e le note di collaudo (fatto), poi Hilt e MVVM (fatto), il nuovo rendering e le funzionalità nuove.
 - [ ] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
-Dopo la v1: animazioni, poi nuovi contenuti.
+Dopo la v1, una funzionalità alla volta: animazioni; statistiche vere ed equipaggiamento; attacchi a distanza (arcieri e coltelli da lancio); nemici che girano in branco; porte, leve e scrigni; più piani, chiusi da chiavi; boss; mercanti ed economia; illustrazioni. Ognuna ha la sua issue con l'etichetta `enhancement`.
 
 ## Compilare ed eseguire
 

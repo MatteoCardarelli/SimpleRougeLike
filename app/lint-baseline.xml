@@ -67,26 +67,4 @@
             column="11"/>
     </issue>
 
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `#000000` with a theme that also paints a background (inferred theme is `@style/Theme.SimpleRougeLike`)"
-        errorLine1="    android:background=&quot;#000000&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_main.xml"
-            line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Inventario&quot;, should use `@string` resource"
-        errorLine1="        android:text=&quot;Inventario&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_main.xml"
-            line="61"
-            column="9"/>
-    </issue>
-
 </issues>

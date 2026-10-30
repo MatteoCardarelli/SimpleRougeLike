@@ -3,7 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.feedback;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.github.matteoCarda.simplerougelike.BuildConfig;
+import io.github.matteocardarelli.simpleroguelike.BuildConfig;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

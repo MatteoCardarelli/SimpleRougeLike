@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SimpleRougeLike"
+rootProject.name = "SimpleRogueLike"
 include(":app")
 include(":domain")
 include(":application")
