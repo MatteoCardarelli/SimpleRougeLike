@@ -14,11 +14,12 @@ Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il pro
 - **A turni:** il tempo passa solo quando il giocatore agisce, e dopo ogni sua azione agiscono tutti i nemici.
 - **Swipe** per muoversi; muoversi verso un nemico vuol dire attaccarlo.
 - **Esperienza e livelli:** ogni nemico sconfitto dà esperienza, ogni livello aumenta salute e attacco.
-- **Pozioni** da raccogliere sulla mappa e usare dall'inventario, che si apre con un doppio tap: una griglia di oggetti con la scheda di quello selezionato.
+- **Pozioni**, normali e grandi, da raccogliere sulla mappa e usare dall'inventario, che si apre con un doppio tap: una griglia di oggetti con la scheda di quello selezionato.
+- **Registro dei messaggi** con quello che succede in ogni turno, letto anche da TalkBack.
 - **Nebbia di guerra:** si vede solo quello che è nel campo visivo, e la mappa ricorda le zone già esplorate.
-- **Vittoria e sconfitta:** si vince sconfiggendo tutti i nemici; a fine partita "Nuova partita" ne inizia un'altra.
+- **Vittoria e sconfitta:** si vince sconfiggendo tutti i nemici; la schermata di fine partita dice fin dove si è arrivati, e "Nuova partita" ne inizia un'altra.
 - **Note di collaudo:** nelle build di debug un pulsante "Nota" salva un'osservazione insieme a tutto quello che serve a rigiocare la partita fino a quel momento.
-- **In arrivo con la v1:** registro dei messaggi, schermata di fine partita, accessibilità di base, pozione grande.
+- **Accessibilità di base:** barre di salute ed esperienza descritte a parole, celle visibili ed esplorate distinte per luminosità, pulsanti e caselle da almeno 48 dp.
 
 ## Architettura
 
@@ -70,7 +71,7 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quell
 - [x] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
 - [x] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
 - [x] **4. `:application`:** turni completi, comandi, stati della partita.
-- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore (fatto), con le correzioni del primo collaudo e le note di collaudo (fatto), poi Hilt e MVVM (fatto), il nuovo rendering con l'inventario a griglia (fatto) e le funzionalità nuove.
+- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore (fatto), con le correzioni del primo collaudo e le note di collaudo (fatto), poi Hilt e MVVM (fatto), il nuovo rendering con l'inventario a griglia (fatto), le funzionalità nuove (fatto), poi i test sul dispositivo in CI e la release.
 - [ ] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
 Dopo la v1, una funzionalità alla volta: animazioni; statistiche vere ed equipaggiamento; attacchi a distanza (arcieri e coltelli da lancio); nemici che girano in branco; porte, leve e scrigni; più piani, chiusi da chiavi; boss; mercanti ed economia; illustrazioni. Ognuna ha la sua issue con l'etichetta `enhancement`.
