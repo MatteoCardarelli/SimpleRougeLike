@@ -148,6 +148,7 @@ class AppArchitectureTest {
                                             BASE + ".command..",
                                             BASE + ".snapshot..",
                                             BASE + ".feedback..",
+                                            BASE + ".settings..",
                                             BASE + ".databinding..",
                                             BASE + ".model..",
                                             BASE + ".event..")
@@ -192,7 +193,39 @@ class AppArchitectureTest {
                     "l'inventario mostra gli oggetti dello snapshot e passa le scelte all'Activity:"
                             + " non conosce il ViewModel",
                     "snapshot",
-                    "ui.content");
+                    "ui.content",
+                    "ui.hud");
+
+    @ArchTest
+    static final ArchRule uiHudUsesOnlySnapshot =
+            onlyDependOn(
+                    "ui.hud",
+                    "le barre mostrano il player della fotografia della partita, e niente altro",
+                    "snapshot");
+
+    @ArchTest
+    static final ArchRule uiSettingsUsesOnlySettings =
+            onlyDependOn(
+                    "ui.settings",
+                    "la finestra delle impostazioni mostra e raccoglie le scelte: chi le salva è il"
+                            + " ViewModel, attraverso SettingsHost e l'Activity",
+                    "settings");
+
+    @ArchTest
+    static final ArchRule settingsUsesOnlyJavaAndPreferences =
+            classes()
+                    .that()
+                    .resideInAPackage(BASE + ".settings..")
+                    .should()
+                    .onlyDependOnClassesThat()
+                    .resideInAnyPackage(
+                            "java..",
+                            "android.content..",
+                            "org.jspecify.annotations..",
+                            BASE + ".settings..")
+                    .because(
+                            "le impostazioni sono dati del giocatore: niente partita né interfaccia,"
+                                    + " e di Android solo SharedPreferences, nel suo adapter");
 
     @ArchTest
     static final ArchRule uiLogUsesOnlyContent =

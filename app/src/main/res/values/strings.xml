@@ -34,9 +34,17 @@
     <string name="a11y_experience">Esperienza</string>
     <string name="a11y_experience_value">%1$d su %2$d, livello %3$d</string>
 
+    <string name="hud_health_value">%1$d/%2$d</string>
+    <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
+
     <string name="debug_info">seed %1$d · turno %2$d</string>
 
-    <string name="feedback_button">Nota</string>
+    <string name="settings_button">Impostazioni</string>
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_show_log">Mostra il registro dei messaggi</string>
+    <string name="settings_write_note">Scrivi una nota di collaudo</string>
+    <string name="settings_close">Chiudi</string>
+
     <string name="feedback_title">Nota di collaudo</string>
     <string name="feedback_hint">Cosa hai notato?</string>
     <string name="feedback_save">Salva</string>

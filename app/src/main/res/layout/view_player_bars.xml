@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Salute ed esperienza con i valori: sulla mappa e in cima all'inventario. TalkBack legge le
+    barre, con nome e valore; i testi accanto sono solo per chi guarda.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_status"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/health_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="150dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/a11y_health"
+            android:max="100"
+            android:progress="100"
+            android:progressTint="@android:color/holo_green_dark" />
+
+        <TextView
+            android:id="@+id/health_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:importantForAccessibility="no"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="38/50" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/xp_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="150dp"
+            android:layout_height="15dp"
+            android:contentDescription="@string/a11y_experience"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="@android:color/holo_blue_light" />
+
+        <TextView
+            android:id="@+id/xp_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:importantForAccessibility="no"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            tools:text="175/225 · liv. 3" />
+
+    </LinearLayout>
+
+</LinearLayout>

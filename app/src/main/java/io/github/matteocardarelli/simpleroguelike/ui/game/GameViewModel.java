@@ -16,6 +16,8 @@ import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
+import io.github.matteocardarelli.simpleroguelike.settings.Settings;
+import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
@@ -46,6 +48,9 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>Se Android chiude l'app la partita non si salva: alla ripartenza {@link SavedStateHandle} ha
  * ancora il segno di una partita in corso, la sessione è nuova, e il giocatore viene avvisato.
+ *
+ * <p>Le impostazioni del giocatore si leggono una volta, alla creazione, e si salvano a ogni
+ * cambiamento: restano anche dopo la chiusura dell'app, e una partita nuova non le tocca.
  */
 @HiltViewModel
 public final class GameViewModel extends ViewModel implements PlayerInput {
@@ -64,6 +69,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private final FeedbackStore feedback;
     private final BuildInfo build;
     private final Clock clock;
+    private final SettingsStore settingsStore;
     private final CommandJournal journal = new CommandJournal();
     private final CommandLogFormat format = new CommandLogFormat();
     private final MutableLiveData<GameUiState> uiState = new MutableLiveData<>();
@@ -71,6 +77,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private boolean inventoryOpen;
     private @Nullable EntityId selectedItem;
     private boolean previousGameLost;
+    private Settings settings;
     private long lastClaimedRevision;
 
     /** Inizia subito una partita, e ricorda se Android aveva chiuso l'app durante quella prima. */
@@ -81,13 +88,16 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
             SeedSource seeds,
             FeedbackStore feedback,
             BuildInfo build,
-            Clock clock) {
+            Clock clock,
+            SettingsStore settingsStore) {
         this.session = session;
         this.saved = saved;
         this.seeds = seeds;
         this.feedback = feedback;
         this.build = build;
         this.clock = clock;
+        this.settingsStore = settingsStore;
+        this.settings = settingsStore.load();
         this.previousGameLost = Boolean.TRUE.equals(saved.get(GAME_IN_PROGRESS));
         start();
     }
@@ -169,6 +179,20 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         start();
     }
 
+    /** Le impostazioni di adesso. */
+    public Settings settings() {
+        return settings;
+    }
+
+    /** Mostra o nasconde il registro dei messaggi, e lo ricorda anche dopo la chiusura dell'app. */
+    public void setLogVisible(boolean visible) {
+        if (settings.logVisible() != visible) {
+            settings = settings.withLogVisible(visible);
+            settingsStore.save(settings);
+            publish(session.current());
+        }
+    }
+
     /** Il giocatore ha letto l'avviso della partita persa. */
     public void acknowledgeLostGame() {
         previousGameLost = false;
@@ -230,7 +254,8 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
                         inventoryOpen,
                         Optional.ofNullable(selectedItem),
                         log,
-                        previousGameLost));
+                        previousGameLost,
+                        settings.logVisible()));
     }
 
     private static boolean inInventory(TurnResult result, @Nullable EntityId item) {

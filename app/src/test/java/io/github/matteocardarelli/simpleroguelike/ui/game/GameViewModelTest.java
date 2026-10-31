@@ -14,6 +14,8 @@ import io.github.matteocardarelli.simpleroguelike.generation.FixedFloorSource;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
+import io.github.matteocardarelli.simpleroguelike.settings.Settings;
+import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +39,22 @@ class GameViewModelTest {
     @TempDir Path directory;
 
     private final AtomicLong seeds = new AtomicLong(100);
+    private final MemorySettingsStore settings = new MemorySettingsStore();
+
+    /** Le impostazioni in memoria, come le terrebbe il telefono tra un avvio e l'altro. */
+    private static final class MemorySettingsStore implements SettingsStore {
+        private Settings saved = Settings.DEFAULT;
+
+        @Override
+        public Settings load() {
+            return saved;
+        }
+
+        @Override
+        public void save(Settings settings) {
+            saved = settings;
+        }
+    }
 
     private GameViewModel viewModel() {
         return viewModel(TestGraph.session(GameConfig.standard()), new SavedStateHandle());
@@ -55,7 +73,8 @@ class GameViewModelTest {
                 seeds::getAndIncrement,
                 new FeedbackStore(directory.toFile()),
                 new BuildInfo("1.0", "abc"),
-                CLOCK);
+                CLOCK,
+                settings);
     }
 
     /** Sconfitta del player: contro il muro aspetta, e i tre goblin attaccano a ogni turno. */
@@ -298,6 +317,43 @@ class GameViewModelTest {
                 .containsExactly("move up", "move up", "move right", "move down");
         assertThat(note.inventoryOpen()).isTrue();
         assertThat(FeedbackReplay.differences(note, replay.last().snapshot())).isEmpty();
+    }
+
+    @Test
+    void constructor_withoutSavedSettings_showsTheLog() {
+        GameViewModel viewModel = viewModel();
+
+        assertThat(viewModel.state().logVisible()).isTrue();
+    }
+
+    @Test
+    void setLogVisible_publishesAndSavesTheChoice() {
+        GameViewModel viewModel = viewModel();
+
+        viewModel.setLogVisible(false);
+
+        assertThat(viewModel.state().logVisible()).isFalse();
+        assertThat(settings.load().logVisible()).isFalse();
+    }
+
+    @Test
+    void constructor_readsTheSavedSettings_asAfterARestartOfTheApp() {
+        viewModel().setLogVisible(false);
+
+        GameViewModel restarted = viewModel();
+
+        assertThat(restarted.state().logVisible()).isFalse();
+        assertThat(restarted.settings().logVisible()).isFalse();
+    }
+
+    @Test
+    void newGame_keepsTheSettings() {
+        GameViewModel viewModel = viewModel();
+        viewModel.setLogVisible(false);
+
+        viewModel.newGame();
+
+        assertThat(viewModel.state().logVisible()).isFalse();
     }
 
     @Test

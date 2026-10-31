@@ -17,53 +17,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <include
+            android:id="@+id/bars"
+            layout="@layout/view_player_bars"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|start"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
+            android:layout_marginTop="16dp" />
 
-            <ProgressBar
-                android:id="@+id/health_bar"
-                android:contentDescription="@string/a11y_health"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="150dp"
-                android:layout_height="20dp"
-                android:max="100"
-                android:progress="100"
-                android:progressTint="@android:color/holo_green_dark" />
-
-            <ProgressBar
-                android:id="@+id/xp_bar"
-                android:contentDescription="@string/a11y_experience"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="150dp"
-                android:layout_height="15dp"
-                android:layout_marginTop="4dp"
-                android:max="100"
-                android:progress="0"
-                android:progressTint="@android:color/holo_blue_light" />
-
-        </LinearLayout>
-
-        <!-- Il pulsante delle note di collaudo: visibile solo nelle build di debug -->
-        <Button
-            android:id="@+id/feedback_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <!-- Le impostazioni: il registro dei messaggi e, nelle build di debug, le note -->
+        <ImageButton
+            android:id="@+id/settings_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="top|end"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:minWidth="48dp"
-            android:minHeight="48dp"
-            android:text="@string/feedback_button"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:background="@drawable/shape_status"
+            android:contentDescription="@string/settings_button"
+            android:src="@drawable/ic_settings" />
 
         <!-- Il registro dei messaggi e, nelle build di debug, seed e turno -->
         <LinearLayout
+            android:id="@+id/bottom_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"

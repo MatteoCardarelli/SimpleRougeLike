@@ -17,14 +17,15 @@ import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.databinding.SheetInventoryBinding;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
+import io.github.matteocardarelli.simpleroguelike.ui.hud.PlayerBars;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * L'inventario: una griglia di oggetti e, sotto, la scheda di quello selezionato con il pulsante
- * "Usa". Un tocco seleziona, non usa. Il dialog ha una finestra sua che consuma indietro, quindi
- * l'Activity non registra callback. Dopo una rotazione il sistema lo ricrea da solo, e l'Activity
- * evita di aprirne un secondo.
+ * L'inventario: salute ed esperienza del player, una griglia di oggetti e, sotto, la scheda di
+ * quello selezionato con il pulsante "Usa". Un tocco seleziona, non usa. Il dialog ha una finestra
+ * sua che consuma indietro, quindi l'Activity non registra callback. Dopo una rotazione il sistema
+ * lo ricrea da solo, e l'Activity evita di aprirne un secondo.
  *
  * <p>Conosce solo {@link InventoryHost}: le scelte le decide il ViewModel, e lo sheet mostra lo
  * stato che riceve.
@@ -100,13 +101,14 @@ public final class InventorySheet extends BottomSheetDialogFragment {
         host().onInventoryCancelled();
     }
 
-    /** Mostra gli oggetti e la scheda di quello selezionato. */
+    /** Mostra le barre del player, gli oggetti e la scheda di quello selezionato. */
     public void show(InventoryContent inventory) {
         SheetInventoryBinding binding = this.binding;
         InventoryAdapter adapter = this.adapter;
         if (binding == null || adapter == null) {
             return;
         }
+        PlayerBars.show(binding.bars, inventory.player());
         adapter.show(inventory.items(), inventory.selected().orElse(null));
         ContentPresentation content = host().content();
         Optional<InventoryEntry> selected = inventory.selectedEntry();

@@ -22,6 +22,8 @@ import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
 import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
 import io.github.matteocardarelli.simpleroguelike.rules.LevelingRules;
+import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
+import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.game.SeedSource;
 import java.io.File;
@@ -150,5 +152,12 @@ public final class ContentModule {
     @Singleton
     static FeedbackStore feedbackStore(@ApplicationContext Context context) {
         return new FeedbackStore(new File(context.getFilesDir(), "feedback"));
+    }
+
+    /** Le impostazioni del giocatore, che restano dopo la chiusura dell'app. */
+    @Provides
+    @Singleton
+    static SettingsStore settingsStore(@ApplicationContext Context context) {
+        return new PreferencesSettingsStore(context);
     }
 }
