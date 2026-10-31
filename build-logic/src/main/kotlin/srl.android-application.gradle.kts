@@ -94,8 +94,6 @@ android {
         checkDependencies = true
         // Tutto il testo dell'interfaccia sta nelle risorse, mai nel codice o nei layout.
         error += "HardcodedText"
-        // Errori del codice scritto prima del refactoring: il file sparisce con quel codice.
-        baseline = file("lint-baseline.xml")
     }
     testOptions {
         // I test sulla JVM usano JUnit 5, come nei moduli Java: basta la piattaforma di JUnit,

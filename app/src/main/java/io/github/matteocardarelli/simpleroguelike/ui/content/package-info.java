@@ -1,4 +1,4 @@
-/** Come si mostra ogni Kind del gioco: nome e, dal passo 5c, aspetto e descrizione. */
+/** Come si mostra ogni Kind del gioco: nome, descrizione e aspetto. */
 @NullMarked
 package io.github.matteocardarelli.simpleroguelike.ui.content;
 

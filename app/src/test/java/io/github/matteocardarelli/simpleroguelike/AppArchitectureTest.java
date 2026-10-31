@@ -28,22 +28,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
-/**
- * Le regole d'architettura di :app, verificate sul bytecode del codice di produzione. Il motore di
- * prima del refactoring non è più usato dall'app e ne è escluso finché non viene rimosso.
- */
+/** Le regole d'architettura di :app, verificate sul bytecode del codice di produzione. */
 @AnalyzeClasses(
-        packages = {AppArchitectureTest.BASE, AppArchitectureTest.OLD},
+        packages = AppArchitectureTest.BASE,
         importOptions = AppArchitectureTest.OnlyThisModule.class)
 class AppArchitectureTest {
 
     static final String BASE = "io.github.matteocardarelli.simpleroguelike";
-    static final String OLD = "com.github.matteoCarda.simplerougelike";
-
-    /** Il motore di prima del refactoring: classi che l'app non usa più. */
-    private static final String[] OLD_ENGINE = {
-        OLD + ".controller..", OLD + ".model..", OLD + ".service..", OLD + ".util.."
-    };
 
     /**
      * Solo le classi di produzione di questo modulo, che i test ricevono in un jar sotto {@code
@@ -64,11 +55,8 @@ class AppArchitectureTest {
     @ArchTest
     static final ArchRule noMutableStaticState =
             fields().that()
-                    .areDeclaredInClassesThat()
-                    .resideOutsideOfPackages(OLD_ENGINE)
                     // Hilt genera queste classi con campi statici non final che servono solo a
                     // R8 per conservare le chiavi dei ViewModel: non sono stato del gioco.
-                    .and()
                     .areDeclaredInClassesThat()
                     .haveSimpleNameNotEndingWith("_LazyMapKey")
                     .and()
@@ -265,8 +253,6 @@ class AppArchitectureTest {
     @ArchTest
     static final ArchRule noInstanceofOnHierarchies =
             classes()
-                    .that()
-                    .resideOutsideOfPackages(OLD_ENGINE)
                     .should(
                             notCheckInstanceofOf(
                                     GameEvent.class,
@@ -282,8 +268,6 @@ class AppArchitectureTest {
     @ArchTest
     static final ArchRule noConsoleOutput =
             noClasses()
-                    .that()
-                    .resideOutsideOfPackages(OLD_ENGINE)
                     .should()
                     .accessField(System.class, "out")
                     .orShould()
