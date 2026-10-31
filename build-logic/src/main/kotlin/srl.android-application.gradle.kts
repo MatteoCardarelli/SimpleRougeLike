@@ -78,7 +78,11 @@ android {
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+                "proguard-minified-rules.pro",
+            )
             matchingFallbacks += "debug"
         }
     }
@@ -97,6 +101,8 @@ android {
         // I test sulla JVM usano JUnit 5, come nei moduli Java: basta la piattaforma di JUnit,
         // senza plugin. I test strumentati restano su JUnit 4, come vuole AndroidX Test.
         unitTests.all { it.useJUnitPlatform() }
+        // Senza animazioni i test strumentati non aspettano transizioni, e sono più stabili.
+        animationsDisabled = true
         // Un dispositivo gestito da Gradle: lo stesso emulatore in CI e in locale, con
         // l'immagine ATD, più leggera, e l'API minima dell'app.
         managedDevices {

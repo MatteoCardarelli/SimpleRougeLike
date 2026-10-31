@@ -106,13 +106,16 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Test strumentati sulla build di debug
+        timeout-minutes: 30
         run: >
           ./gradlew :app:pixel2api30DebugAndroidTest
           -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
 
       # Lo stesso controllo di avvio sulla build con R8: un problema di R8 si vede prima della
-      # release.
+      # release. Se il runner dei test si ferma all'avvio, Gradle aspetta senza fine: da qui i
+      # limiti di tempo.
       - name: Avvio sulla build con R8
+        timeout-minutes: 20
         run: >
           ./gradlew :app:pixel2api30MinifiedAndroidTest
           -Psrl.testBuildType=minified

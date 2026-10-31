@@ -1,8 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.ui.game;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBack;
-import static androidx.test.espresso.action.ViewActions.doubleClick;
+import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -12,10 +11,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.os.SystemClock;
+import android.view.MotionEvent;
+import android.view.View;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.espresso.Espresso;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
@@ -90,9 +91,10 @@ public class GameActivityTest {
                         viewModel(activity).toggleInventory();
                         activity.getSupportFragmentManager().executePendingTransactions();
                     });
-            Espresso.onIdle();
+            // Indietro va alla finestra dello sheet: si aspetta che ci sia e che abbia il fuoco.
+            onView(withId(R.id.grid)).inRoot(isDialog()).check(matches(isDisplayed()));
 
-            pressBack();
+            onView(withId(R.id.grid)).inRoot(isDialog()).perform(pressBack());
 
             scenario.onActivity(
                     activity -> assertFalse(viewModel(activity).state().inventoryOpen()));
@@ -113,8 +115,9 @@ public class GameActivityTest {
                         activity.getSupportFragmentManager().executePendingTransactions();
                         revision.set(viewModel.state().result().revision());
                     });
+            onView(withId(R.id.grid)).inRoot(isDialog()).check(matches(isDisplayed()));
 
-            onView(withId(R.id.grid)).inRoot(isDialog()).perform(doubleClick());
+            scenario.onActivity(GameActivityTest::doubleTapOnTheInventoryGrid);
 
             scenario.onActivity(
                     activity -> {
@@ -122,6 +125,37 @@ public class GameActivityTest {
                         assertFalse(viewModel.state().inventoryOpen());
                         assertEquals(revision.get(), viewModel.state().result().revision());
                     });
+        }
+    }
+
+    /**
+     * Un doppio tap al centro della griglia, mandato alla finestra dello sheet. I tempi degli
+     * eventi sono fissati: con i tocchi di Espresso, su un emulatore lento il secondo può arrivare
+     * dopo il tempo massimo di un doppio tap.
+     */
+    private static void doubleTapOnTheInventoryGrid(GameActivity activity) {
+        InventorySheet sheet =
+                (InventorySheet)
+                        activity.getSupportFragmentManager().findFragmentByTag(InventorySheet.TAG);
+        assertNotNull(sheet);
+        View grid = sheet.requireView().findViewById(R.id.grid);
+        int[] position = new int[2];
+        grid.getLocationInWindow(position);
+        float x = position[0] + grid.getWidth() / 2f;
+        float y = position[1] + grid.getHeight() / 2f;
+        long start = SystemClock.uptimeMillis();
+        int[] actions = {
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_UP
+        };
+        long[] times = {0, 50, 150, 200};
+        for (int i = 0; i < actions.length; i++) {
+            long downTime = start + (i < 2 ? 0 : times[2]);
+            MotionEvent event = MotionEvent.obtain(downTime, start + times[i], actions[i], x, y, 0);
+            sheet.requireDialog().dispatchTouchEvent(event);
+            event.recycle();
         }
     }
 }
