@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: refactoring in corso.** L'app gioca già sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, il nuovo rendering e l'inventario a griglia. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e il codice vecchio sparisce solo quando la nuova app fa tutto quello che faceva lui (vedi [Roadmap](#roadmap)).
+> **Stato: refactoring in corso.** L'app gioca già sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, il nuovo rendering, l'inventario a griglia, le impostazioni e i test sul dispositivo in CI. Manca la pulizia del codice vecchio, prima della `v1.0.0`. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e il codice vecchio sparisce solo quando la nuova app fa tutto quello che faceva lui (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -15,10 +15,11 @@ Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il pro
 - **Swipe** per muoversi; muoversi verso un nemico vuol dire attaccarlo.
 - **Esperienza e livelli:** ogni nemico sconfitto dà esperienza, ogni livello aumenta salute e attacco.
 - **Pozioni**, normali e grandi, da raccogliere sulla mappa e usare dall'inventario, che si apre con un doppio tap: una griglia di oggetti con la scheda di quello selezionato.
-- **Registro dei messaggi** con quello che succede in ogni turno, letto anche da TalkBack.
+- **Salute ed esperienza con i valori**, sulla mappa e in cima all'inventario.
+- **Registro dei messaggi** con quello che succede in ogni turno, letto anche da TalkBack, che si può nascondere dalle impostazioni (l'ingranaggio in alto a destra).
 - **Nebbia di guerra:** si vede solo quello che è nel campo visivo, e la mappa ricorda le zone già esplorate.
 - **Vittoria e sconfitta:** si vince sconfiggendo tutti i nemici; la schermata di fine partita dice fin dove si è arrivati, e "Nuova partita" ne inizia un'altra.
-- **Note di collaudo:** nelle build di debug un pulsante "Nota" salva un'osservazione insieme a tutto quello che serve a rigiocare la partita fino a quel momento.
+- **Note di collaudo:** nelle build di debug, dalle impostazioni, si salva un'osservazione insieme a tutto quello che serve a rigiocare la partita fino a quel momento.
 - **Accessibilità di base:** barre di salute ed esperienza descritte a parole, celle visibili ed esplorate distinte per luminosità, pulsanti e caselle da almeno 48 dp.
 
 ## Architettura
@@ -54,7 +55,7 @@ flowchart LR
 
 ## Qualità
 
-Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quello che riguarda i moduli Java (`:domain`, `:infrastructure`, `:application`): la CI, su ogni push e pull request, controlla formattazione, Lint, NullAway e Animal Sniffer, esegue i test (unitari, di proprietà, di contratto, ArchUnit) con le soglie di copertura e verifica i checksum delle dipendenze; sulle pull request verso la branch principale esegue anche PIT. Nell'app Android girano già ArchUnit e il test golden sulla JVM; il golden sul dispositivo e gli altri test strumentati arriveranno con la nuova interfaccia.
+Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quello che riguarda i moduli Java (`:domain`, `:infrastructure`, `:application`): la CI, su ogni push e pull request, controlla formattazione, Lint, NullAway e Animal Sniffer, esegue i test (unitari, di proprietà, di contratto, ArchUnit) con le soglie di copertura e verifica i checksum delle dipendenze; sulle pull request verso la branch principale esegue anche PIT. Nell'app Android girano ArchUnit e il test golden sulla JVM; sulle pull request verso la branch principale i test strumentati girano su un emulatore gestito da Gradle: avvio, rotazione, tasto indietro, inventario, impostazioni e il golden sul dispositivo, più l'avvio sulla build con R8.
 
 - **Regole d'architettura verificate dai test** con ArchUnit: dipendenze tra moduli e package, niente Android nel dominio, niente sorgenti casuali che rompano il determinismo.
 - **Test sulla JVM** con JUnit 5 e AssertJ, senza mock nel dominio: i test giocano su mappe disegnate in ASCII.
@@ -71,7 +72,7 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quell
 - [x] **1–2. `:domain`:** valori di base, mappa, personaggi, oggetti, regole, generazione, intelligenza dei nemici.
 - [x] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
 - [x] **4. `:application`:** turni completi, comandi, stati della partita.
-- [ ] **5. Nuova app Android:** prima la stessa app di oggi sul nuovo motore (fatto), con le correzioni del primo collaudo e le note di collaudo (fatto), poi Hilt e MVVM (fatto), il nuovo rendering con l'inventario a griglia (fatto), le funzionalità nuove (fatto), poi i test sul dispositivo in CI e la release.
+- [x] **5. Nuova app Android:** la stessa app di prima sul nuovo motore, le correzioni del primo collaudo e le note di collaudo, Hilt e MVVM, il nuovo rendering con l'inventario a griglia, le funzionalità nuove (pozione grande, registro dei messaggi, fine partita, barre con i valori, impostazioni), i test sul dispositivo in CI e il workflow di release.
 - [ ] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
 Dopo la v1, una funzionalità alla volta: animazioni; statistiche vere ed equipaggiamento; attacchi a distanza (arcieri e coltelli da lancio); nemici che girano in branco; porte, leve e scrigni; più piani, chiusi da chiavi; boss; mercanti ed economia; illustrazioni. Ognuna ha la sua issue con l'etichetta `enhancement`.
