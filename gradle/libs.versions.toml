@@ -9,8 +9,6 @@ fragment = "1.5.1"
 hilt = "2.58"
 recyclerview = "1.1.0"
 squidlib = "3.0.6"
-junit4 = "4.13.2"
-mockito = "5.11.0"
 androidx-test-ext-junit = "1.1.5"
 espresso = "3.5.1"
 androidx-test-runner = "1.5.2"
@@ -41,15 +39,12 @@ lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmo
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 squidlib-util = { module = "com.squidpony:squidlib-util", version.ref = "squidlib" }
-junit4 = { module = "junit:junit", version.ref = "junit4" }
-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit5" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }

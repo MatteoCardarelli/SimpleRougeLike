@@ -116,14 +116,8 @@ dependencies {
     implementation(libs.lifecycle.livedata)
     implementation(libs.fragment)
     implementation(libs.recyclerview)
-    implementation(libs.squidlib.util)
 
     testImplementation(testFixtures(project(":domain")))
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockito.core)
-    // I test del codice di prima del refactoring sono scritti con JUnit 4: il motore vintage li
-    // esegue sulla piattaforma di JUnit 5 finché non spariscono insieme a quel codice.
-    testRuntimeOnly(libs.junit.vintage.engine)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)

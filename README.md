@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: refactoring in corso.** L'app gioca già sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, il nuovo rendering, l'inventario a griglia, le impostazioni e i test sul dispositivo in CI. Manca la pulizia del codice vecchio, prima della `v1.0.0`. La nuova architettura descritta qui sotto si costruisce un passo alla volta, e il codice vecchio sparisce solo quando la nuova app fa tutto quello che faceva lui (vedi [Roadmap](#roadmap)).
+> **Stato: `v1.0.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -55,7 +55,7 @@ flowchart LR
 
 ## Qualità
 
-Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quello che riguarda i moduli Java (`:domain`, `:infrastructure`, `:application`): la CI, su ogni push e pull request, controlla formattazione, Lint, NullAway e Animal Sniffer, esegue i test (unitari, di proprietà, di contratto, ArchUnit) con le soglie di copertura e verifica i checksum delle dipendenze; sulle pull request verso la branch principale esegue anche PIT. Nell'app Android girano ArchUnit e il test golden sulla JVM; sulle pull request verso la branch principale i test strumentati girano su un emulatore gestito da Gradle: avvio, rotazione, tasto indietro, inventario, impostazioni e il golden sul dispositivo, più l'avvio sulla build con R8.
+La CI, su ogni push e pull request, controlla formattazione, Lint (senza eccezioni registrate), NullAway e Animal Sniffer, esegue i test (unitari, di proprietà, di contratto, ArchUnit, golden) con le soglie di copertura e verifica i checksum delle dipendenze. Sulle pull request verso la branch principale esegue anche PIT e i test strumentati su un emulatore gestito da Gradle: avvio, rotazione, tasto indietro, inventario, impostazioni e il golden sul dispositivo, più l'avvio sulla build con R8.
 
 - **Regole d'architettura verificate dai test** con ArchUnit: dipendenze tra moduli e package, niente Android nel dominio, niente sorgenti casuali che rompano il determinismo.
 - **Test sulla JVM** con JUnit 5 e AssertJ, senza mock nel dominio: i test giocano su mappe disegnate in ASCII.
@@ -73,7 +73,7 @@ Obiettivo della v1, raggiunto durante il refactoring. Oggi è attivo tutto quell
 - [x] **3. `:infrastructure`:** adapter deterministici per terreno, percorsi e campo visivo.
 - [x] **4. `:application`:** turni completi, comandi, stati della partita.
 - [x] **5. Nuova app Android:** la stessa app di prima sul nuovo motore, le correzioni del primo collaudo e le note di collaudo, Hilt e MVVM, il nuovo rendering con l'inventario a griglia, le funzionalità nuove (pozione grande, registro dei messaggi, fine partita, barre con i valori, impostazioni), i test sul dispositivo in CI e il workflow di release.
-- [ ] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
+- [x] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
 Dopo la v1, una funzionalità alla volta: animazioni; statistiche vere ed equipaggiamento; attacchi a distanza (arcieri e coltelli da lancio); nemici che girano in branco; porte, leve e scrigni; più piani, chiusi da chiavi; boss; mercanti ed economia; illustrazioni. Ognuna ha la sua issue con l'etichetta `enhancement`.
 
@@ -89,9 +89,11 @@ Servono Android Studio, il JDK 21 e un dispositivo o un emulatore con Android 11
 
 Su Windows si usa `gradlew.bat` al posto di `./gradlew`.
 
+Ogni release (un tag `vX.Y.Z` sulla branch principale) ha l'APK e l'AAB firmati allegati nella pagina delle release su GitHub.
+
 ## Tecnologie
 
-Java 21 · Android SDK (minimo API 30) · AndroidX e Material Components · [SquidLib](https://github.com/yellowstonegames/SquidLib) per generazione delle mappe, percorsi e campo visivo · GitHub Actions. Con il refactoring: Hilt, JUnit 5, ArchUnit, jqwik, PIT, JaCoCo, Spotless, NullAway, Animal Sniffer.
+Java 21 · Android SDK (minimo API 30) · AndroidX e Material Components · [SquidLib](https://github.com/yellowstonegames/SquidLib) per la generazione delle mappe e il campo visivo · Hilt · GitHub Actions. Test e controlli: JUnit 5, AssertJ, ArchUnit, jqwik, Espresso, PIT, JaCoCo, Spotless, NullAway, Animal Sniffer.
 
 ## Autore
 
