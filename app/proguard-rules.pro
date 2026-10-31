@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Il progetto non usa riflessione; Hilt e AndroidX portano le loro regole. Qui si tolgono solo
+# i log di livello verbose e debug, che nelle build con R8 non servono.
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+}
