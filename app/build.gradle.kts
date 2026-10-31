@@ -10,20 +10,17 @@ android {
         applicationId = "io.github.matteocardarelli.simpleroguelike"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
+    sourceSets {
+        // Il giocatore automatico del test golden e la sessione dei test servono sia sulla JVM
+        // sia sul dispositivo: lo stesso codice deve dare la stessa partita nei due posti.
+        getByName("test").java.srcDir("src/sharedTest/java")
+        getByName("androidTest").java.srcDir("src/sharedTest/java")
+        // Il registro atteso del golden, letto anche dal test sul dispositivo.
+        getByName("androidTest").assets.srcDir("src/test/resources/golden")
     }
 }
 
@@ -129,5 +126,16 @@ dependencies {
     testRuntimeOnly(libs.junit.vintage.engine)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.espresso.core)
+    // Sul dispositivo servono solo le classi dei testFixtures, come EventLogWriter: JUnit 5,
+    // jqwik e AssertJ, che i testFixtures portano per i test di contratto, restano fuori
+    // dall'APK di test.
+    val domainFixtures = testFixtures(project(":domain")) as ModuleDependency
+    domainFixtures.exclude(group = "org.junit")
+    domainFixtures.exclude(group = "org.junit.jupiter")
+    domainFixtures.exclude(group = "org.junit.platform")
+    domainFixtures.exclude(group = "org.assertj")
+    domainFixtures.exclude(group = "net.jqwik")
+    androidTestImplementation(domainFixtures)
 }
