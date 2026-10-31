@@ -19,11 +19,12 @@ import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.databinding.ActivityGameBinding;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
+import io.github.matteocardarelli.simpleroguelike.settings.Settings;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
-import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackHost;
+import io.github.matteocardarelli.simpleroguelike.ui.hud.PlayerBars;
 import io.github.matteocardarelli.simpleroguelike.ui.input.SwipeInputMapper;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryContent;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryHost;
@@ -35,6 +36,8 @@ import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.TurnPlayback;
 import io.github.matteocardarelli.simpleroguelike.ui.render.Camera;
 import io.github.matteocardarelli.simpleroguelike.ui.render.TilePalette;
+import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsDialog;
+import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsHost;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +50,12 @@ import org.jspecify.annotations.Nullable;
  * ridisegna senza ripetere le animazioni e lascia al sistema il compito di ricreare l'inventario.
  *
  * <p>Ogni azione di gioco, dalla mappa o dall'inventario, passa da {@link GatedPlayerInput}: mentre
- * un turno viene riprodotto resta in coda solo l'ultima.
+ * un turno viene riprodotto resta in coda solo l'ultima. Impostazioni e note non sono azioni di
+ * gioco: non passano da lì.
  */
 @AndroidEntryPoint
-public class GameActivity extends AppCompatActivity implements InventoryHost, FeedbackHost {
+public class GameActivity extends AppCompatActivity
+        implements InventoryHost, FeedbackHost, SettingsHost {
 
     private static final String TAG = "GameActivity";
 
@@ -90,10 +95,7 @@ public class GameActivity extends AppCompatActivity implements InventoryHost, Fe
                         new SwipeInputMapper(
                                 input, getResources().getDimension(R.dimen.swipe_min_distance)));
         binding.newGameButton.setOnClickListener(v -> viewModel.newGame());
-        if (getResources().getBoolean(R.bool.feedback_enabled)) {
-            binding.feedbackButton.setVisibility(View.VISIBLE);
-            binding.feedbackButton.setOnClickListener(v -> showFeedbackDialog());
-        }
+        binding.settingsButton.setOnClickListener(v -> showSettingsDialog());
         keepTextAwayFromSystemBars();
 
         viewModel.uiState().observe(this, this::render);
@@ -123,33 +125,26 @@ public class GameActivity extends AppCompatActivity implements InventoryHost, Fe
                 });
     }
 
-    /** Disegna lo stato: riproduzione del turno, barre, fine partita, inventario, avvisi. */
+    /**
+     * Disegna lo stato: riproduzione del turno, barre, registro, fine partita, inventario, avvisi.
+     */
     private void render(GameUiState state) {
         GameSnapshot snapshot = state.result().snapshot();
         playback.show(state.result(), viewModel.claimPlayback(state.result().revision()));
         binding.gameView.show(snapshot, scene);
 
-        PlayerView player = snapshot.player();
-        binding.healthBar.setMax(player.maxHealth());
-        binding.healthBar.setProgress(player.health());
-        binding.xpBar.setMax(player.experienceToNextLevel());
-        binding.xpBar.setProgress(player.experience());
-        // TalkBack legge il nome della barra e il suo valore, non una percentuale.
-        binding.healthBar.setStateDescription(
-                getString(R.string.a11y_health_value, player.health(), player.maxHealth()));
-        binding.xpBar.setStateDescription(
-                getString(
-                        R.string.a11y_experience_value,
-                        player.experience(),
-                        player.experienceToNextLevel(),
-                        player.level()));
+        PlayerBars.show(binding.bars, snapshot.player());
 
         showLog(state);
-        if (getResources().getBoolean(R.bool.show_debug_info)) {
+        boolean debugInfo = getResources().getBoolean(R.bool.show_debug_info);
+        if (debugInfo) {
             binding.debugInfo.setVisibility(View.VISIBLE);
             binding.debugInfo.setText(
                     getString(R.string.debug_info, snapshot.seed(), snapshot.turn()));
         }
+        // Senza registro e senza informazioni di debug il pannello in basso non resta vuoto.
+        binding.bottomPanel.setVisibility(
+                state.logVisible() || debugInfo ? View.VISIBLE : View.GONE);
 
         switch (snapshot.phase()) {
             case PLAYING -> binding.endPanel.setVisibility(View.GONE);
@@ -170,10 +165,11 @@ public class GameActivity extends AppCompatActivity implements InventoryHost, Fe
     }
 
     /**
-     * Le ultime righe del registro. È una regione live: TalkBack legge i messaggi nuovi mentre si
-     * gioca.
+     * Le ultime righe del registro, se il giocatore non l'ha nascosto. È una regione live: TalkBack
+     * legge i messaggi nuovi mentre si gioca.
      */
     private void showLog(GameUiState state) {
+        binding.log.setVisibility(state.logVisible() ? View.VISIBLE : View.GONE);
         EntityId player = state.result().snapshot().player().id();
         List<String> lines = new ArrayList<>();
         for (GameEvent event : state.log()) {
@@ -206,7 +202,8 @@ public class GameActivity extends AppCompatActivity implements InventoryHost, Fe
     }
 
     private static InventoryContent inventory(GameUiState state) {
-        return new InventoryContent(state.result().snapshot().inventory(), state.selectedItem());
+        GameSnapshot snapshot = state.result().snapshot();
+        return new InventoryContent(snapshot.inventory(), state.selectedItem(), snapshot.player());
     }
 
     /** L'avviso resta finché il giocatore non lo conferma, anche dopo una rotazione. */
@@ -254,6 +251,28 @@ public class GameActivity extends AppCompatActivity implements InventoryHost, Fe
     @Override
     public void onInventoryCancelled() {
         viewModel.closeInventory();
+    }
+
+    /** Apre le impostazioni, se non sono già aperte: non consuma il turno. */
+    private void showSettingsDialog() {
+        if (getSupportFragmentManager().findFragmentByTag(SettingsDialog.TAG) == null) {
+            new SettingsDialog().show(getSupportFragmentManager(), SettingsDialog.TAG);
+        }
+    }
+
+    @Override
+    public Settings currentSettings() {
+        return viewModel.settings();
+    }
+
+    @Override
+    public void onLogVisibilityChanged(boolean visible) {
+        viewModel.setLogVisible(visible);
+    }
+
+    @Override
+    public void onWriteNoteRequested() {
+        showFeedbackDialog();
     }
 
     /** Apre la finestra della nota, se non è già aperta: non consuma il turno. */

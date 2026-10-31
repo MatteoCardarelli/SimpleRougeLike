@@ -14,13 +14,15 @@ import java.util.Optional;
  * @param log gli ultimi eventi visibili della partita, dal più vecchio: il registro dei messaggi
  * @param previousGameLost Android ha chiuso l'app durante una partita, che è andata persa: va detto
  *     al giocatore finché non lo conferma
+ * @param logVisible il registro dei messaggi si vede: un'impostazione del giocatore
  */
 public record GameUiState(
         TurnResult result,
         boolean inventoryOpen,
         Optional<EntityId> selectedItem,
         List<GameEvent> log,
-        boolean previousGameLost) {
+        boolean previousGameLost,
+        boolean logVisible) {
 
     public GameUiState {
         log = List.copyOf(log);

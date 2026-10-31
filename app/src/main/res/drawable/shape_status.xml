@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Il fondo delle barre: scuro e semitrasparente, si legge sopra la mappa e sopra lo sheet -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/overlay" />
+    <corners android:radius="8dp" />
+</shape>

@@ -14,6 +14,14 @@
         android:text="@string/inventory_title"
         android:textAppearance="?attr/textAppearanceHeadline6" />
 
+    <!-- Salute ed esperienza anche qui: lo sheet copre o oscura le barre sulla mappa -->
+    <include
+        android:id="@+id/bars"
+        layout="@layout/view_player_bars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/grid"
         android:layout_width="match_parent"

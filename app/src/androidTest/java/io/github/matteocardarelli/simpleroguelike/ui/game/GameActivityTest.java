@@ -1,34 +1,59 @@
 package io.github.matteocardarelli.simpleroguelike.ui.game;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.matcher.ViewMatchers.Visibility;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
+import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventorySheet;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/** L'app vera sul dispositivo: avvio, rotazione, tasto indietro e doppio tap sull'inventario. */
+/**
+ * L'app vera sul dispositivo: avvio, rotazione, tasto indietro, doppio tap sull'inventario, barre e
+ * impostazioni.
+ */
 @RunWith(AndroidJUnit4.class)
 public class GameActivityTest {
+
+    /** Le impostazioni restano tra un avvio e l'altro: ogni test parte da quelle iniziali. */
+    @Before
+    @After
+    public void clearTheSettings() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        context.getSharedPreferences(PreferencesSettingsStore.FILE, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .commit();
+    }
 
     private static GameViewModel viewModel(GameActivity activity) {
         return new ViewModelProvider(activity).get(GameViewModel.class);
@@ -156,6 +181,61 @@ public class GameActivityTest {
             MotionEvent event = MotionEvent.obtain(downTime, start + times[i], actions[i], x, y, 0);
             sheet.requireDialog().dispatchTouchEvent(event);
             event.recycle();
+        }
+    }
+
+    /** Issue #33: con l'inventario aperto si leggono salute ed esperienza con i loro valori. */
+    @Test
+    public void inventory_showsHealthAndExperienceWithTheirValues() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            AtomicReference<String> health = new AtomicReference<>();
+            AtomicReference<String> experience = new AtomicReference<>();
+            scenario.onActivity(
+                    activity -> {
+                        GameViewModel viewModel = viewModel(activity);
+                        viewModel.toggleInventory();
+                        activity.getSupportFragmentManager().executePendingTransactions();
+                        PlayerView player = viewModel.state().result().snapshot().player();
+                        health.set(
+                                activity.getString(
+                                        R.string.hud_health_value,
+                                        player.health(),
+                                        player.maxHealth()));
+                        experience.set(
+                                activity.getString(
+                                        R.string.hud_experience_value,
+                                        player.experience(),
+                                        player.experienceToNextLevel(),
+                                        player.level()));
+                    });
+
+            onView(withId(R.id.health_value))
+                    .inRoot(isDialog())
+                    .check(matches(isDisplayed()))
+                    .check(matches(withText(health.get())));
+            onView(withId(R.id.xp_value))
+                    .inRoot(isDialog())
+                    .check(matches(isDisplayed()))
+                    .check(matches(withText(experience.get())));
+        }
+    }
+
+    /** Issue #34: il registro nascosto dalle impostazioni resta nascosto dopo una rotazione. */
+    @Test
+    public void settings_hidingTheLog_keepsItHiddenAfterARotation() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            onView(withId(R.id.log)).check(matches(isDisplayed()));
+
+            onView(withId(R.id.settings_button)).perform(click());
+            onView(withId(R.id.log_switch)).inRoot(isDialog()).perform(click());
+            onView(withText(R.string.settings_close)).inRoot(isDialog()).perform(click());
+
+            onView(withId(R.id.log)).check(matches(withEffectiveVisibility(Visibility.GONE)));
+            scenario.recreate();
+            onView(withId(R.id.log)).check(matches(withEffectiveVisibility(Visibility.GONE)));
+            scenario.onActivity(activity -> assertFalse(viewModel(activity).state().logVisible()));
         }
     }
 }
