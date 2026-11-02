@@ -69,6 +69,7 @@ public final class TestGraph {
         Set<BehaviorBinding> behaviors = new LinkedHashSet<>();
         behaviors.add(GameModule.chaseOrWander(GameModule.pathfinder()));
         behaviors.add(GameModule.keepDistance(GameModule.pathfinder()));
+        behaviors.add(GameModule.pack(GameModule.pathfinder()));
         return behaviors;
     }
 }

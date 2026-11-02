@@ -13,6 +13,7 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
  * @param spawnWeight quanto spesso compare sul piano rispetto agli altri tipi; 0 vuol dire mai
  * @param range quante celle in linea retta raggiunge il suo colpo a distanza; 0 se combatte solo da
  *     vicino
+ * @param packSize quanti nemici di questo tipo nascono insieme, vicini: 1 per chi va da solo
  */
 public record EnemyDefinition(
         Kind kind,
@@ -21,26 +22,33 @@ public record EnemyDefinition(
         int aggroRange,
         BehaviorKey behavior,
         int spawnWeight,
-        int range) {
+        int range,
+        int packSize) {
 
     public EnemyDefinition {
         if (stats.maxHealth() <= 0) {
             throw new IllegalArgumentException("Un nemico deve avere salute: " + stats);
         }
-        if (experienceReward < 0 || aggroRange < 0 || spawnWeight < 0 || range < 0) {
+        if (experienceReward < 0
+                || aggroRange < 0
+                || spawnWeight < 0
+                || range < 0
+                || packSize < 1) {
             throw new IllegalArgumentException(
-                    "Valori negativi: experienceReward="
+                    "Valori non validi: experienceReward="
                             + experienceReward
                             + ", aggroRange="
                             + aggroRange
                             + ", spawnWeight="
                             + spawnWeight
                             + ", range="
-                            + range);
+                            + range
+                            + ", packSize="
+                            + packSize);
         }
     }
 
-    /** Un nemico che combatte solo da vicino. */
+    /** Un nemico che combatte solo da vicino e va da solo. */
     public EnemyDefinition(
             Kind kind,
             Stats stats,
@@ -48,6 +56,18 @@ public record EnemyDefinition(
             int aggroRange,
             BehaviorKey behavior,
             int spawnWeight) {
-        this(kind, stats, experienceReward, aggroRange, behavior, spawnWeight, 0);
+        this(kind, stats, experienceReward, aggroRange, behavior, spawnWeight, 0, 1);
+    }
+
+    /** Un nemico che va da solo, con un colpo a distanza di portata {@code range}. */
+    public EnemyDefinition(
+            Kind kind,
+            Stats stats,
+            int experienceReward,
+            int aggroRange,
+            BehaviorKey behavior,
+            int spawnWeight,
+            int range) {
+        this(kind, stats, experienceReward, aggroRange, behavior, spawnWeight, range, 1);
     }
 }

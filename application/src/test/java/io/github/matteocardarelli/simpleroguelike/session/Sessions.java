@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.KiteBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.SurroundBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
@@ -85,7 +86,16 @@ final class Sessions {
                         new AggroBehavior(
                                 new KiteBehavior(new ChaseBehavior(new StraightLinePathfinder())),
                                 new WanderBehavior()));
+        BehaviorBinding pack =
+                new BehaviorBinding(
+                        StandardEnemyCatalog.PACK,
+                        new AggroBehavior(
+                                new SurroundBehavior(new StraightLinePathfinder()),
+                                new WanderBehavior()));
         return new EnemyTurnRunner(
-                List.of(chaseOrWander, keepDistance), new StandardEnemyCatalog(), ACTIONS, RANGED);
+                List.of(chaseOrWander, keepDistance, pack),
+                new StandardEnemyCatalog(),
+                ACTIONS,
+                RANGED);
     }
 }

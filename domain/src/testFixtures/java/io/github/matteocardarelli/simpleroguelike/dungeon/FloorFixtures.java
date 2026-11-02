@@ -21,7 +21,7 @@ import java.util.Optional;
  * a  arciere            -  coltello da lancio
  * +  porta chiusa        $  scrigno con una pozione
  * G  cancello chiuso     L  leva nel muro, che apre tutti i cancelli del disegno
- * >  scale
+ * >  scale              w  lupo
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -95,6 +95,7 @@ public final class FloorFixtures {
                                     at);
                     case 'g' -> builder.enemy(new Enemy(ids.next(), goblin()), at);
                     case 'a' -> builder.enemy(new Enemy(ids.next(), archer()), at);
+                    case 'w' -> builder.enemy(new Enemy(ids.next(), wolf()), at);
                     case '-' ->
                             builder.item(
                                     new Item(ids.next(), item(StandardItemCatalog.THROWING_KNIFE)),
@@ -143,6 +144,10 @@ public final class FloorFixtures {
 
     public static EnemyDefinition archer() {
         return new StandardEnemyCatalog().all().get(1);
+    }
+
+    public static EnemyDefinition wolf() {
+        return new StandardEnemyCatalog().all().get(2);
     }
 
     public static ItemDefinition potion() {

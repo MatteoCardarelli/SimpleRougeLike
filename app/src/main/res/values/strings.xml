@@ -35,6 +35,8 @@
     <string name="kind_chest_description">Urtalo per aprirlo: dentro c\'è un oggetto.</string>
     <string name="kind_stairs_name">Scale</string>
     <string name="kind_stairs_description">Passaci sopra per scendere al piano successivo.</string>
+    <string name="kind_wolf_name">Lupo</string>
+    <string name="kind_wolf_description">Debole da solo, ma non va mai da solo: il branco ti accerchia.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 

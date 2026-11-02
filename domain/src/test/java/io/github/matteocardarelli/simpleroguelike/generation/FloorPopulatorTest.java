@@ -123,6 +123,26 @@ class FloorPopulatorTest {
     }
 
     @Test
+    void populate_aPack_spawnsTogether_andTheTotalStaysTheSpecOne() {
+        FloorPopulator wolves =
+                new FloorPopulator(
+                        new StandardItemCatalog(),
+                        () -> java.util.List.of(FloorFixtures.wolf()),
+                        StandardPlayer.DEFINITION);
+        FloorSpec spec = new FloorSpec(10, 7, 3, 0, 0, 1);
+
+        Floor floor =
+                wolves.populate(ROOM, spec, new SeededRandomSource(5), new EntityIdSequence());
+
+        assertThat(floor.enemies()).hasSize(3);
+        Position first = floor.positionOf(floor.enemies().get(0).id());
+        for (var wolf : floor.enemies()) {
+            assertThat(floor.positionOf(wolf.id()).distanceTo(first))
+                    .isLessThanOrEqualTo(FloorPopulator.PACK_RADIUS);
+        }
+    }
+
+    @Test
     void populate_noWalkableCell_fails() {
         Grid<TileType> rock = FloorFixtures.terrain("###", "###", "###");
 
