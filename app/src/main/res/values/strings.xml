@@ -25,6 +25,14 @@
     <string name="kind_archer_description">Tira frecce da lontano e scappa se ti avvicini. Avvicinati di lato.</string>
     <string name="kind_arrow_name">Freccia</string>
     <string name="kind_arrow_description">Il proiettile degli arcieri.</string>
+    <string name="kind_door_name">Porta</string>
+    <string name="kind_door_description">Si apre urtandola. Chiusa, non si vede cosa c\'è dietro.</string>
+    <string name="kind_gate_name">Cancello</string>
+    <string name="kind_gate_description">Sbarre di ferro: si vede oltre, ma lo apre solo la sua leva.</string>
+    <string name="kind_lever_name">Leva</string>
+    <string name="kind_lever_description">Urtala per tirarla: da qualche parte un cancello si apre.</string>
+    <string name="kind_chest_name">Scrigno</string>
+    <string name="kind_chest_description">Urtalo per aprirlo: dentro c\'è un oggetto.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -55,6 +63,10 @@
     <string name="log_item_picked_up">Raccogli: %1$s.</string>
     <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
     <string name="log_item_used">Usi: %1$s.</string>
+    <string name="log_door_opened">Apri la porta.</string>
+    <string name="log_lever_pulled">Tiri la leva: in lontananza un cancello si apre.</string>
+    <string name="log_chest_opened">Apri lo scrigno: dentro c\'è %1$s.</string>
+    <string name="log_chest_empty">Lo scrigno è vuoto.</string>
     <string name="log_fired_player">Lanci: %1$s.</string>
     <string name="log_fired_enemy">%1$s tira una freccia.</string>
     <string name="log_item_equipped">Equipaggi: %1$s.</string>

@@ -12,11 +12,12 @@ import java.util.OptionalLong;
 public record GameConfig(FloorSpec floorSpec, int visionRadius, OptionalLong fixedSeed) {
 
     /**
-     * I valori del gioco di prima del refactoring: piano 50×50 con 20 nemici e 10 oggetti, campo
-     * visivo di 8 celle. I nemici possono nascere in qualunque cella diversa da quella del player,
-     * come prima.
+     * Piano 50×50 con 20 nemici e 10 oggetti, come il gioco di prima del refactoring, più 6 porte,
+     * 3 scrigni e un cancello con la sua leva; campo visivo di 8 celle. I nemici possono nascere in
+     * qualunque cella diversa da quella del player, come prima.
      */
     public static GameConfig standard() {
-        return new GameConfig(new FloorSpec(50, 50, 20, 10, 1, 10), 8, OptionalLong.empty());
+        return new GameConfig(
+                new FloorSpec(50, 50, 20, 10, 1, 10, 6, 3, 1), 8, OptionalLong.empty());
     }
 }

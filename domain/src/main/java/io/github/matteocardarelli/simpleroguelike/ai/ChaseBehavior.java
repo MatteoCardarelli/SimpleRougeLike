@@ -33,9 +33,10 @@ public final class ChaseBehavior implements EnemyBehavior {
             }
         }
         CellSet blocked = CellSet.of(floor.terrain().width(), floor.terrain().height(), others);
+        // Porte, cancelli e scrigni chiusi sono muri per chi cerca un percorso.
         return pathfinder
                 .nextStep(
-                        floor.terrain(),
+                        floor.movementGrid(),
                         blocked,
                         floor.positionOf(enemy.id()),
                         floor.positionOf(floor.playerId()))

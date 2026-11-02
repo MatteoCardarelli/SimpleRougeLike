@@ -8,13 +8,16 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.di.TestContent;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
+import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
+import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -104,6 +107,21 @@ class EventMessageFormatterTest {
                                 new Fired(GOBLIN, archer, Kind.of("arrow"), AT, List.of(AT)),
                                 PLAYER))
                 .contains(R.string.log_fired_enemy + "[" + R.string.kind_archer_name + "[]]");
+    }
+
+    @Test
+    void format_fixtures_sayWhatHappened() {
+        assertThat(formatter.format(new DoorOpened(AT), PLAYER))
+                .contains(R.string.log_door_opened + "[]");
+        assertThat(formatter.format(new LeverPulled(AT, List.of(AT)), PLAYER))
+                .contains(R.string.log_lever_pulled + "[]");
+        assertThat(
+                        formatter.format(
+                                new ChestOpened(AT, java.util.Optional.of(Kind.of("potion"))),
+                                PLAYER))
+                .contains(R.string.log_chest_opened + "[" + R.string.kind_potion_name + "[]]");
+        assertThat(formatter.format(new ChestOpened(AT, java.util.Optional.empty()), PLAYER))
+                .contains(R.string.log_chest_empty + "[]");
     }
 
     @Test

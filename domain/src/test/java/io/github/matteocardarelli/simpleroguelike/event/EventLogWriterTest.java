@@ -39,7 +39,11 @@ class EventLogWriterTest {
                         "t12 InventoryFull item=7 kind=goblin at=3,4",
                         "t12 ItemUsed item=7 kind=goblin at=3,4",
                         "t12 ItemEquipped item=7 kind=goblin at=3,4",
-                        "t12 ItemUnequipped item=7 kind=goblin at=3,4");
+                        "t12 ItemUnequipped item=7 kind=goblin at=3,4",
+                        "t12 DoorOpened at=3,4",
+                        "t12 LeverPulled at=3,4 opened=4,4",
+                        "t12 ChestOpened at=3,4 contents=goblin",
+                        "t12 ChestOpened at=3,4 contents=-");
     }
 
     @Test
@@ -85,6 +89,10 @@ class EventLogWriterTest {
                         List.of(P),
                         List.of(P),
                         List.of(P),
+                        List.of(P),
+                        List.of(P),
+                        List.of(P, Q),
+                        List.of(P),
                         List.of(P));
     }
 
@@ -103,6 +111,10 @@ class EventLogWriterTest {
                 new InventoryFull(B, GOBLIN, P),
                 new ItemUsed(B, GOBLIN, P),
                 new ItemEquipped(B, GOBLIN, P),
-                new ItemUnequipped(B, GOBLIN, P));
+                new ItemUnequipped(B, GOBLIN, P),
+                new DoorOpened(P),
+                new LeverPulled(P, List.of(Q)),
+                new ChestOpened(P, java.util.Optional.of(GOBLIN)),
+                new ChestOpened(P, java.util.Optional.empty()));
     }
 }

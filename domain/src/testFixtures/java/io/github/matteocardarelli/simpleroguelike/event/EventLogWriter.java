@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.event;
 
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
+import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -144,6 +145,17 @@ public final class EventLogWriter {
                                 + e.kind().value()
                                 + " at="
                                 + at(e.at()));
+        register(DoorOpened.class, e -> "DoorOpened at=" + at(e.at()));
+        register(
+                LeverPulled.class,
+                e -> "LeverPulled at=" + at(e.at()) + " opened=" + path(e.opened()));
+        register(
+                ChestOpened.class,
+                e ->
+                        "ChestOpened at="
+                                + at(e.at())
+                                + " contents="
+                                + e.contents().map(Kind::value).orElse("-"));
     }
 
     /**

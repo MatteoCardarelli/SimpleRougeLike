@@ -14,7 +14,8 @@ import java.util.Optional;
 /**
  * Un passo in una direzione, la stessa regola per il player e per i nemici: contro un attore ostile
  * è un attacco, in una cella libera è uno spostamento, altrimenti non succede niente. Il player,
- * quando si sposta, raccoglie l'oggetto che trova a terra.
+ * quando si sposta, raccoglie l'oggetto che trova a terra; contro un oggetto fisso lo usa: apre una
+ * porta o uno scrigno, tira una leva.
  */
 public final class ActionRules {
 
@@ -48,6 +49,10 @@ public final class ActionRules {
                     combat.resolveAttack(floor, actorId, occupant.get().id(), random));
         }
         if (!floor.isFree(to)) {
+            if (actorId.equals(floor.playerId()) && floor.fixtureAt(to).isPresent()) {
+                List<GameEvent> used = floor.interact(actorId, to);
+                return used.isEmpty() ? ActionResult.blocked() : ActionResult.performed(used);
+            }
             return ActionResult.blocked();
         }
         List<GameEvent> events = new ArrayList<>();
