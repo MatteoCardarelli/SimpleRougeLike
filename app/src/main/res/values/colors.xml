@@ -17,6 +17,7 @@
     <!-- Gli attori e gli oggetti, finché non arrivano le illustrazioni -->
     <color name="kind_player">#FF00FF00</color>
     <color name="kind_goblin">#FFFF0000</color>
+    <color name="kind_arrow">#FFFFE082</color>
     <color name="kind_throwing_knife">#FFCFD8DC</color>
     <color name="kind_archer">#FFFFA000</color>
     <color name="kind_potion">#FF00FFFF</color>

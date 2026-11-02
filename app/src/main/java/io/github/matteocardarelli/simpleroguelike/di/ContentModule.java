@@ -180,6 +180,13 @@ public final class ContentModule {
                         R.string.kind_archer_name,
                         R.string.kind_archer_description,
                         R.color.kind_archer));
+        // Non è un contenuto dei cataloghi, ma si disegna in volo.
+        styles.put(
+                RangedRules.ARROW,
+                new ContentPresentation.Style(
+                        R.string.kind_arrow_name,
+                        R.string.kind_arrow_description,
+                        R.color.kind_arrow));
         return new ContentPresentation(styles);
     }
 

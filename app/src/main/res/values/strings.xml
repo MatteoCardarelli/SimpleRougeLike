@@ -23,6 +23,8 @@
     <string name="kind_throwing_knife_description">Piccolo e bilanciato: si lancia fino a 6 celle per 8 danni. Si impila.</string>
     <string name="kind_archer_name">Arciere</string>
     <string name="kind_archer_description">Tira frecce da lontano e scappa se ti avvicini. Avvicinati di lato.</string>
+    <string name="kind_arrow_name">Freccia</string>
+    <string name="kind_arrow_description">Il proiettile degli arcieri.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 

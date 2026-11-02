@@ -1,5 +1,6 @@
 package io.github.matteocardarelli.simpleroguelike.di;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import dagger.Module;
 import dagger.Provides;
@@ -11,17 +12,19 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.log.EventMessageFormatter;
 import io.github.matteocardarelli.simpleroguelike.ui.log.Texts;
+import io.github.matteocardarelli.simpleroguelike.ui.playback.AnimatedEventPlayer;
+import io.github.matteocardarelli.simpleroguelike.ui.playback.Animations;
+import io.github.matteocardarelli.simpleroguelike.ui.playback.ChoreographerFrameClock;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.CompositeEventListener;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.EventListener;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.EventPlayer;
-import io.github.matteocardarelli.simpleroguelike.ui.playback.InstantEventPlayer;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import java.util.Set;
 
 /**
  * La riproduzione dei turni: vive quanto l'Activity, e dopo una rotazione si ricrea. Un suono o una
- * vibrazione si aggiungono come {@link EventListener} con {@code @IntoSet}; le animazioni
- * sostituiranno il riproduttore istantaneo in un metodo solo.
+ * vibrazione si aggiungono come {@link EventListener} con {@code @IntoSet}; un'animazione nuova si
+ * registra in {@link Animations}.
  */
 @Module
 @InstallIn(ActivityComponent.class)
@@ -38,9 +41,17 @@ public abstract class UiModule {
         return new CompositeEventListener(listeners);
     }
 
+    /**
+     * Gli eventi si animano a ogni fotogramma dello schermo; se le animazioni del sistema sono
+     * spente, per accessibilità o nei test sul dispositivo, si mostrano subito.
+     */
     @Provides
     static EventPlayer eventPlayer(EventListener listener) {
-        return new InstantEventPlayer(listener);
+        return Animations.registerAll(
+                new AnimatedEventPlayer(
+                        listener,
+                        new ChoreographerFrameClock(),
+                        ValueAnimator::areAnimatorsEnabled));
     }
 
     @Provides
