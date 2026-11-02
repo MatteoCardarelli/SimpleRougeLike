@@ -145,6 +145,11 @@ public final class GameView extends View {
             float y = fixture.position().y() * cell;
             float inset = cell * 0.15f;
             switch (fixture.kind().value()) {
+                case "locked_door", "boss_door" -> {
+                    canvas.drawRect(x + inset, y, x + cell - inset, y + cell, paint);
+                    paint.setColor(Color.BLACK);
+                    canvas.drawCircle(x + cell / 2, y + cell / 2, cell / 10f, paint);
+                }
                 case "door" -> {
                     if (fixture.open()) {
                         frame(canvas, x + inset, y + inset, x + cell - inset, y + cell - inset);

@@ -12,6 +12,7 @@ import java.util.Optional;
  * @param equipped se il player lo porta addosso
  * @param throwable se si lancia, come un coltello
  * @param count quanti pezzi ha: più di 1 solo per un oggetto che si impila
+ * @param usable se si usa, come una pozione: chiavi, armi e coltelli no
  */
 public record InventoryEntry(
         EntityId id,
@@ -19,15 +20,16 @@ public record InventoryEntry(
         Optional<EquipmentSlot> slot,
         boolean equipped,
         boolean throwable,
-        int count) {
+        int count,
+        boolean usable) {
 
     /** Un oggetto che si usa, come una pozione. */
     public InventoryEntry(EntityId id, Kind kind) {
-        this(id, kind, Optional.empty(), false, false, 1);
+        this(id, kind, Optional.empty(), false, false, 1, true);
     }
 
     /** Un oggetto che si usa o si equipaggia, in un solo pezzo. */
     public InventoryEntry(EntityId id, Kind kind, Optional<EquipmentSlot> slot, boolean equipped) {
-        this(id, kind, slot, equipped, false, 1);
+        this(id, kind, slot, equipped, false, 1, !slot.isPresent());
     }
 }

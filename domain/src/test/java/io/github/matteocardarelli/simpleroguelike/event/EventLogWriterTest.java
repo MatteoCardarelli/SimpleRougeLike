@@ -44,7 +44,10 @@ class EventLogWriterTest {
                         "t12 LeverPulled at=3,4 opened=4,4",
                         "t12 ChestOpened at=3,4 contents=goblin",
                         "t12 ChestOpened at=3,4 contents=-",
-                        "t12 FloorChanged depth=2");
+                        "t12 FloorChanged depth=2",
+                        "t12 DoorUnlocked at=3,4",
+                        "t12 DoorLocked at=3,4",
+                        "t12 ItemDropped item=7 kind=goblin at=3,4");
     }
 
     @Test
@@ -95,7 +98,10 @@ class EventLogWriterTest {
                         List.of(P, Q),
                         List.of(P),
                         List.of(P),
-                        List.of());
+                        List.of(),
+                        List.of(P),
+                        List.of(P),
+                        List.of(P));
     }
 
     private static List<GameEvent> everyEvent() {
@@ -118,6 +124,9 @@ class EventLogWriterTest {
                 new LeverPulled(P, List.of(Q)),
                 new ChestOpened(P, java.util.Optional.of(GOBLIN)),
                 new ChestOpened(P, java.util.Optional.empty()),
-                new FloorChanged(2));
+                new FloorChanged(2),
+                new DoorUnlocked(P),
+                new DoorLocked(P),
+                new ItemDropped(B, GOBLIN, P));
     }
 }

@@ -46,7 +46,10 @@ class StandardCatalogsTest {
                                 25,
                                 8,
                                 StandardEnemyCatalog.CHASE_OR_WANDER,
-                                10),
+                                10,
+                                0,
+                                1,
+                                25),
                         new EnemyDefinition(
                                 StandardEnemyCatalog.ARCHER,
                                 new Stats(20, 6, 0, 5, 10),
@@ -54,7 +57,9 @@ class StandardCatalogsTest {
                                 8,
                                 StandardEnemyCatalog.KEEP_DISTANCE,
                                 4,
-                                5),
+                                5,
+                                1,
+                                30),
                         new EnemyDefinition(
                                 StandardEnemyCatalog.WOLF,
                                 new Stats(14, 5, 0, 5, 10),
@@ -63,7 +68,8 @@ class StandardCatalogsTest {
                                 StandardEnemyCatalog.PACK,
                                 3,
                                 0,
-                                3));
+                                3,
+                                15));
     }
 
     @Test

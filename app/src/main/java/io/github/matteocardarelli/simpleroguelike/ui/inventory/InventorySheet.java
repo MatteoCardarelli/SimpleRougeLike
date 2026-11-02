@@ -120,7 +120,8 @@ public final class InventorySheet extends BottomSheetDialogFragment {
                             requireContext().getColor(content.colorRes(entry.kind()))));
             binding.detailName.setText(content.nameRes(entry.kind()));
             binding.detailDescription.setText(content.descriptionRes(entry.kind()));
-            binding.use.setEnabled(true);
+            // Una chiave non si usa: la consuma la porta che apre.
+            binding.use.setEnabled(entry.usable() || entry.throwable() || entry.slot().isPresent());
             binding.use.setText(
                     entry.throwable()
                             ? R.string.inventory_throw

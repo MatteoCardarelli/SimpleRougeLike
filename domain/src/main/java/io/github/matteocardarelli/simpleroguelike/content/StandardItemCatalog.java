@@ -2,6 +2,7 @@ package io.github.matteocardarelli.simpleroguelike.content;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemDefinition;
+import io.github.matteocardarelli.simpleroguelike.dungeon.KeyType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Throwing;
 import io.github.matteocardarelli.simpleroguelike.effect.HealEffect;
 import io.github.matteocardarelli.simpleroguelike.model.EquipmentSlot;
@@ -30,6 +31,12 @@ public final class StandardItemCatalog implements ItemCatalog {
     /** Si lancia fino a 6 celle per 8 danni; i coltelli si impilano. */
     public static final Kind THROWING_KNIFE = Kind.of("throwing_knife");
 
+    /** Apre una porta chiusa a chiave; la mette la generazione, non compare a caso. */
+    public static final Kind KEY = Kind.of("key");
+
+    /** Apre la porta del boss. */
+    public static final Kind BOSS_KEY = Kind.of("boss_key");
+
     private static final List<ItemDefinition> ITEMS =
             List.of(
                     new ItemDefinition(POTION, new HealEffect(25), true, 10),
@@ -44,7 +51,9 @@ public final class StandardItemCatalog implements ItemCatalog {
                             RING_OF_ACCURACY, EquipmentSlot.RING, new Stats(0, 0, 0, 10, 0), 1),
                     ItemDefinition.equipment(
                             RING_OF_VIGOR, EquipmentSlot.RING, new Stats(20, 0), 1),
-                    ItemDefinition.throwable(THROWING_KNIFE, new Throwing(8, 6), 5));
+                    ItemDefinition.throwable(THROWING_KNIFE, new Throwing(8, 6), 5),
+                    ItemDefinition.key(KEY, KeyType.COMMON),
+                    ItemDefinition.key(BOSS_KEY, KeyType.BOSS));
 
     @Override
     public List<ItemDefinition> all() {

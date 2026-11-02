@@ -22,6 +22,7 @@ import java.util.Optional;
  * +  porta chiusa        $  scrigno con una pozione
  * G  cancello chiuso     L  leva nel muro, che apre tutti i cancelli del disegno
  * >  scale              w  lupo
+ * K  porta chiusa a chiave   k  chiave a terra
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -74,6 +75,9 @@ public final class FloorFixtures {
                 switch (cell) {
                     case '#', '.' -> {}
                     case '+' -> builder.fixture(Fixture.door(), at);
+                    case 'K' -> builder.fixture(Fixture.lockedDoor(), at);
+                    case 'k' ->
+                            builder.item(new Item(ids.next(), item(StandardItemCatalog.KEY)), at);
                     case '>' -> builder.fixture(Fixture.stairs(), at);
                     case 'G' -> {
                         builder.fixture(Fixture.gate(), at);

@@ -1107,6 +1107,7 @@ t388 Died actor=7 kind=archer at=11,32
 t388 ExperienceGained at=12,32 amount=30
 t388 Attacked attacker=13 target=1 from=13,32 at=12,32
 t388 Damaged target=1 at=12,32 amount=5 hp=80
+t388 ItemDropped item=31 kind=potion at=11,32
 t389 > move right
 t389 Attacked attacker=1 target=13 from=12,32 at=13,32
 t389 Damaged target=13 at=13,32 amount=9 hp=3
@@ -1119,6 +1120,7 @@ t390 Died actor=13 kind=goblin at=13,32
 t390 ExperienceGained at=12,32 amount=25
 t391 > move left
 t391 Moved actor=1 kind=player from=12,32 to=11,32
+t391 ItemPickedUp item=31 kind=potion at=11,32
 t392 > move left
 t392 Moved actor=1 kind=player from=11,32 to=10,32
 t393 > move left
@@ -1137,4 +1139,4 @@ t399 > move left
 t399 Moved actor=1 kind=player from=4,32 to=3,32
 t400 > move left
 t400 Moved actor=1 kind=player from=3,32 to=2,32
-t401 phase=playing player=2,32 hp=75/100 level=1 xp=55/100 enemies=0 items=0 inventory=0
+t401 phase=playing player=2,32 hp=75/100 level=1 xp=55/100 enemies=0 items=0 inventory=1

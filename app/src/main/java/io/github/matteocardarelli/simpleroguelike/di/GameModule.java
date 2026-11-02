@@ -35,6 +35,7 @@ import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
+import io.github.matteocardarelli.simpleroguelike.session.LootHook;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidFieldOfView;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidTerrainGenerator;
@@ -139,9 +140,16 @@ public abstract class GameModule {
         return new UnequipHandler();
     }
 
-    /** Le regole di fine turno: oggi nessuna, e l'insieme vuoto è ammesso. */
+    /** Le regole di fine turno; l'insieme vuoto è ammesso. */
     @Multibinds
     abstract Set<TurnHook> hooks();
+
+    /** Il bottino dei nemici morti. */
+    @Provides
+    @IntoSet
+    static TurnHook lootHook(ItemCatalog items) {
+        return new LootHook(items);
+    }
 
     @Provides
     static EnemyTurnRunner enemyTurnRunner(

@@ -10,6 +10,7 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.FloorBuilder;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemDefinition;
+import io.github.matteocardarelli.simpleroguelike.dungeon.KeyType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.PlayerDefinition;
 import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
@@ -143,6 +144,8 @@ public final class FloorPopulator {
             itemTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
         }
 
+        List<Position> keyCells = keyCells(terrain, layout, playerAt, free, random);
+
         List<ItemDefinition> chestTypes = new ArrayList<>();
         for (int i = 0; i < layout.chests().size(); i++) {
             chestTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
@@ -169,6 +172,13 @@ public final class FloorPopulator {
         for (Position door : layout.doors()) {
             builder.fixture(Fixture.door(), door);
         }
+        for (Position door : layout.lockedDoors()) {
+            builder.fixture(Fixture.lockedDoor(), door);
+        }
+        ItemDefinition key = commonKey();
+        for (Position cell : keyCells) {
+            builder.item(new Item(ids.next(), key), cell);
+        }
         layout.stairs().ifPresent(stairs -> builder.fixture(Fixture.stairs(), stairs));
         return builder.build();
     }
@@ -189,6 +199,63 @@ public final class FloorPopulator {
             }
         }
         return Optional.ofNullable(best);
+    }
+
+    /**
+     * Una cella per chiave, una per porta chiusa a chiave, tra quelle libere che il player
+     * raggiunge senza passare da porte chiuse a chiave o cancelli: così ogni chiave si trova prima
+     * della porta che apre, e nessun piano resta senza uscita.
+     *
+     * @throws FloorGenerationException se non ci sono abbastanza celle raggiungibili
+     */
+    private static List<Position> keyCells(
+            Grid<TileType> terrain,
+            FixtureLayout layout,
+            Position playerAt,
+            List<Position> free,
+            RandomSource random) {
+        if (layout.lockedDoors().isEmpty()) {
+            return List.of();
+        }
+        List<Position> barriers = new ArrayList<>(layout.lockedDoors());
+        for (FixtureLayout.Gate gate : layout.gates()) {
+            barriers.add(gate.at());
+        }
+        List<Position> reachable = new ArrayList<>();
+        java.util.Set<Position> seen = new java.util.LinkedHashSet<>();
+        java.util.ArrayDeque<Position> queue = new java.util.ArrayDeque<>();
+        seen.add(playerAt);
+        queue.add(playerAt);
+        while (!queue.isEmpty()) {
+            Position cell = queue.poll();
+            for (io.github.matteocardarelli.simpleroguelike.model.Direction direction :
+                    io.github.matteocardarelli.simpleroguelike.model.Direction.values()) {
+                Position next = cell.translate(direction);
+                if (terrain.isInside(next)
+                        && terrain.get(next).isWalkable()
+                        && !barriers.contains(next)
+                        && seen.add(next)) {
+                    queue.add(next);
+                }
+            }
+        }
+        for (Position cell : free) {
+            if (seen.contains(cell)) {
+                reachable.add(cell);
+            }
+        }
+        List<Position> keys = take(reachable, layout.lockedDoors().size(), random, "chiavi");
+        free.removeAll(keys);
+        return keys;
+    }
+
+    private ItemDefinition commonKey() {
+        for (ItemDefinition definition : items.all()) {
+            if (definition.key().equals(Optional.of(KeyType.COMMON))) {
+                return definition;
+            }
+        }
+        throw new FloorGenerationException("Il catalogo non ha una chiave per le porte chiuse");
     }
 
     /** Toglie {@code count} celle a caso da {@code cells} e le restituisce. */

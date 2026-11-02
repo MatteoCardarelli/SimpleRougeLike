@@ -8,6 +8,7 @@ import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.content.StandardPlayer;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EntityIdSequence;
+import io.github.matteocardarelli.simpleroguelike.dungeon.FixtureType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorFixtures;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
@@ -139,6 +140,40 @@ class FloorPopulatorTest {
         for (var wolf : floor.enemies()) {
             assertThat(floor.positionOf(wolf.id()).distanceTo(first))
                     .isLessThanOrEqualTo(FloorPopulator.PACK_RADIUS);
+        }
+    }
+
+    @Test
+    void populate_theKeyOfALockedDoor_isOnThePlayerSide() {
+        Grid<TileType> twoRooms =
+                FloorFixtures.terrain(
+                        "##############",
+                        "#......###...#",
+                        "#............#",
+                        "#......###...#",
+                        "#......#######",
+                        "##############");
+        FloorSpec spec = new FloorSpec(14, 6, 0, 0, 0, 1, 1, 0, 0, 0, 1);
+
+        for (long seed = 1; seed <= 20; seed++) {
+            Floor floor =
+                    POPULATOR.populate(
+                            twoRooms, spec, new SeededRandomSource(seed), new EntityIdSequence());
+            Position door =
+                    floor.fixtures().entrySet().stream()
+                            .filter(e -> e.getValue().type() == FixtureType.LOCKED_DOOR)
+                            .map(java.util.Map.Entry::getKey)
+                            .findFirst()
+                            .orElseThrow();
+            Position player = floor.positionOf(floor.playerId());
+            Position key =
+                    floor.itemsOnGround().entrySet().stream()
+                            .filter(e -> e.getValue().kind().equals(StandardItemCatalog.KEY))
+                            .map(java.util.Map.Entry::getKey)
+                            .findFirst()
+                            .orElseThrow();
+            assertThat(Integer.signum(key.x() - door.x()))
+                    .isEqualTo(Integer.signum(player.x() - door.x()));
         }
     }
 

@@ -14,6 +14,7 @@ import java.util.Optional;
  * @param spawnWeight quanto spesso compare sul piano rispetto agli altri tipi; 0 vuol dire mai
  * @param equipment lo spazio e il bonus, se l'oggetto si equipaggia
  * @param throwing danno e portata, se l'oggetto si lancia
+ * @param key che porte apre, se l'oggetto è una chiave
  */
 public record ItemDefinition(
         Kind kind,
@@ -21,7 +22,8 @@ public record ItemDefinition(
         boolean consumable,
         int spawnWeight,
         Optional<Equipment> equipment,
-        Optional<Throwing> throwing) {
+        Optional<Throwing> throwing,
+        Optional<KeyType> key) {
 
     public ItemDefinition {
         if (spawnWeight < 0) {
@@ -31,15 +33,27 @@ public record ItemDefinition(
             throw new IllegalArgumentException(
                     "Un oggetto da equipaggiare non si consuma: " + kind.value());
         }
-        if (equipment.isPresent() && throwing.isPresent()) {
+        int uses =
+                (equipment.isPresent() ? 1 : 0)
+                        + (throwing.isPresent() ? 1 : 0)
+                        + (key.isPresent() ? 1 : 0);
+        if (uses > 1) {
             throw new IllegalArgumentException(
-                    "Un oggetto non si equipaggia e si lancia insieme: " + kind.value());
+                    "Un oggetto si equipaggia, si lancia o apre porte, una cosa sola: "
+                            + kind.value());
         }
     }
 
     /** Un oggetto che si usa. */
     public ItemDefinition(Kind kind, ItemEffect effect, boolean consumable, int spawnWeight) {
-        this(kind, effect, consumable, spawnWeight, Optional.empty(), Optional.empty());
+        this(
+                kind,
+                effect,
+                consumable,
+                spawnWeight,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty());
     }
 
     /** Un oggetto che si usa o si equipaggia, ma non si lancia. */
@@ -49,7 +63,33 @@ public record ItemDefinition(
             boolean consumable,
             int spawnWeight,
             Optional<Equipment> equipment) {
-        this(kind, effect, consumable, spawnWeight, equipment, Optional.empty());
+        this(kind, effect, consumable, spawnWeight, equipment, Optional.empty(), Optional.empty());
+    }
+
+    /** Un oggetto che si usa, si equipaggia o si lancia, ma non è una chiave. */
+    public ItemDefinition(
+            Kind kind,
+            ItemEffect effect,
+            boolean consumable,
+            int spawnWeight,
+            Optional<Equipment> equipment,
+            Optional<Throwing> throwing) {
+        this(kind, effect, consumable, spawnWeight, equipment, throwing, Optional.empty());
+    }
+
+    /**
+     * Una chiave: non si usa, si impila e la consuma la porta che apre. Non compare a caso sul
+     * piano: la mette la generazione dove serve.
+     */
+    public static ItemDefinition key(Kind kind, KeyType type) {
+        return new ItemDefinition(
+                kind,
+                ItemEffect.NONE,
+                false,
+                0,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(type));
     }
 
     /** Un oggetto da equipaggiare nello spazio {@code slot}, che aggiunge {@code bonus}. */
@@ -65,8 +105,15 @@ public record ItemDefinition(
                 kind, ItemEffect.NONE, false, spawnWeight, Optional.empty(), Optional.of(throwing));
     }
 
+    /**
+     * Vero per gli oggetti che si usano: non si equipaggiano, non si lanciano e non sono chiavi.
+     */
+    public boolean usable() {
+        return !equipment.isPresent() && !throwing.isPresent() && !key.isPresent();
+    }
+
     /** Vero per gli oggetti che occupano un solo posto nell'inventario, con un numero. */
     public boolean stackable() {
-        return throwing.isPresent();
+        return throwing.isPresent() || key.isPresent();
     }
 }
