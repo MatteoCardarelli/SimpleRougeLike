@@ -11,6 +11,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.KiteBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.SurroundBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
@@ -97,6 +98,15 @@ public abstract class GameModule {
                 StandardEnemyCatalog.KEEP_DISTANCE,
                 new AggroBehavior(
                         new KiteBehavior(new ChaseBehavior(pathfinder)), new WanderBehavior()));
+    }
+
+    /** I lupi accerchiano il player con il resto del branco; se è lontano, vagano. */
+    @Provides
+    @IntoSet
+    static BehaviorBinding pack(Pathfinder pathfinder) {
+        return new BehaviorBinding(
+                StandardEnemyCatalog.PACK,
+                new AggroBehavior(new SurroundBehavior(pathfinder), new WanderBehavior()));
     }
 
     @Provides

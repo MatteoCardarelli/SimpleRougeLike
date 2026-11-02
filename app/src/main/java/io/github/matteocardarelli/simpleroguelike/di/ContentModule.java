@@ -181,6 +181,12 @@ public final class ContentModule {
                         R.string.kind_archer_name,
                         R.string.kind_archer_description,
                         R.color.kind_archer));
+        styles.put(
+                StandardEnemyCatalog.WOLF,
+                new ContentPresentation.Style(
+                        R.string.kind_wolf_name,
+                        R.string.kind_wolf_description,
+                        R.color.kind_wolf));
         // Gli oggetti fissi del piano.
         styles.put(
                 FixtureType.STAIRS.kind(),

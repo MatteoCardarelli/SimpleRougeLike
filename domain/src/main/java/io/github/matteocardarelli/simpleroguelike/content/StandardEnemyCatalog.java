@@ -20,6 +20,12 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
      */
     public static final Kind ARCHER = Kind.of("archer");
 
+    /** Debole da solo, nasce in branchi di tre che accerchiano il player. */
+    public static final Kind WOLF = Kind.of("wolf");
+
+    /** Accerchia il player con il resto del branco; se il player è lontano, vaga. */
+    public static final BehaviorKey PACK = BehaviorKey.of("pack");
+
     /** Tiene la distanza e tira; se il player è lontano, vaga. */
     public static final BehaviorKey KEEP_DISTANCE = BehaviorKey.of("keep_distance");
 
@@ -28,7 +34,8 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
                     new EnemyDefinition(
                             GOBLIN, new Stats(30, 7, 1, 0, 5), 25, 8, CHASE_OR_WANDER, 10),
                     new EnemyDefinition(
-                            ARCHER, new Stats(20, 6, 0, 5, 10), 30, 8, KEEP_DISTANCE, 4, 5));
+                            ARCHER, new Stats(20, 6, 0, 5, 10), 30, 8, KEEP_DISTANCE, 4, 5),
+                    new EnemyDefinition(WOLF, new Stats(14, 5, 0, 5, 10), 15, 10, PACK, 3, 0, 3));
 
     @Override
     public List<EnemyDefinition> all() {

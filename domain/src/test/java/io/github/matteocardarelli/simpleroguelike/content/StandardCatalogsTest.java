@@ -37,7 +37,7 @@ class StandardCatalogsTest {
     }
 
     @Test
-    void enemies_containTheGoblinAndTheArcher() {
+    void enemies_containTheGoblinTheArcherAndTheWolf() {
         assertThat(new StandardEnemyCatalog().all())
                 .containsExactly(
                         new EnemyDefinition(
@@ -54,7 +54,16 @@ class StandardCatalogsTest {
                                 8,
                                 StandardEnemyCatalog.KEEP_DISTANCE,
                                 4,
-                                5));
+                                5),
+                        new EnemyDefinition(
+                                StandardEnemyCatalog.WOLF,
+                                new Stats(14, 5, 0, 5, 10),
+                                15,
+                                10,
+                                StandardEnemyCatalog.PACK,
+                                3,
+                                0,
+                                3));
     }
 
     @Test
