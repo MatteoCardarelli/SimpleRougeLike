@@ -52,6 +52,8 @@ public final class TestGraph {
         Set<CommandHandler<?>> handlers = new LinkedHashSet<>();
         handlers.add(GameModule.moveHandler(actions));
         handlers.add(GameModule.useItemHandler());
+        handlers.add(GameModule.equipHandler());
+        handlers.add(GameModule.unequipHandler());
         return handlers;
     }
 

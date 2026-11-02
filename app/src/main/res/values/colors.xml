@@ -19,6 +19,12 @@
     <color name="kind_goblin">#FFFF0000</color>
     <color name="kind_potion">#FF00FFFF</color>
     <color name="kind_greater_potion">#FF4D7CFF</color>
+    <color name="kind_sword">#FFB0BEC5</color>
+    <color name="kind_axe">#FFFF8A65</color>
+    <color name="kind_leather_armor">#FFA1887F</color>
+    <color name="kind_chain_mail">#FF90A4AE</color>
+    <color name="kind_ring_of_accuracy">#FFFFD54F</color>
+    <color name="kind_ring_of_vigor">#FFE57373</color>
 
     <!-- Il fondo del registro e della fine partita, sopra la mappa -->
     <color name="overlay">#CC000000</color>

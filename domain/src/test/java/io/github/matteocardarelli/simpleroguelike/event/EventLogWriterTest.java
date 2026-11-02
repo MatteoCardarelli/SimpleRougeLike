@@ -36,7 +36,9 @@ class EventLogWriterTest {
                         "t12 LeveledUp at=3,4 level=2",
                         "t12 ItemPickedUp item=7 kind=goblin at=3,4",
                         "t12 InventoryFull item=7 kind=goblin at=3,4",
-                        "t12 ItemUsed item=7 kind=goblin at=3,4");
+                        "t12 ItemUsed item=7 kind=goblin at=3,4",
+                        "t12 ItemEquipped item=7 kind=goblin at=3,4",
+                        "t12 ItemUnequipped item=7 kind=goblin at=3,4");
     }
 
     @Test
@@ -79,6 +81,8 @@ class EventLogWriterTest {
                         List.of(P),
                         List.of(P),
                         List.of(P),
+                        List.of(P),
+                        List.of(P),
                         List.of(P));
     }
 
@@ -94,6 +98,8 @@ class EventLogWriterTest {
                 new LeveledUp(P, 2),
                 new ItemPickedUp(B, GOBLIN, P),
                 new InventoryFull(B, GOBLIN, P),
-                new ItemUsed(B, GOBLIN, P));
+                new ItemUsed(B, GOBLIN, P),
+                new ItemEquipped(B, GOBLIN, P),
+                new ItemUnequipped(B, GOBLIN, P));
     }
 }

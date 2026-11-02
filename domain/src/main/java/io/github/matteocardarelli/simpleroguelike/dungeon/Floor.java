@@ -5,7 +5,9 @@ import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
+import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
+import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
@@ -261,6 +263,57 @@ public final class Floor implements FloorView {
             player.inventory().remove(itemId);
         }
         return List.copyOf(events);
+    }
+
+    /**
+     * Equipaggia un oggetto dell'inventario. Se lo spazio era occupato, l'oggetto di prima torna
+     * solo nell'inventario. Non consuma niente.
+     *
+     * @return {@code ItemUnequipped} per l'oggetto sostituito, se c'era, e {@code ItemEquipped};
+     *     vuoto se l'oggetto era già equipaggiato
+     * @throws IllegalArgumentException se {@code user} non è il player, l'oggetto non è nel suo
+     *     inventario o non si equipaggia
+     * @throws IllegalStateException se il player è morto
+     */
+    public List<GameEvent> equip(EntityId user, EntityId itemId) {
+        Item item = requireInInventory(user, itemId);
+        if (!item.equipment().isPresent()) {
+            throw new IllegalArgumentException(item.kind().value() + " non si equipaggia");
+        }
+        if (player.isEquipped(itemId)) {
+            return List.of();
+        }
+        Position at = positionOf(user);
+        List<GameEvent> events = new ArrayList<>();
+        player.equip(item)
+                .ifPresent(old -> events.add(new ItemUnequipped(old.id(), old.kind(), at)));
+        events.add(new ItemEquipped(itemId, item.kind(), at));
+        return List.copyOf(events);
+    }
+
+    /**
+     * Toglie un oggetto equipaggiato, che resta nell'inventario.
+     *
+     * @return {@code ItemUnequipped}, o vuoto se l'oggetto non era equipaggiato
+     * @throws IllegalArgumentException se {@code user} non è il player o l'oggetto non è nel suo
+     *     inventario
+     * @throws IllegalStateException se il player è morto
+     */
+    public List<GameEvent> unequip(EntityId user, EntityId itemId) {
+        Item item = requireInInventory(user, itemId);
+        if (!player.isEquipped(itemId)) {
+            return List.of();
+        }
+        player.unequip(item);
+        return List.of(new ItemUnequipped(itemId, item.kind(), positionOf(user)));
+    }
+
+    private Item requireInInventory(EntityId user, EntityId itemId) {
+        requirePlayer(user);
+        requireAlive(user);
+        return player.inventory()
+                .find(itemId)
+                .orElseThrow(() -> new IllegalArgumentException(itemId + " non è nell'inventario"));
     }
 
     /**

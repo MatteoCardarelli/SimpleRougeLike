@@ -8,7 +8,9 @@ import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
+import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
+import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.LeveledUp;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
@@ -82,6 +84,12 @@ public final class EventMessageFormatter {
                 InventoryFull.class,
                 (e, player) -> texts.text(R.string.log_inventory_full, name(e.kind())));
         register(ItemUsed.class, (e, player) -> texts.text(R.string.log_item_used, name(e.kind())));
+        register(
+                ItemEquipped.class,
+                (e, player) -> texts.text(R.string.log_item_equipped, name(e.kind())));
+        register(
+                ItemUnequipped.class,
+                (e, player) -> texts.text(R.string.log_item_unequipped, name(e.kind())));
     }
 
     /**

@@ -113,6 +113,24 @@ public final class EventLogWriter {
                                 + e.kind().value()
                                 + " at="
                                 + at(e.at()));
+        register(
+                ItemEquipped.class,
+                e ->
+                        "ItemEquipped item="
+                                + id(e.item())
+                                + " kind="
+                                + e.kind().value()
+                                + " at="
+                                + at(e.at()));
+        register(
+                ItemUnequipped.class,
+                e ->
+                        "ItemUnequipped item="
+                                + id(e.item())
+                                + " kind="
+                                + e.kind().value()
+                                + " at="
+                                + at(e.at()));
     }
 
     /**

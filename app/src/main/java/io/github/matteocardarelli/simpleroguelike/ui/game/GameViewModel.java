@@ -6,6 +6,8 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.github.matteocardarelli.simpleroguelike.command.Command;
+import io.github.matteocardarelli.simpleroguelike.command.EquipCommand;
+import io.github.matteocardarelli.simpleroguelike.command.UnequipCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.feedback.BuildInfo;
@@ -161,10 +163,27 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         }
     }
 
-    /** Usa un oggetto dell'inventario, che resta aperto con la lista aggiornata. */
+    /**
+     * Usa un oggetto dell'inventario, che resta aperto con la lista aggiornata. Un oggetto da
+     * equipaggiare si equipaggia, o si toglie se il player lo porta già.
+     */
     @Override
     public void chooseItem(EntityId item) {
-        submit(new UseItemCommand(item));
+        Optional<InventoryEntry> entry = entry(session.current(), item);
+        if (entry.isPresent() && entry.get().slot().isPresent()) {
+            submit(entry.get().equipped() ? new UnequipCommand(item) : new EquipCommand(item));
+        } else {
+            submit(new UseItemCommand(item));
+        }
+    }
+
+    private static Optional<InventoryEntry> entry(TurnResult result, EntityId item) {
+        for (InventoryEntry entry : result.snapshot().inventory()) {
+            if (entry.id().equals(item)) {
+                return Optional.of(entry);
+            }
+        }
+        return Optional.empty();
     }
 
     /** Chiude l'inventario senza toccare la partita. */

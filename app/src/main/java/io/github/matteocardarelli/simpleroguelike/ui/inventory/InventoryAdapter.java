@@ -2,11 +2,13 @@ package io.github.matteocardarelli.simpleroguelike.ui.inventory;
 
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.databinding.ItemInventoryEntryBinding;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
@@ -15,7 +17,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 
-/** Le caselle della griglia: una per oggetto, con il colore del suo {@code Kind} e il nome. */
+/**
+ * Le caselle della griglia: una per oggetto, con il colore del suo {@code Kind}, il nome e, se il
+ * player lo porta, il segno dell'equipaggiamento.
+ */
 final class InventoryAdapter extends ListAdapter<InventoryEntry, InventoryAdapter.Holder> {
 
     private static final DiffUtil.ItemCallback<InventoryEntry> SAME_ENTRY =
@@ -68,7 +73,14 @@ final class InventoryAdapter extends ListAdapter<InventoryEntry, InventoryAdapte
         binding.art.setBackgroundTintList(
                 ColorStateList.valueOf(
                         binding.getRoot().getContext().getColor(content.colorRes(entry.kind()))));
-        binding.getRoot().setContentDescription(name);
+        binding.equipped.setVisibility(entry.equipped() ? View.VISIBLE : View.GONE);
+        binding.getRoot()
+                .setContentDescription(
+                        entry.equipped()
+                                ? binding.getRoot()
+                                        .getContext()
+                                        .getString(R.string.inventory_equipped, name)
+                                : name);
         binding.getRoot().setSelected(entry.id().equals(selected));
         binding.getRoot().setOnClickListener(v -> onSelected.accept(entry.id()));
     }

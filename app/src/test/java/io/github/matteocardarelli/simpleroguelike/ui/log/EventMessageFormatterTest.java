@@ -11,7 +11,9 @@ import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
+import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
+import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -80,6 +82,17 @@ class EventMessageFormatterTest {
                 .contains(R.string.log_missed_by_player + "[]");
         assertThat(formatter.format(new Missed(GOBLIN, PLAYER, AT, AT), PLAYER))
                 .contains(R.string.log_missed_player + "[]");
+    }
+
+    @Test
+    void format_equipment_namesTheItem() {
+        String sword = R.string.kind_sword_name + "[]";
+        Kind kind = Kind.of("sword");
+
+        assertThat(formatter.format(new ItemEquipped(new EntityId(7), kind, AT), PLAYER))
+                .contains(R.string.log_item_equipped + "[" + sword + "]");
+        assertThat(formatter.format(new ItemUnequipped(new EntityId(7), kind, AT), PLAYER))
+                .contains(R.string.log_item_unequipped + "[" + sword + "]");
     }
 
     @Test

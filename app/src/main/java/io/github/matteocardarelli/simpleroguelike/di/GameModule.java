@@ -13,7 +13,9 @@ import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
+import io.github.matteocardarelli.simpleroguelike.command.EquipHandler;
 import io.github.matteocardarelli.simpleroguelike.command.MoveHandler;
+import io.github.matteocardarelli.simpleroguelike.command.UnequipHandler;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemHandler;
 import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyCatalog;
@@ -91,6 +93,18 @@ public abstract class GameModule {
     @IntoSet
     static CommandHandler<?> useItemHandler() {
         return new UseItemHandler();
+    }
+
+    @Provides
+    @IntoSet
+    static CommandHandler<?> equipHandler() {
+        return new EquipHandler();
+    }
+
+    @Provides
+    @IntoSet
+    static CommandHandler<?> unequipHandler() {
+        return new UnequipHandler();
     }
 
     /** Le regole di fine turno: oggi nessuna, e l'insieme vuoto è ammesso. */

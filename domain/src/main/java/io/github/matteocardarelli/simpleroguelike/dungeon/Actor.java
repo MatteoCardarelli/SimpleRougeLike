@@ -10,7 +10,8 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
  *
  * <p>Fuori da questo package un attore si può solo leggere: salute e statistiche cambiano solo con
  * i metodi di {@link Floor}. La salute resta tra 0 e {@code stats().maxHealth()}, e un attore a 0 è
- * morto per sempre.
+ * morto per sempre. Le statistiche sono quelle di base più gli eventuali bonus, come
+ * l'equipaggiamento del player.
  */
 public abstract class Actor {
 
@@ -35,7 +36,13 @@ public abstract class Actor {
 
     public abstract Faction faction();
 
-    public final Stats stats() {
+    /** Le statistiche con cui l'attore combatte: quelle di base, per chi non ha bonus. */
+    public Stats stats() {
+        return stats;
+    }
+
+    /** Le statistiche senza bonus: quelle iniziali più la crescita per livello. */
+    public final Stats baseStats() {
         return stats;
     }
 
@@ -59,12 +66,17 @@ public abstract class Actor {
         if (!isAlive()) {
             return 0;
         }
-        int restored = Math.min(amount, stats.maxHealth() - health);
+        int restored = Math.min(amount, stats().maxHealth() - health);
         health += restored;
         return restored;
     }
 
-    /** Aumenta le statistiche; la salute cresce quanto la salute massima. */
+    /** Riporta la salute entro la salute massima, se un bonus tolto l'ha abbassata. */
+    final void clampHealth() {
+        health = Math.min(health, stats().maxHealth());
+    }
+
+    /** Aumenta le statistiche di base; la salute cresce quanto la salute massima. */
     final void raiseStats(Stats bonus) {
         stats = stats.plus(bonus);
         health += bonus.maxHealth();
