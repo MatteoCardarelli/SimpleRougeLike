@@ -15,6 +15,7 @@ import java.util.Optional;
  * @param previousGameLost Android ha chiuso l'app durante una partita, che è andata persa: va detto
  *     al giocatore finché non lo conferma
  * @param logVisible il registro dei messaggi si vede: un'impostazione del giocatore
+ * @param aimingItem l'oggetto da lanciare scelto, mentre si sceglie la direzione
  */
 public record GameUiState(
         TurnResult result,
@@ -22,7 +23,8 @@ public record GameUiState(
         Optional<EntityId> selectedItem,
         List<GameEvent> log,
         boolean previousGameLost,
-        boolean logVisible) {
+        boolean logVisible,
+        Optional<EntityId> aimingItem) {
 
     public GameUiState {
         log = List.copyOf(log);

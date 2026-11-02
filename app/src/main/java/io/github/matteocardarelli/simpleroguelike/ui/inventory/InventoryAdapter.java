@@ -68,7 +68,13 @@ final class InventoryAdapter extends ListAdapter<InventoryEntry, InventoryAdapte
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         InventoryEntry entry = getItem(position);
         ItemInventoryEntryBinding binding = holder.binding;
-        String name = binding.getRoot().getContext().getString(content.nameRes(entry.kind()));
+        String kindName = binding.getRoot().getContext().getString(content.nameRes(entry.kind()));
+        String name =
+                entry.count() > 1
+                        ? binding.getRoot()
+                                .getContext()
+                                .getString(R.string.inventory_count, kindName, entry.count())
+                        : kindName;
         binding.name.setText(name);
         binding.art.setBackgroundTintList(
                 ColorStateList.valueOf(

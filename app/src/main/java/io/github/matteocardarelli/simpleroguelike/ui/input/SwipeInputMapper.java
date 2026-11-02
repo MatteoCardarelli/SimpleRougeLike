@@ -2,14 +2,14 @@ package io.github.matteocardarelli.simpleroguelike.ui.input;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * I gesti sulla mappa: uno swipe è un passo nella sua direzione, un doppio tap apre l'inventario.
- * La direzione è quella dello spostamento più lungo, orizzontale o verticale.
+ * I gesti sulla mappa: uno swipe va nella sua direzione (un passo, o un lancio se si sta mirando),
+ * un doppio tap apre l'inventario o annulla la mira. La direzione è quella dello spostamento più
+ * lungo, orizzontale o verticale.
  */
 public final class SwipeInputMapper extends GestureDetector.SimpleOnGestureListener {
 
@@ -37,7 +37,7 @@ public final class SwipeInputMapper extends GestureDetector.SimpleOnGestureListe
                         velocityX,
                         velocityY,
                         minSwipeDistancePx);
-        direction.ifPresent(d -> input.submit(new MoveCommand(d)));
+        direction.ifPresent(input::swipe);
         return direction.isPresent();
     }
 

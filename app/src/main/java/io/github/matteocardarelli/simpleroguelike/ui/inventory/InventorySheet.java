@@ -122,11 +122,13 @@ public final class InventorySheet extends BottomSheetDialogFragment {
             binding.detailDescription.setText(content.descriptionRes(entry.kind()));
             binding.use.setEnabled(true);
             binding.use.setText(
-                    !entry.slot().isPresent()
-                            ? R.string.inventory_use
-                            : entry.equipped()
-                                    ? R.string.inventory_unequip
-                                    : R.string.inventory_equip);
+                    entry.throwable()
+                            ? R.string.inventory_throw
+                            : !entry.slot().isPresent()
+                                    ? R.string.inventory_use
+                                    : entry.equipped()
+                                            ? R.string.inventory_unequip
+                                            : R.string.inventory_equip);
         } else {
             binding.detailArt.setVisibility(View.INVISIBLE);
             binding.detailName.setText(

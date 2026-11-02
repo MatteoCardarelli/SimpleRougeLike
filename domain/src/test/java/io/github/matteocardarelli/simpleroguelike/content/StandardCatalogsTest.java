@@ -37,7 +37,7 @@ class StandardCatalogsTest {
     }
 
     @Test
-    void enemies_containTheGoblin() {
+    void enemies_containTheGoblinAndTheArcher() {
         assertThat(new StandardEnemyCatalog().all())
                 .containsExactly(
                         new EnemyDefinition(
@@ -46,6 +46,23 @@ class StandardCatalogsTest {
                                 25,
                                 8,
                                 StandardEnemyCatalog.CHASE_OR_WANDER,
-                                10));
+                                10),
+                        new EnemyDefinition(
+                                StandardEnemyCatalog.ARCHER,
+                                new Stats(20, 6, 0, 5, 10),
+                                30,
+                                8,
+                                StandardEnemyCatalog.KEEP_DISTANCE,
+                                4,
+                                5));
+    }
+
+    @Test
+    void items_haveTheThrowingKnife_thatStacks() {
+        assertThat(new StandardItemCatalog().all())
+                .filteredOn(
+                        definition -> definition.kind().equals(StandardItemCatalog.THROWING_KNIFE))
+                .singleElement()
+                .satisfies(knife -> assertThat(knife.stackable()).isTrue());
     }
 }

@@ -1,16 +1,20 @@
 package io.github.matteocardarelli.simpleroguelike.session;
 
 import static io.github.matteocardarelli.simpleroguelike.session.Sessions.ACTIONS;
+import static io.github.matteocardarelli.simpleroguelike.session.Sessions.RANGED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.EnemyBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.RangedAttackIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.StepIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.WaitIntent;
 import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
+import io.github.matteocardarelli.simpleroguelike.dungeon.FloorFixtures;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
+import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.generation.FixedFloorSource;
@@ -19,6 +23,7 @@ import io.github.matteocardarelli.simpleroguelike.model.BehaviorKey;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
+import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.run.Run;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +104,27 @@ class EnemyTurnRunnerTest {
     }
 
     @Test
+    void run_rangedIntent_shootsAnArrowAtThePlayer() {
+        Run run = run("@..a");
+        EnemyTurnRunner runner =
+                new EnemyTurnRunner(
+                        List.of(
+                                new BehaviorBinding(
+                                        StandardEnemyCatalog.KEEP_DISTANCE,
+                                        (e, f, r) -> new RangedAttackIntent(Direction.LEFT))),
+                        () -> List.of(FloorFixtures.archer()),
+                        ACTIONS,
+                        RANGED);
+
+        List<GameEvent> events = runner.run(run);
+
+        assertThat(events.get(0)).isInstanceOf(Fired.class);
+        Fired fired = (Fired) events.get(0);
+        assertThat(fired.projectile()).isEqualTo(RangedRules.ARROW);
+        assertThat(fired.path()).last().isEqualTo(new Position(0, 0));
+    }
+
+    @Test
     void run_enemyWithAnUnknownBehavior_isAnError() {
         Run run = run("@g");
         EnemyTurnRunner runner =
@@ -107,19 +133,22 @@ class EnemyTurnRunnerTest {
                                 new BehaviorBinding(
                                         CHASE_OR_WANDER, (e, f, r) -> new WaitIntent())),
                         List::of,
-                        ACTIONS);
+                        ACTIONS,
+                        RANGED);
         Enemy goblin = run.floor().enemies().get(0);
 
         assertThat(goblin.behavior()).isEqualTo(CHASE_OR_WANDER);
         assertThat(runner.run(run)).isEmpty();
-        EnemyTurnRunner empty = new EnemyTurnRunner(List.of(), List::of, ACTIONS);
+        EnemyTurnRunner empty = new EnemyTurnRunner(List.of(), List::of, ACTIONS, RANGED);
         assertThatThrownBy(() -> empty.run(run)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void constructor_catalogKeyWithoutBehavior_isRejected() {
         assertThatThrownBy(
-                        () -> new EnemyTurnRunner(List.of(), new StandardEnemyCatalog(), ACTIONS))
+                        () ->
+                                new EnemyTurnRunner(
+                                        List.of(), new StandardEnemyCatalog(), ACTIONS, RANGED))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("chase_or_wander");
     }
@@ -132,15 +161,19 @@ class EnemyTurnRunnerTest {
         assertThatThrownBy(
                         () ->
                                 new EnemyTurnRunner(
-                                        List.of(one, two), new StandardEnemyCatalog(), ACTIONS))
+                                        List.of(one, two),
+                                        new StandardEnemyCatalog(),
+                                        ACTIONS,
+                                        RANGED))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     private static EnemyTurnRunner runner(EnemyBehavior behavior) {
         return new EnemyTurnRunner(
                 List.of(new BehaviorBinding(CHASE_OR_WANDER, behavior)),
-                new StandardEnemyCatalog(),
-                ACTIONS);
+                () -> List.of(FloorFixtures.goblin()),
+                ACTIONS,
+                RANGED);
     }
 
     private static Run run(String... rows) {

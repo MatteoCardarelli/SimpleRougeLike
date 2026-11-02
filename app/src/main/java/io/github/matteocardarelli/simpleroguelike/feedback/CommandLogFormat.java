@@ -3,6 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.feedback;
 import io.github.matteocardarelli.simpleroguelike.command.Command;
 import io.github.matteocardarelli.simpleroguelike.command.EquipCommand;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
+import io.github.matteocardarelli.simpleroguelike.command.ThrowCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UnequipCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
@@ -35,6 +36,17 @@ public final class CommandLogFormat {
                 "use",
                 command -> "item=" + command.itemId().value(),
                 arguments -> new UseItemCommand(new EntityId(itemId(arguments))));
+        register(
+                ThrowCommand.class,
+                "throw",
+                command -> "item=" + command.itemId().value() + " " + name(command.direction()),
+                arguments -> {
+                    String[] parts = arguments.split(" ");
+                    if (parts.length != 2) {
+                        throw new IllegalArgumentException("Lancio senza direzione: " + arguments);
+                    }
+                    return new ThrowCommand(new EntityId(itemId(parts[0])), direction(parts[1]));
+                });
         register(
                 EquipCommand.class,
                 "equip",

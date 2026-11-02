@@ -47,7 +47,8 @@ class ModulesTest {
             }
         }
         List<String> handled = new ArrayList<>();
-        for (CommandHandler<?> handler : TestGraph.commandHandlers(TestGraph.actionRules())) {
+        for (CommandHandler<?> handler :
+                TestGraph.commandHandlers(TestGraph.actionRules(), TestGraph.rangedRules())) {
             handled.add(handler.commandType().getName());
         }
 

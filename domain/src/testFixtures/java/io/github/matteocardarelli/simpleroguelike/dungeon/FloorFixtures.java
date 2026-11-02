@@ -17,6 +17,7 @@ import java.util.List;
  * &#64;  player          g  goblin
  * !  pozione a terra    /  spada a terra
  * [  armatura di cuoio   =  anello del vigore
+ * a  arciere            -  coltello da lancio
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -66,6 +67,11 @@ public final class FloorFixtures {
                                             inventoryCapacity),
                                     at);
                     case 'g' -> builder.enemy(new Enemy(ids.next(), goblin()), at);
+                    case 'a' -> builder.enemy(new Enemy(ids.next(), archer()), at);
+                    case '-' ->
+                            builder.item(
+                                    new Item(ids.next(), item(StandardItemCatalog.THROWING_KNIFE)),
+                                    at);
                     case '!' -> builder.item(new Item(ids.next(), potion()), at);
                     case '/' ->
                             builder.item(new Item(ids.next(), item(StandardItemCatalog.SWORD)), at);
@@ -103,6 +109,10 @@ public final class FloorFixtures {
 
     public static EnemyDefinition goblin() {
         return new StandardEnemyCatalog().all().get(0);
+    }
+
+    public static EnemyDefinition archer() {
+        return new StandardEnemyCatalog().all().get(1);
     }
 
     public static ItemDefinition potion() {

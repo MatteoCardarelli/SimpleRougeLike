@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.ui.playback;
 
 import io.github.matteocardarelli.simpleroguelike.command.Command;
+import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.ui.input.PlayerInput;
 import org.jspecify.annotations.Nullable;
@@ -24,6 +25,11 @@ public final class GatedPlayerInput implements PlayerInput {
     @Override
     public void submit(Command command) {
         forward(() -> target.submit(command));
+    }
+
+    @Override
+    public void swipe(Direction direction) {
+        forward(() -> target.swipe(direction));
     }
 
     @Override

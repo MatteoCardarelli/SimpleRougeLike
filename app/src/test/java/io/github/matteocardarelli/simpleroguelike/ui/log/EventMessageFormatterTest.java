@@ -10,6 +10,7 @@ import io.github.matteocardarelli.simpleroguelike.di.TestContent;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
@@ -82,6 +83,27 @@ class EventMessageFormatterTest {
                 .contains(R.string.log_missed_by_player + "[]");
         assertThat(formatter.format(new Missed(GOBLIN, PLAYER, AT, AT), PLAYER))
                 .contains(R.string.log_missed_player + "[]");
+    }
+
+    @Test
+    void format_fired_byThePlayer_namesTheProjectile_byAnEnemy_namesTheShooter() {
+        Kind knife = Kind.of("throwing_knife");
+        Kind archer = Kind.of("archer");
+
+        assertThat(
+                        formatter.format(
+                                new Fired(PLAYER, Kind.of("player"), knife, AT, List.of(AT)),
+                                PLAYER))
+                .contains(
+                        R.string.log_fired_player
+                                + "["
+                                + R.string.kind_throwing_knife_name
+                                + "[]]");
+        assertThat(
+                        formatter.format(
+                                new Fired(GOBLIN, archer, Kind.of("arrow"), AT, List.of(AT)),
+                                PLAYER))
+                .contains(R.string.log_fired_enemy + "[" + R.string.kind_archer_name + "[]]");
     }
 
     @Test

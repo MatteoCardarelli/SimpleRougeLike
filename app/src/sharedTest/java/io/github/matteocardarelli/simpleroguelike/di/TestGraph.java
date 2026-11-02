@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorSource;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
+import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
 import java.util.LinkedHashSet;
@@ -34,11 +35,16 @@ public final class TestGraph {
         ActionRules actions = actionRules();
         return GameModule.gameSession(
                 floors,
-                GameModule.commandDispatcher(commandHandlers(actions)),
-                GameModule.enemyTurnRunner(behaviors(), ContentModule.enemyCatalog(), actions),
+                GameModule.commandDispatcher(commandHandlers(actions, rangedRules())),
+                GameModule.enemyTurnRunner(
+                        behaviors(), ContentModule.enemyCatalog(), actions, rangedRules()),
                 GameModule.fieldOfView(),
                 Set.<TurnHook>of(),
                 config);
+    }
+
+    public static RangedRules rangedRules() {
+        return ContentModule.rangedRules(ContentModule.damageRules(ContentModule.levelingRules()));
     }
 
     public static ActionRules actionRules() {
@@ -48,10 +54,11 @@ public final class TestGraph {
     }
 
     /** Gli handler che Hilt raccoglie con {@code @IntoSet}. */
-    public static Set<CommandHandler<?>> commandHandlers(ActionRules actions) {
+    public static Set<CommandHandler<?>> commandHandlers(ActionRules actions, RangedRules ranged) {
         Set<CommandHandler<?>> handlers = new LinkedHashSet<>();
         handlers.add(GameModule.moveHandler(actions));
         handlers.add(GameModule.useItemHandler());
+        handlers.add(GameModule.throwHandler(ranged));
         handlers.add(GameModule.equipHandler());
         handlers.add(GameModule.unequipHandler());
         return handlers;
@@ -61,6 +68,7 @@ public final class TestGraph {
     public static Set<BehaviorBinding> behaviors() {
         Set<BehaviorBinding> behaviors = new LinkedHashSet<>();
         behaviors.add(GameModule.chaseOrWander(GameModule.pathfinder()));
+        behaviors.add(GameModule.keepDistance(GameModule.pathfinder()));
         return behaviors;
     }
 }
