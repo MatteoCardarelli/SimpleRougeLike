@@ -1,23 +1,52 @@
 package io.github.matteocardarelli.simpleroguelike.di;
 
 import io.github.matteocardarelli.simpleroguelike.generation.FloorSpec;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalLong;
 
 /**
  * La configurazione di una partita.
  *
+ * @param floorSpecs i piani della partita, dal primo all'ultimo: si scende con le scale e si vince
+ *     sull'ultimo
  * @param visionRadius fin dove vede il player, in celle, raggio compreso
  * @param fixedSeed il seed di ogni partita nuova; vuoto per un seed casuale a ogni partita
  */
-public record GameConfig(FloorSpec floorSpec, int visionRadius, OptionalLong fixedSeed) {
+public record GameConfig(List<FloorSpec> floorSpecs, int visionRadius, OptionalLong fixedSeed) {
+
+    /** Quanti piani ha una partita. */
+    public static final int FLOORS = 5;
+
+    public GameConfig {
+        floorSpecs = List.copyOf(floorSpecs);
+        if (floorSpecs.isEmpty()) {
+            throw new IllegalArgumentException("Una partita ha almeno un piano");
+        }
+    }
 
     /**
-     * Piano 50×50 con 20 nemici e 10 oggetti, come il gioco di prima del refactoring, più 6 porte,
-     * 3 scrigni e un cancello con la sua leva; campo visivo di 8 celle. I nemici possono nascere in
-     * qualunque cella diversa da quella del player, come prima.
+     * Cinque piani 50×50, campo visivo di 8 celle. Ogni piano ha 10 oggetti, 6 porte, 3 scrigni e
+     * un cancello con la sua leva; i nemici partono da 14 e crescono di 3 a ogni piano. Tutti
+     * tranne l'ultimo hanno le scale. I nemici possono nascere in qualunque cella diversa da quella
+     * del player, come nel gioco di prima.
      */
     public static GameConfig standard() {
-        return new GameConfig(
-                new FloorSpec(50, 50, 20, 10, 1, 10, 6, 3, 1), 8, OptionalLong.empty());
+        List<FloorSpec> floors = new ArrayList<>();
+        for (int depth = 1; depth <= FLOORS; depth++) {
+            floors.add(
+                    new FloorSpec(
+                            50,
+                            50,
+                            14 + 3 * (depth - 1),
+                            10,
+                            1,
+                            10,
+                            6,
+                            3,
+                            1,
+                            depth < FLOORS ? 1 : 0));
+        }
+        return new GameConfig(floors, 8, OptionalLong.empty());
     }
 }

@@ -27,6 +27,35 @@ class RunTest {
                             StandardPlayer.DEFINITION));
 
     @Test
+    void descend_keepsThePlayer_onANewFloor_withNewIds() {
+        Run run = Run.start(7, SPEC, FLOORS);
+        var player = run.floor().player();
+        run.floor().damage(player.id(), 10);
+        var firstFloor = run.floor();
+
+        run.descend(FLOORS, SPEC);
+
+        assertThat(run.depth()).isEqualTo(2);
+        assertThat(run.floor()).isNotSameAs(firstFloor);
+        assertThat(run.floor().player()).isSameAs(player);
+        assertThat(run.floor().player().health()).isEqualTo(player.stats().maxHealth() - 10);
+        for (Enemy enemy : run.floor().enemies()) {
+            assertThat(firstFloor.enemy(enemy.id())).isEmpty();
+        }
+    }
+
+    @Test
+    void descend_isDeterministic() {
+        Run first = Run.start(7, SPEC, FLOORS);
+        Run second = Run.start(7, SPEC, FLOORS);
+
+        first.descend(FLOORS, SPEC);
+        second.descend(FLOORS, SPEC);
+
+        assertThat(describe(first)).isEqualTo(describe(second));
+    }
+
+    @Test
     void start_sameSeed_givesSameRun() {
         Run first = Run.start(7, SPEC, FLOORS);
         Run second = Run.start(7, SPEC, FLOORS);

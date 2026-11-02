@@ -33,6 +33,7 @@ import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
+import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventorySheet;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsDialog;
@@ -259,9 +260,14 @@ public class GameActivityTest {
             AtomicReference<String> level = new AtomicReference<>();
             scenario.onActivity(
                     activity -> {
-                        PlayerView player =
-                                viewModel(activity).state().result().snapshot().player();
-                        level.set(activity.getString(R.string.hud_level, player.level()));
+                        GameSnapshot snapshot = viewModel(activity).state().result().snapshot();
+                        PlayerView player = snapshot.player();
+                        level.set(
+                                activity.getString(
+                                        R.string.hud_level,
+                                        player.level(),
+                                        snapshot.depth(),
+                                        snapshot.floors()));
                         View healthBar = activity.findViewById(R.id.health_bar);
                         assertEquals(
                                 activity.getString(

@@ -33,6 +33,8 @@
     <string name="kind_lever_description">Urtala per tirarla: da qualche parte un cancello si apre.</string>
     <string name="kind_chest_name">Scrigno</string>
     <string name="kind_chest_description">Urtalo per aprirlo: dentro c\'è un oggetto.</string>
+    <string name="kind_stairs_name">Scale</string>
+    <string name="kind_stairs_description">Passaci sopra per scendere al piano successivo.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -49,7 +51,7 @@
     <string name="inventory_equipped">%1$s, equipaggiato</string>
 
     <string name="end_game_over">Sei morto.</string>
-    <string name="end_victory">Hai sconfitto tutti i nemici!</string>
+    <string name="end_victory">Hai ripulito l\'ultimo piano!</string>
     <string name="end_stats">Turno %1$d · livello %2$d</string>
     <string name="new_game">Nuova partita</string>
     <string name="previous_game_lost">Android ha chiuso l\'app: la partita precedente è andata persa.</string>
@@ -64,6 +66,7 @@
     <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
     <string name="log_item_used">Usi: %1$s.</string>
     <string name="log_door_opened">Apri la porta.</string>
+    <string name="log_floor_changed">Scendi al piano %1$d.</string>
     <string name="log_lever_pulled">Tiri la leva: in lontananza un cancello si apre.</string>
     <string name="log_chest_opened">Apri lo scrigno: dentro c\'è %1$s.</string>
     <string name="log_chest_empty">Lo scrigno è vuoto.</string>
@@ -79,7 +82,7 @@
 
     <string name="hud_health_value">%1$d/%2$d</string>
     <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
-    <string name="hud_level">liv. %1$d</string>
+    <string name="hud_level">liv. %1$d · piano %2$d/%3$d</string>
     <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d</string>
 
     <string name="debug_turn">turno %1$d</string>

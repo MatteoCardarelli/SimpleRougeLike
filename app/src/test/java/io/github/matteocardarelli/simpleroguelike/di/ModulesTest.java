@@ -67,7 +67,7 @@ class ModulesTest {
     void seedSource_withAFixedSeed_givesAlwaysThatSeed() {
         GameConfig fixed =
                 new GameConfig(
-                        GameConfig.standard().floorSpec(),
+                        GameConfig.standard().floorSpecs(),
                         GameConfig.standard().visionRadius(),
                         OptionalLong.of(42));
 

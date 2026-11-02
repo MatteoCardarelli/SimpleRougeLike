@@ -22,7 +22,7 @@ class FixtureLayoutTest {
                     "#......#######",
                     "##############");
 
-    private static final FloorSpec SPEC = new FloorSpec(14, 6, 0, 0, 0, 1, 1, 1, 1);
+    private static final FloorSpec SPEC = new FloorSpec(14, 6, 0, 0, 0, 1, 1, 1, 1, 1);
 
     @Test
     void plan_putsTheGateInTheCorridor_theChestInTheClosedRoom_andTheLeverOutside() {
@@ -60,10 +60,26 @@ class FixtureLayoutTest {
 
         FixtureLayout layout =
                 FixtureLayout.plan(
-                        open, new FloorSpec(5, 4, 0, 0, 0, 1, 2, 0, 1), new SeededRandomSource(1));
+                        open,
+                        new FloorSpec(5, 4, 0, 0, 0, 1, 2, 0, 1, 0),
+                        new SeededRandomSource(1));
 
         assertThat(layout.gates()).isEmpty();
         assertThat(layout.doors()).isEmpty();
+    }
+
+    @Test
+    void plan_putsTheStairsOutsideCorridorsAndClosedZones() {
+        for (long seed = 1; seed <= 20; seed++) {
+            FixtureLayout layout =
+                    FixtureLayout.plan(TWO_ROOMS, SPEC, new SeededRandomSource(seed));
+
+            assertThat(layout.stairs()).isPresent();
+            Position stairs = layout.stairs().get();
+            assertThat(layout.closed()).doesNotContain(stairs);
+            assertThat(stairs.y() == 2 && stairs.x() >= 7 && stairs.x() <= 9).isFalse();
+            assertThat(layout.chests()).doesNotContain(stairs);
+        }
     }
 
     @Test

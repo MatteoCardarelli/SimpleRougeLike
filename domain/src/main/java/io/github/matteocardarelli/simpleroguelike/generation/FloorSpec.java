@@ -10,6 +10,7 @@ package io.github.matteocardarelli.simpleroguelike.generation;
  * @param chestCount quanti scrigni, ognuno con un oggetto
  * @param gateCount quanti cancelli con la loro leva, ognuno davanti a una zona chiusa con uno
  *     scrigno in più; se il terreno non ha un passaggio adatto, ce ne sono meno
+ * @param stairsCount 1 se il piano ha le scale per il successivo, 0 per l'ultimo piano
  */
 public record FloorSpec(
         int width,
@@ -20,7 +21,8 @@ public record FloorSpec(
         int maxAttempts,
         int doorCount,
         int chestCount,
-        int gateCount) {
+        int gateCount,
+        int stairsCount) {
 
     public FloorSpec {
         if (width < 3 || height < 3) {
@@ -32,7 +34,9 @@ public record FloorSpec(
                 || maxAttempts < 1
                 || doorCount < 0
                 || chestCount < 0
-                || gateCount < 0) {
+                || gateCount < 0
+                || stairsCount < 0
+                || stairsCount > 1) {
             throw new IllegalArgumentException(
                     "Valori non validi: enemyCount="
                             + enemyCount
@@ -47,7 +51,9 @@ public record FloorSpec(
                             + ", chests="
                             + chestCount
                             + ", gates="
-                            + gateCount);
+                            + gateCount
+                            + ", stairs="
+                            + stairsCount);
         }
     }
 
@@ -59,6 +65,6 @@ public record FloorSpec(
             int itemCount,
             int minSpawnDistance,
             int maxAttempts) {
-        this(width, height, enemyCount, itemCount, minSpawnDistance, maxAttempts, 0, 0, 0);
+        this(width, height, enemyCount, itemCount, minSpawnDistance, maxAttempts, 0, 0, 0, 0);
     }
 }

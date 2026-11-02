@@ -2,6 +2,7 @@ package io.github.matteocardarelli.simpleroguelike.generation;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.EntityIdSequence;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
 
 /**
@@ -17,4 +18,12 @@ public interface FloorSource {
      * @throws FloorGenerationException se non si riesce a creare un piano per la specifica
      */
     Floor create(FloorSpec spec, RandomSource random, EntityIdSequence ids);
+
+    /**
+     * Crea il piano successivo, con il player che arriva da quello di prima: stesse statistiche,
+     * salute e inventario.
+     *
+     * @throws FloorGenerationException se non si riesce a creare un piano per la specifica
+     */
+    Floor createNext(FloorSpec spec, RandomSource random, EntityIdSequence ids, Player player);
 }

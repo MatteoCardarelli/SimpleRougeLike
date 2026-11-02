@@ -6,7 +6,8 @@ import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 
 /**
  * Si gioca: accetta ogni comando. Dopo un turno controlla prima la morte del player, poi la
- * vittoria, così se accadono insieme vince la sconfitta.
+ * vittoria, così se accadono insieme vince la sconfitta. Si vince solo sull'ultimo piano, quando
+ * non resta nessun nemico vivo.
  */
 public record PlayingState() implements GameState {
 
@@ -16,11 +17,11 @@ public record PlayingState() implements GameState {
     }
 
     @Override
-    public GameState next(FloorView floor) {
+    public GameState next(FloorView floor, boolean lastFloor) {
         if (!floor.player().isAlive()) {
             return new GameOverState();
         }
-        if (floor.enemies().isEmpty()) {
+        if (lastFloor && floor.enemies().isEmpty()) {
             return new VictoryState();
         }
         return this;

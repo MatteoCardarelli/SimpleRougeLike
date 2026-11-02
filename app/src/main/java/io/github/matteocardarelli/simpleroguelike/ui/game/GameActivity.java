@@ -134,7 +134,7 @@ public class GameActivity extends AppCompatActivity
         playback.show(state.result(), viewModel.claimPlayback(state.result().revision()));
         binding.gameView.show(snapshot, scene);
 
-        PlayerBars.showOnMap(binding.bars, snapshot.player());
+        PlayerBars.showOnMap(binding.bars, snapshot.player(), snapshot.depth(), snapshot.floors());
 
         showLog(state);
         binding.aimHint.setVisibility(state.aimingItem().isPresent() ? View.VISIBLE : View.GONE);

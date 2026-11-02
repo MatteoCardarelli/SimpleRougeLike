@@ -183,6 +183,18 @@ public final class GameView extends View {
                                 paint);
                     }
                 }
+                case "stairs" -> {
+                    float step = cell / 4f;
+                    for (int i = 0; i < 3; i++) {
+                        float top = y + step * (i + 0.5f);
+                        canvas.drawRect(
+                                x + inset + step * i,
+                                top,
+                                x + cell - inset,
+                                top + step * 0.6f,
+                                paint);
+                    }
+                }
                 default ->
                         canvas.drawRect(
                                 x + inset, y + inset, x + cell - inset, y + cell - inset, paint);

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Set;
  *       dietro.
  *   <li>Un cancello sta in un corridoio che, chiuso, separa dal resto del piano una zona piccola:
  *       dentro c'è uno scrigno, la leva sta in un muro fuori dalla zona, e il player nasce fuori.
- *   <li>Gli scrigni sparsi stanno fuori dai corridoi, per non chiudere passaggi.
+ *   <li>Gli scrigni sparsi e le scale stanno fuori dai corridoi, per non chiudere passaggi.
  * </ul>
  *
  * Tutte le scelte vengono dal flusso casuale di generazione, nello stesso ordine: lo stesso seed dà
@@ -31,9 +32,14 @@ import java.util.Set;
  * @param doors le celle delle porte
  * @param chests le celle degli scrigni, compresi quelli nelle zone chiuse
  * @param closed le celle delle zone chiuse, dove il player non nasce
+ * @param stairs la cella delle scale, fuori dai corridoi e dalle zone chiuse, se il piano le ha
  */
 record FixtureLayout(
-        List<Gate> gates, List<Position> doors, List<Position> chests, Set<Position> closed) {
+        List<Gate> gates,
+        List<Position> doors,
+        List<Position> chests,
+        Set<Position> closed,
+        Optional<Position> stairs) {
 
     /** Un cancello, la leva nel muro che lo apre e la zona che chiude. */
     record Gate(Position at, Position lever, Set<Position> zone) {}
@@ -59,6 +65,7 @@ record FixtureLayout(
         }
         cells.addAll(doors);
         cells.addAll(chests);
+        stairs.ifPresent(cells::add);
         return cells;
     }
 
@@ -117,12 +124,16 @@ record FixtureLayout(
         List<Position> open = new ArrayList<>(walkable);
         open.removeIf(
                 cell -> used.contains(cell) || closed.contains(cell) || isCorridor(terrain, cell));
+        Optional<Position> stairs = Optional.empty();
+        if (spec.stairsCount() > 0 && !open.isEmpty()) {
+            stairs = Optional.of(open.remove(random.nextInt(open.size())));
+        }
         for (int c = 0; c < spec.chestCount() && !open.isEmpty(); c++) {
             Position at = open.remove(random.nextInt(open.size()));
             chests.add(at);
             used.add(at);
         }
-        return new FixtureLayout(gates, doors, chests, closed);
+        return new FixtureLayout(gates, doors, chests, closed, stairs);
     }
 
     private static boolean walkable(Grid<TileType> terrain, Position cell) {

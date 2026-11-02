@@ -8,6 +8,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
+import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
@@ -95,6 +96,9 @@ public final class EventMessageFormatter {
                 (e, player) -> texts.text(R.string.log_inventory_full, name(e.kind())));
         register(ItemUsed.class, (e, player) -> texts.text(R.string.log_item_used, name(e.kind())));
         register(DoorOpened.class, (e, player) -> texts.text(R.string.log_door_opened));
+        register(
+                FloorChanged.class,
+                (e, player) -> texts.text(R.string.log_floor_changed, e.depth()));
         register(LeverPulled.class, (e, player) -> texts.text(R.string.log_lever_pulled));
         register(
                 ChestOpened.class,

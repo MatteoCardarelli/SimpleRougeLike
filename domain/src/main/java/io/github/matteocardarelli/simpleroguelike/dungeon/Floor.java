@@ -434,7 +434,7 @@ public final class Floor implements FloorView {
                 changed();
                 yield List.of(new ChestOpened(at, item.map(Item::kind)));
             }
-            case GATE -> List.of();
+            case GATE, STAIRS -> List.of();
         };
     }
 

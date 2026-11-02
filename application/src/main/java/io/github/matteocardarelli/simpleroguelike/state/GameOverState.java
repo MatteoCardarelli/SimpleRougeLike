@@ -16,7 +16,7 @@ public record GameOverState() implements GameState {
     }
 
     @Override
-    public GameState next(FloorView floor) {
+    public GameState next(FloorView floor, boolean lastFloor) {
         return this;
     }
 

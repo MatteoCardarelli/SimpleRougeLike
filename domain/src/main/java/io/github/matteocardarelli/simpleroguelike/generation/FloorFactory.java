@@ -2,10 +2,12 @@ package io.github.matteocardarelli.simpleroguelike.generation;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.EntityIdSequence;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.port.TerrainGenerator;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
+import java.util.Optional;
 
 /**
  * Crea un piano: terreno dalla porta, poi il popolamento. Se un terreno non basta per la specifica
@@ -30,11 +32,22 @@ public final class FloorFactory implements FloorSource {
      */
     @Override
     public Floor create(FloorSpec spec, RandomSource random, EntityIdSequence ids) {
+        return create(spec, random, ids, Optional.empty());
+    }
+
+    @Override
+    public Floor createNext(
+            FloorSpec spec, RandomSource random, EntityIdSequence ids, Player player) {
+        return create(spec, random, ids, Optional.of(player));
+    }
+
+    private Floor create(
+            FloorSpec spec, RandomSource random, EntityIdSequence ids, Optional<Player> player) {
         FloorGenerationException last = null;
         for (int attempt = 0; attempt < spec.maxAttempts(); attempt++) {
             Grid<TileType> generated = terrain.generate(spec.width(), spec.height(), random);
             try {
-                return populator.populate(generated, spec, random, ids);
+                return populator.populate(generated, spec, random, ids, player);
             } catch (FloorGenerationException e) {
                 last = e;
             }

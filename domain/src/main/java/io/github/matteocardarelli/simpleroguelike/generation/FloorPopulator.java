@@ -50,6 +50,21 @@ public final class FloorPopulator {
      */
     public Floor populate(
             Grid<TileType> terrain, FloorSpec spec, RandomSource random, EntityIdSequence ids) {
+        return populate(terrain, spec, random, ids, Optional.empty());
+    }
+
+    /**
+     * Crea il piano con un player che esiste già, quando si scende dal piano di prima: tiene id,
+     * statistiche, salute e inventario.
+     *
+     * @throws FloorGenerationException se il terreno non ha abbastanza celle per la specifica
+     */
+    public Floor populate(
+            Grid<TileType> terrain,
+            FloorSpec spec,
+            RandomSource random,
+            EntityIdSequence ids,
+            Optional<Player> existing) {
         List<Position> free = new ArrayList<>();
         for (Position cell : terrain.positions()) {
             if (terrain.get(cell).isWalkable()) {
@@ -65,6 +80,21 @@ public final class FloorPopulator {
         playerCells.removeAll(layout.closed());
         if (playerCells.isEmpty()) {
             throw new FloorGenerationException("Nessuna cella per il player");
+        }
+        if (layout.stairs().isPresent()) {
+            // Le scale non nascono accanto al player: lontane almeno un quarto del piano, se si
+            // può.
+            Position stairs = layout.stairs().get();
+            int far = (terrain.width() + terrain.height()) / 4;
+            List<Position> distant = new ArrayList<>();
+            for (Position cell : playerCells) {
+                if (cell.distanceTo(stairs) >= far) {
+                    distant.add(cell);
+                }
+            }
+            if (!distant.isEmpty()) {
+                playerCells = distant;
+            }
         }
         Position playerAt = playerCells.get(random.nextInt(playerCells.size()));
         free.remove(playerAt);
@@ -96,7 +126,7 @@ public final class FloorPopulator {
         FloorBuilder builder =
                 new FloorBuilder()
                         .terrain(terrain)
-                        .player(new Player(ids.next(), player), playerAt);
+                        .player(existing.orElseGet(() -> new Player(ids.next(), player)), playerAt);
         for (int i = 0; i < enemyCells.size(); i++) {
             builder.enemy(new Enemy(ids.next(), enemyTypes.get(i)), enemyCells.get(i));
         }
@@ -115,6 +145,7 @@ public final class FloorPopulator {
         for (Position door : layout.doors()) {
             builder.fixture(Fixture.door(), door);
         }
+        layout.stairs().ifPresent(stairs -> builder.fixture(Fixture.stairs(), stairs));
         return builder.build();
     }
 

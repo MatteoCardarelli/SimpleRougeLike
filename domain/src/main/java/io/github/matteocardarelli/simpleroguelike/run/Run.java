@@ -19,7 +19,8 @@ import io.github.matteocardarelli.simpleroguelike.random.SeededRandomSource;
  */
 public final class Run {
 
-    private final Floor floor;
+    private Floor floor;
+    private int depth = 1;
     private final EntityIdSequence ids;
     private final RandomSource generation;
     private final RandomSource gameplay;
@@ -63,6 +64,21 @@ public final class Run {
     /** Il flusso casuale del gioco: comportamenti dei nemici ed effetti. */
     public RandomSource gameplay() {
         return gameplay;
+    }
+
+    /** Il piano in cui si gioca, da 1. */
+    public int depth() {
+        return depth;
+    }
+
+    /**
+     * Scende al piano successivo: il player ci arriva con le sue statistiche, la salute e
+     * l'inventario, e il piano di prima si dimentica. Il piano nuovo viene dal flusso di
+     * generazione, come il primo.
+     */
+    public void descend(FloorSource floors, FloorSpec spec) {
+        floor = floors.createNext(spec, generation, ids, floor.player());
+        depth++;
     }
 
     /** Il turno in corso, da 1. */

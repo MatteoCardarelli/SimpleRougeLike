@@ -16,13 +16,14 @@ public final class PlayerBars {
 
     private PlayerBars() {}
 
-    /** Sulla mappa: le barre e il livello, senza numeri. */
-    public static void showOnMap(ViewPlayerBarsBinding bars, PlayerView player) {
+    /** Sulla mappa: le barre, il livello e il piano, senza numeri. */
+    public static void showOnMap(
+            ViewPlayerBarsBinding bars, PlayerView player, int depth, int floors) {
         Context context = bars.getRoot().getContext();
         fill(bars, player);
         bars.healthValue.setVisibility(View.GONE);
         bars.statsValue.setVisibility(View.GONE);
-        bars.xpValue.setText(context.getString(R.string.hud_level, player.level()));
+        bars.xpValue.setText(context.getString(R.string.hud_level, player.level(), depth, floors));
     }
 
     /**
