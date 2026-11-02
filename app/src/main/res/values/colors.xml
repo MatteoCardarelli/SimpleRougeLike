@@ -26,4 +26,12 @@
     <!-- L'inventario -->
     <color name="inventory_cell">#FF2A2A2A</color>
     <color name="inventory_cell_selected">#FFFFFFFF</color>
+
+    <!-- Le impostazioni: scure come il gioco, qualunque sia il tema del telefono -->
+    <color name="settings_background">#FF121212</color>
+    <color name="settings_section">#FF03DAC5</color>
+    <color name="settings_text">#FFFFFFFF</color>
+    <color name="settings_text_secondary">#B3FFFFFF</color>
+    <color name="settings_icon">#B3FFFFFF</color>
+    <color name="settings_divider">#1FFFFFFF</color>
 </resources>
