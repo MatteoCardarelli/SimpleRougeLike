@@ -8,6 +8,7 @@ import io.github.matteocardarelli.simpleroguelike.generation.FloorSpec;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
+import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
 import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
@@ -22,7 +23,8 @@ class MoveHandlerTest {
     private static final MoveHandler MOVE =
             new MoveHandler(
                     new ActionRules(
-                            new CombatRules(new DamageRules(new LevelingRules(20, 2, 150)))));
+                            new CombatRules(
+                                    new DamageRules(new LevelingRules(new Stats(20, 2), 150)))));
     private static final UseItemHandler USE = new UseItemHandler();
 
     @Test

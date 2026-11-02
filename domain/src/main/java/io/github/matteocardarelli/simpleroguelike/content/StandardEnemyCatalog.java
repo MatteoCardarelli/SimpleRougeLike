@@ -16,7 +16,9 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
     public static final BehaviorKey CHASE_OR_WANDER = BehaviorKey.of("chase_or_wander");
 
     private static final List<EnemyDefinition> ENEMIES =
-            List.of(new EnemyDefinition(GOBLIN, new Stats(30, 5), 25, 8, CHASE_OR_WANDER, 10));
+            List.of(
+                    new EnemyDefinition(
+                            GOBLIN, new Stats(30, 7, 1, 0, 5), 25, 8, CHASE_OR_WANDER, 10));
 
     @Override
     public List<EnemyDefinition> all() {

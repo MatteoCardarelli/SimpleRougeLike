@@ -16,7 +16,7 @@ class InventoryContentTest {
     private static final InventoryEntry POTION =
             new InventoryEntry(new EntityId(7), Kind.of("potion"));
     private static final PlayerView PLAYER =
-            new PlayerView(new EntityId(1), new Position(3, 4), 38, 50, 1, 0, 100);
+            new PlayerView(new EntityId(1), new Position(3, 4), 38, 50, 1, 0, 100, 10, 2, 10, 5);
 
     @Test
     void selectedEntry_isTheSelectedItem() {

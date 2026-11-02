@@ -23,7 +23,7 @@ class LevelingRulesTest {
 
     @Test
     void nextThreshold_alwaysGrowsByAtLeastOne() {
-        assertThat(new LevelingRules(0, 0, 100).nextThreshold(5)).isEqualTo(6);
+        assertThat(new LevelingRules(new Stats(0, 0), 100).nextThreshold(5)).isEqualTo(6);
         assertThat(LEVELING.nextThreshold(1)).isEqualTo(2);
     }
 
@@ -35,7 +35,7 @@ class LevelingRulesTest {
 
     @Test
     void constructor_shrinkingThreshold_isRejected() {
-        assertThatThrownBy(() -> new LevelingRules(1, 1, 99))
+        assertThatThrownBy(() -> new LevelingRules(new Stats(1, 1), 99))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

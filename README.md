@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: `v1.0.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
+> **Stato: `v1.2.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, ognuna con la sua release, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -75,7 +75,16 @@ La CI, su ogni push e pull request, controlla formattazione, Lint (senza eccezio
 - [x] **5. Nuova app Android:** la stessa app di prima sul nuovo motore, le correzioni del primo collaudo e le note di collaudo, Hilt e MVVM, il nuovo rendering con l'inventario a griglia, le funzionalità nuove (pozione grande, registro dei messaggi, fine partita, barre con i valori, impostazioni), i test sul dispositivo in CI e il workflow di release.
 - [x] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
-Dopo la v1, una funzionalità alla volta: animazioni; statistiche vere ed equipaggiamento; attacchi a distanza (arcieri e coltelli da lancio); nemici che girano in branco; porte, leve e scrigni; più piani, chiusi da chiavi; boss; mercanti ed economia; illustrazioni. Ognuna ha la sua issue con l'etichetta `enhancement`.
+- [ ] **7. Dopo la v1:** una funzionalità alla volta, ognuna con la sua issue `enhancement` e la sua release.
+  - [x] Barre più pulite e impostazioni a tutto schermo, con il seed da copiare e la nuova partita (`v1.1.0`).
+  - [x] Statistiche: attacco, difesa, precisione e schivata, con colpi che possono mancare (`v1.2.0`).
+  - [ ] Equipaggiamento: arma, armatura e anello.
+  - [ ] Coltelli da lancio e arcieri.
+  - [ ] Animazioni.
+  - [ ] Porte, leve e scrigni; cinque piani con le scale.
+  - [ ] Nemici in branco, chiavi e bottino.
+  - [ ] Il boss, uno slime gigante, e i mercanti.
+  - [ ] Illustrazioni e salvataggio della partita.
 
 ## Compilare ed eseguire
 

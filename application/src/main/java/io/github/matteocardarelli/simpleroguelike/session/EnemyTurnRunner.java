@@ -80,7 +80,9 @@ public final class EnemyTurnRunner {
             EnemyIntent intent = behavior.decide(enemy, run.view(), run.gameplay());
             switch (intent) {
                 case StepIntent(Direction direction) ->
-                        events.addAll(actions.step(floor, enemy.id(), direction).events());
+                        events.addAll(
+                                actions.step(floor, enemy.id(), direction, run.gameplay())
+                                        .events());
                 case WaitIntent() -> {}
             }
         }

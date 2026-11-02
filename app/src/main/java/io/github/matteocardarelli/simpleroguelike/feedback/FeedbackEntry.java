@@ -56,6 +56,15 @@ public record FeedbackEntry(
         lines.add("health=" + player.health() + "/" + player.maxHealth());
         lines.add("level=" + player.level());
         lines.add("experience=" + player.experience() + "/" + player.experienceToNextLevel());
+        lines.add(
+                "stats="
+                        + player.attack()
+                        + "/"
+                        + player.defense()
+                        + "/"
+                        + player.accuracy()
+                        + "/"
+                        + player.evasion());
         lines.add("inventory_open=" + inventoryOpen);
         lines.add(SEPARATOR);
         // Né String.lines né Stream.toList esistono su Android 11.
@@ -87,6 +96,7 @@ public record FeedbackEntry(
         String[] position = key(keys, "position").split(",");
         String[] health = key(keys, "health").split("/");
         String[] experience = key(keys, "experience").split("/");
+        String[] stats = key(keys, "stats").split("/");
         PlayerView player =
                 new PlayerView(
                         new EntityId(Integer.parseInt(key(keys, "player"))),
@@ -95,7 +105,11 @@ public record FeedbackEntry(
                         Integer.parseInt(health[1]),
                         Integer.parseInt(key(keys, "level")),
                         Integer.parseInt(experience[0]),
-                        Integer.parseInt(experience[1]));
+                        Integer.parseInt(experience[1]),
+                        Integer.parseInt(stats[0]),
+                        Integer.parseInt(stats[1]),
+                        Integer.parseInt(stats[2]),
+                        Integer.parseInt(stats[3]));
         List<String> commands = new ArrayList<>();
         for (String line : lines.subList(last + 1, lines.size())) {
             if (!line.trim().isEmpty()) {

@@ -23,6 +23,8 @@
     <string name="previous_game_lost_ok">OK</string>
 
     <string name="log_died_player">Sei morto.</string>
+    <string name="log_missed_by_player">Il tuo colpo va a vuoto.</string>
+    <string name="log_missed_player">Schivi un colpo.</string>
     <string name="log_died">%1$s muore.</string>
     <string name="log_leveled_up">Sali al livello %1$d!</string>
     <string name="log_item_picked_up">Raccogli: %1$s.</string>
@@ -37,6 +39,7 @@
     <string name="hud_health_value">%1$d/%2$d</string>
     <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
     <string name="hud_level">liv. %1$d</string>
+    <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d</string>
 
     <string name="debug_turn">turno %1$d</string>
 

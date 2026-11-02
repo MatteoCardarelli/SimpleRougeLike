@@ -26,7 +26,7 @@ class StandardCatalogsTest {
                 .containsExactly(
                         new EnemyDefinition(
                                 StandardEnemyCatalog.GOBLIN,
-                                new Stats(30, 5),
+                                new Stats(30, 7, 1, 0, 5),
                                 25,
                                 8,
                                 StandardEnemyCatalog.CHASE_OR_WANDER,

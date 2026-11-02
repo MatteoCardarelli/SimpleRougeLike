@@ -3,7 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.snapshot;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 
-/** Il player, sempre visibile a sé stesso. */
+/** Il player, sempre visibile a sé stesso, con le statistiche di combattimento da mostrare. */
 public record PlayerView(
         EntityId id,
         Position position,
@@ -11,4 +11,8 @@ public record PlayerView(
         int maxHealth,
         int level,
         int experience,
-        int experienceToNextLevel) {}
+        int experienceToNextLevel,
+        int attack,
+        int defense,
+        int accuracy,
+        int evasion) {}

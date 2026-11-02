@@ -21,10 +21,14 @@ public final class PlayerBars {
         Context context = bars.getRoot().getContext();
         fill(bars, player);
         bars.healthValue.setVisibility(View.GONE);
+        bars.statsValue.setVisibility(View.GONE);
         bars.xpValue.setText(context.getString(R.string.hud_level, player.level()));
     }
 
-    /** Nell'inventario: le barre con salute ed esperienza scritte accanto, e il livello. */
+    /**
+     * Nell'inventario: le barre con salute ed esperienza scritte accanto, il livello e le
+     * statistiche di combattimento.
+     */
     public static void showWithValues(ViewPlayerBarsBinding bars, PlayerView player) {
         Context context = bars.getRoot().getContext();
         fill(bars, player);
@@ -37,6 +41,14 @@ public final class PlayerBars {
                         player.experience(),
                         player.experienceToNextLevel(),
                         player.level()));
+        bars.statsValue.setVisibility(View.VISIBLE);
+        bars.statsValue.setText(
+                context.getString(
+                        R.string.hud_stats,
+                        player.attack(),
+                        player.defense(),
+                        player.accuracy(),
+                        player.evasion()));
     }
 
     /** Le barre e le loro descrizioni per TalkBack, uguali nei due posti. */

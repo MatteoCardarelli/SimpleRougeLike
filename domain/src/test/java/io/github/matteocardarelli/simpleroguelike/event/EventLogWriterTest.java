@@ -28,6 +28,7 @@ class EventLogWriterTest {
                 .containsExactly(
                         "t12 Moved actor=1 kind=goblin from=3,4 to=4,4",
                         "t12 Attacked attacker=1 target=7 from=3,4 at=4,4",
+                        "t12 Missed attacker=1 target=7 from=3,4 at=4,4",
                         "t12 Damaged target=7 at=3,4 amount=5 hp=20",
                         "t12 Died actor=7 kind=goblin at=3,4",
                         "t12 Healed target=1 at=3,4 amount=25",
@@ -70,6 +71,7 @@ class EventLogWriterTest {
                 .containsExactly(
                         List.of(P, Q),
                         List.of(P, Q),
+                        List.of(P, Q),
                         List.of(P),
                         List.of(P),
                         List.of(P),
@@ -84,6 +86,7 @@ class EventLogWriterTest {
         return List.of(
                 new Moved(A, GOBLIN, P, Q),
                 new Attacked(A, B, P, Q),
+                new Missed(A, B, P, Q),
                 new Damaged(B, P, 5, 20),
                 new Died(B, GOBLIN, P),
                 new Healed(A, P, 25),

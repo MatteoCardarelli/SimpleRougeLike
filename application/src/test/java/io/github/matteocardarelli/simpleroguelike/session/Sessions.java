@@ -11,6 +11,7 @@ import io.github.matteocardarelli.simpleroguelike.command.UseItemHandler;
 import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorSource;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorSpec;
+import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import io.github.matteocardarelli.simpleroguelike.port.OpenFieldOfView;
 import io.github.matteocardarelli.simpleroguelike.port.StraightLinePathfinder;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
@@ -23,7 +24,7 @@ import java.util.List;
 /** Sessioni costruite con le regole vere e i fake del dominio, senza mock. */
 final class Sessions {
 
-    static final LevelingRules LEVELING = new LevelingRules(20, 2, 150);
+    static final LevelingRules LEVELING = new LevelingRules(new Stats(20, 2), 150);
     static final DamageRules DAMAGE = new DamageRules(LEVELING);
     static final ActionRules ACTIONS = new ActionRules(new CombatRules(DAMAGE));
     static final FloorSpec SPEC = new FloorSpec(15, 10, 3, 2, 3, 1);

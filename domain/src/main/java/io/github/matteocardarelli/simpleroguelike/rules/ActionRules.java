@@ -6,6 +6,7 @@ import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
+import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,9 +27,11 @@ public final class ActionRules {
     /**
      * Fa fare un passo all'attore.
      *
+     * @param random il flusso di gameplay, per un eventuale attacco
      * @throws IllegalStateException se l'attore è morto
      */
-    public ActionResult step(Floor floor, EntityId actorId, Direction direction) {
+    public ActionResult step(
+            Floor floor, EntityId actorId, Direction direction, RandomSource random) {
         Actor actor =
                 floor.actor(actorId)
                         .filter(Actor::isAlive)
@@ -42,7 +45,7 @@ public final class ActionRules {
                 return ActionResult.blocked();
             }
             return ActionResult.performed(
-                    combat.resolveAttack(floor, actorId, occupant.get().id()));
+                    combat.resolveAttack(floor, actorId, occupant.get().id(), random));
         }
         if (!floor.isFree(to)) {
             return ActionResult.blocked();
