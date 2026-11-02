@@ -5,6 +5,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
+import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
@@ -49,6 +50,12 @@ public final class EventMessageFormatter {
         this.content = content;
         muted.add(Moved.class);
         muted.add(Attacked.class);
+        register(
+                Fired.class,
+                (e, player) ->
+                        e.shooter().equals(player)
+                                ? texts.text(R.string.log_fired_player, name(e.projectile()))
+                                : texts.text(R.string.log_fired_enemy, name(e.shooterKind())));
         register(
                 Missed.class,
                 (e, player) ->

@@ -25,6 +25,11 @@ class GatedPlayerInputTest {
         }
 
         @Override
+        public void swipe(Direction direction) {
+            actions.add("swipe " + direction);
+        }
+
+        @Override
         public void toggleInventory() {
             actions.add("toggle");
         }

@@ -19,6 +19,10 @@
     <string name="kind_ring_of_accuracy_description">Guida la mano verso il bersaglio: +10 precisione. Anello.</string>
     <string name="kind_ring_of_vigor_name">Anello del vigore</string>
     <string name="kind_ring_of_vigor_description">Scalda il sangue: +20 salute massima. Anello.</string>
+    <string name="kind_throwing_knife_name">Coltello da lancio</string>
+    <string name="kind_throwing_knife_description">Piccolo e bilanciato: si lancia fino a 6 celle per 8 danni. Si impila.</string>
+    <string name="kind_archer_name">Arciere</string>
+    <string name="kind_archer_description">Tira frecce da lontano e scappa se ti avvicini. Avvicinati di lato.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -28,6 +32,9 @@
     <string name="inventory_use">Usa</string>
     <string name="inventory_equip">Equipaggia</string>
     <string name="inventory_unequip">Togli</string>
+    <string name="inventory_throw">Lancia</string>
+    <string name="inventory_count">%1$s ×%2$d</string>
+    <string name="aim_hint">Scorri per lanciare · doppio tap per annullare</string>
     <string name="inventory_equipped_badge">E</string>
     <string name="inventory_equipped">%1$s, equipaggiato</string>
 
@@ -46,6 +53,8 @@
     <string name="log_item_picked_up">Raccogli: %1$s.</string>
     <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
     <string name="log_item_used">Usi: %1$s.</string>
+    <string name="log_fired_player">Lanci: %1$s.</string>
+    <string name="log_fired_enemy">%1$s tira una freccia.</string>
     <string name="log_item_equipped">Equipaggi: %1$s.</string>
     <string name="log_item_unequipped">Togli: %1$s.</string>
 

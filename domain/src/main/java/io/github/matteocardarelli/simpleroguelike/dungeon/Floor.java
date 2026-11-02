@@ -308,6 +308,27 @@ public final class Floor implements FloorView {
         return List.of(new ItemUnequipped(itemId, item.kind(), positionOf(user)));
     }
 
+    /**
+     * Prende un pezzo di un oggetto da lanciare: l'inventario ne ha uno in meno, e la pila sparisce
+     * con l'ultimo. Il colpo lo risolve chi chiama.
+     *
+     * @return danno e portata dell'oggetto
+     * @throws IllegalArgumentException se {@code user} non è il player, l'oggetto non è nel suo
+     *     inventario o non si lancia
+     * @throws IllegalStateException se il player è morto
+     */
+    public Throwing spendThrowable(EntityId user, EntityId itemId) {
+        Item item = requireInInventory(user, itemId);
+        Throwing throwing =
+                item.throwing()
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                item.kind().value() + " non si lancia"));
+        player.inventory().removeOne(itemId);
+        return throwing;
+    }
+
     private Item requireInInventory(EntityId user, EntityId itemId) {
         requirePlayer(user);
         requireAlive(user);

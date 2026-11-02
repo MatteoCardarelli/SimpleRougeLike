@@ -33,6 +33,11 @@ public final class Enemy extends Actor {
         return definition.aggroRange();
     }
 
+    /** Quante celle raggiunge il suo colpo a distanza; 0 se combatte solo da vicino. */
+    public int range() {
+        return definition.range();
+    }
+
     public BehaviorKey behavior() {
         return definition.behavior();
     }

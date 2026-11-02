@@ -43,6 +43,19 @@ public final class EventLogWriter {
                                 + " at="
                                 + at(e.targetAt()));
         register(
+                Fired.class,
+                e ->
+                        "Fired shooter="
+                                + id(e.shooter())
+                                + " kind="
+                                + e.shooterKind().value()
+                                + " projectile="
+                                + e.projectile().value()
+                                + " from="
+                                + at(e.from())
+                                + " path="
+                                + path(e.path()));
+        register(
                 Missed.class,
                 e ->
                         "Missed attacker="
@@ -170,5 +183,13 @@ public final class EventLogWriter {
 
     private static String at(Position position) {
         return position.x() + "," + position.y();
+    }
+
+    private static String path(List<Position> cells) {
+        List<String> parts = new ArrayList<>(cells.size());
+        for (Position cell : cells) {
+            parts.add(at(cell));
+        }
+        return parts.isEmpty() ? "-" : String.join(";", parts);
     }
 }

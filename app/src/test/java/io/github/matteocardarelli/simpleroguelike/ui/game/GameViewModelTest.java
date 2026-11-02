@@ -13,6 +13,7 @@ import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
 import io.github.matteocardarelli.simpleroguelike.generation.FixedFloorSource;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
+import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.settings.Settings;
 import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
@@ -172,6 +173,50 @@ class GameViewModelTest {
 
         assertThat(viewModel.state().result().snapshot().inventory().get(0).equipped()).isFalse();
         assertThat(viewModel.state().result().snapshot().player().attack()).isEqualTo(attack);
+    }
+
+    /**
+     * Scegliere i coltelli chiude l'inventario e fa mirare; lo swipe lancia un coltello, che lascia
+     * la pila con uno in meno.
+     */
+    @Test
+    void chooseItem_onKnives_aims_andTheSwipeThrowsOne() {
+        GameViewModel viewModel =
+                drawn("############", "#@--.......#", "#.........g#", "############");
+        viewModel.submit(new MoveCommand(Direction.RIGHT));
+        viewModel.submit(new MoveCommand(Direction.RIGHT));
+        EntityId knives = viewModel.state().result().snapshot().inventory().get(0).id();
+        viewModel.toggleInventory();
+        int turn = viewModel.state().result().snapshot().turn();
+
+        viewModel.chooseItem(knives);
+
+        assertThat(viewModel.state().aimingItem()).contains(knives);
+        assertThat(viewModel.state().inventoryOpen()).isFalse();
+
+        viewModel.swipe(Direction.RIGHT);
+
+        assertThat(viewModel.state().aimingItem()).isEmpty();
+        assertThat(viewModel.state().result().snapshot().turn()).isEqualTo(turn + 1);
+        assertThat(viewModel.state().result().snapshot().inventory().get(0).count()).isEqualTo(1);
+        assertThat(viewModel.state().result().snapshot().player().position())
+                .isEqualTo(new Position(3, 1));
+    }
+
+    /** Il doppio tap mentre si mira annulla la mira, senza lanciare e senza aprire l'inventario. */
+    @Test
+    void toggleInventory_whileAiming_cancelsTheAim() {
+        GameViewModel viewModel =
+                drawn("############", "#@-........#", "#.........g#", "############");
+        viewModel.submit(new MoveCommand(Direction.RIGHT));
+        EntityId knives = viewModel.state().result().snapshot().inventory().get(0).id();
+        viewModel.chooseItem(knives);
+
+        viewModel.toggleInventory();
+
+        assertThat(viewModel.state().aimingItem()).isEmpty();
+        assertThat(viewModel.state().inventoryOpen()).isFalse();
+        assertThat(viewModel.state().result().snapshot().inventory().get(0).count()).isEqualTo(1);
     }
 
     /** Un tocco seleziona e mostra la scheda; "Usa" consuma l'oggetto, che esce dalla selezione. */

@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.github.matteocardarelli.simpleroguelike.command.Command;
 import io.github.matteocardarelli.simpleroguelike.command.EquipCommand;
+import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
+import io.github.matteocardarelli.simpleroguelike.command.ThrowCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UnequipCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
@@ -15,6 +17,7 @@ import io.github.matteocardarelli.simpleroguelike.feedback.CommandJournal;
 import io.github.matteocardarelli.simpleroguelike.feedback.CommandLogFormat;
 import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackEntry;
 import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
+import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
@@ -78,6 +81,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private final List<GameEvent> log = new ArrayList<>();
     private boolean inventoryOpen;
     private @Nullable EntityId selectedItem;
+    private @Nullable EntityId aimingItem;
     private boolean previousGameLost;
     private Settings settings;
     private long lastClaimedRevision;
@@ -145,9 +149,24 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         publish(result);
     }
 
-    /** Apre o chiude l'inventario; a partita finita resta chiuso. */
+    /** Uno swipe: il lancio dell'oggetto scelto, se si sta mirando, altrimenti un passo. */
+    @Override
+    public void swipe(Direction direction) {
+        EntityId item = aimingItem;
+        aimingItem = null;
+        submit(item != null ? new ThrowCommand(item, direction) : new MoveCommand(direction));
+    }
+
+    /**
+     * Apre o chiude l'inventario; a partita finita resta chiuso. Mentre si mira, annulla la mira.
+     */
     @Override
     public void toggleInventory() {
+        if (aimingItem != null) {
+            aimingItem = null;
+            publish(session.current());
+            return;
+        }
         inventoryOpen = !inventoryOpen && session.current().snapshot().phase() == Phase.PLAYING;
         if (!inventoryOpen) {
             selectedItem = null;
@@ -170,7 +189,12 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     @Override
     public void chooseItem(EntityId item) {
         Optional<InventoryEntry> entry = entry(session.current(), item);
-        if (entry.isPresent() && entry.get().slot().isPresent()) {
+        if (entry.isPresent() && entry.get().throwable()) {
+            aimingItem = item;
+            inventoryOpen = false;
+            selectedItem = null;
+            publish(session.current());
+        } else if (entry.isPresent() && entry.get().slot().isPresent()) {
             submit(entry.get().equipped() ? new UnequipCommand(item) : new EquipCommand(item));
         } else {
             submit(new UseItemCommand(item));
@@ -260,6 +284,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         journal.start(seed);
         inventoryOpen = false;
         selectedItem = null;
+        aimingItem = null;
         log.clear();
         TurnResult result = session.newGame(seed);
         saved.set(GAME_IN_PROGRESS, true);
@@ -274,7 +299,8 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
                         Optional.ofNullable(selectedItem),
                         log,
                         previousGameLost,
-                        settings.logVisible()));
+                        settings.logVisible(),
+                        Optional.ofNullable(aimingItem)));
     }
 
     private static boolean inInventory(TurnResult result, @Nullable EntityId item) {

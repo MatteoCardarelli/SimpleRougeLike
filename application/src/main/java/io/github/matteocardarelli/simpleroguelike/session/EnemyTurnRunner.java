@@ -3,6 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.session;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.EnemyBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.EnemyIntent;
+import io.github.matteocardarelli.simpleroguelike.ai.RangedAttackIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.StepIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.WaitIntent;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
@@ -13,6 +14,7 @@ import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.BehaviorKey;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
+import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.run.Run;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +32,7 @@ public final class EnemyTurnRunner {
 
     private final TreeMap<BehaviorKey, EnemyBehavior> behaviors = new TreeMap<>();
     private final ActionRules actions;
+    private final RangedRules ranged;
 
     /**
      * Registra le strategie.
@@ -38,7 +41,10 @@ public final class EnemyTurnRunner {
      *     catalogo non ha una strategia
      */
     public EnemyTurnRunner(
-            Collection<BehaviorBinding> bindings, EnemyCatalog catalog, ActionRules actions) {
+            Collection<BehaviorBinding> bindings,
+            EnemyCatalog catalog,
+            ActionRules actions,
+            RangedRules ranged) {
         for (BehaviorBinding binding : bindings) {
             if (behaviors.putIfAbsent(binding.key(), binding.behavior()) != null) {
                 throw new IllegalArgumentException("Due strategie per " + binding.key().value());
@@ -54,6 +60,7 @@ public final class EnemyTurnRunner {
             }
         }
         this.actions = actions;
+        this.ranged = ranged;
     }
 
     /**
@@ -83,6 +90,16 @@ public final class EnemyTurnRunner {
                         events.addAll(
                                 actions.step(floor, enemy.id(), direction, run.gameplay())
                                         .events());
+                case RangedAttackIntent(Direction direction) ->
+                        events.addAll(
+                                ranged.shoot(
+                                        floor,
+                                        enemy.id(),
+                                        direction,
+                                        enemy.range(),
+                                        RangedRules.ARROW,
+                                        enemy.stats().attack(),
+                                        run.gameplay()));
                 case WaitIntent() -> {}
             }
         }

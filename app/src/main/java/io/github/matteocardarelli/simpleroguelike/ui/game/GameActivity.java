@@ -137,6 +137,7 @@ public class GameActivity extends AppCompatActivity
         PlayerBars.showOnMap(binding.bars, snapshot.player());
 
         showLog(state);
+        binding.aimHint.setVisibility(state.aimingItem().isPresent() ? View.VISIBLE : View.GONE);
         // Il seed sta nelle impostazioni, in tutte le build: qui resta solo il turno.
         boolean debugInfo = getResources().getBoolean(R.bool.show_debug_info);
         if (debugInfo) {

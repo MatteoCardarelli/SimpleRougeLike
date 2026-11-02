@@ -6,7 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/** Gli oggetti del player, in ordine di raccolta, fino a una capienza massima. */
+/**
+ * Gli oggetti del player, in ordine di raccolta, fino a una capienza massima. Un oggetto che si
+ * impila si aggiunge alla pila dello stesso tipo, se c'è, senza occupare un posto in più.
+ */
 public final class Inventory {
 
     private final List<Item> items = new ArrayList<>();
@@ -43,11 +46,29 @@ public final class Inventory {
 
     /** Restituisce falso, senza aggiungere l'oggetto, se l'inventario è pieno. */
     boolean add(Item item) {
+        if (item.definition().stackable()) {
+            for (Item stack : items) {
+                if (stack.kind().equals(item.kind())) {
+                    stack.absorb(item);
+                    return true;
+                }
+            }
+        }
         if (isFull()) {
             return false;
         }
         items.add(item);
         return true;
+    }
+
+    /** Toglie un pezzo dell'oggetto, e l'oggetto quando non ne resta nessuno. */
+    void removeOne(EntityId id) {
+        Item item =
+                find(id).orElseThrow(
+                                () -> new IllegalArgumentException(id + " non è nell'inventario"));
+        if (item.spendOne()) {
+            items.remove(item);
+        }
     }
 
     Optional<Item> remove(EntityId id) {

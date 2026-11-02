@@ -10,11 +10,13 @@ import dagger.multibindings.Multibinds;
 import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.KiteBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
 import io.github.matteocardarelli.simpleroguelike.command.EquipHandler;
 import io.github.matteocardarelli.simpleroguelike.command.MoveHandler;
+import io.github.matteocardarelli.simpleroguelike.command.ThrowHandler;
 import io.github.matteocardarelli.simpleroguelike.command.UnequipHandler;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemHandler;
 import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
@@ -29,6 +31,7 @@ import io.github.matteocardarelli.simpleroguelike.port.FieldOfView;
 import io.github.matteocardarelli.simpleroguelike.port.Pathfinder;
 import io.github.matteocardarelli.simpleroguelike.port.TerrainGenerator;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
+import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
@@ -83,6 +86,19 @@ public abstract class GameModule {
                 new AggroBehavior(new ChaseBehavior(pathfinder), new WanderBehavior()));
     }
 
+    /**
+     * L'arciere tira quando ha il player a tiro, scappa se è vicino, e altrimenti lo insegue; se è
+     * lontano, vaga.
+     */
+    @Provides
+    @IntoSet
+    static BehaviorBinding keepDistance(Pathfinder pathfinder) {
+        return new BehaviorBinding(
+                StandardEnemyCatalog.KEEP_DISTANCE,
+                new AggroBehavior(
+                        new KiteBehavior(new ChaseBehavior(pathfinder)), new WanderBehavior()));
+    }
+
     @Provides
     @IntoSet
     static CommandHandler<?> moveHandler(ActionRules actions) {
@@ -93,6 +109,12 @@ public abstract class GameModule {
     @IntoSet
     static CommandHandler<?> useItemHandler() {
         return new UseItemHandler();
+    }
+
+    @Provides
+    @IntoSet
+    static CommandHandler<?> throwHandler(RangedRules ranged) {
+        return new ThrowHandler(ranged);
     }
 
     @Provides
@@ -113,8 +135,11 @@ public abstract class GameModule {
 
     @Provides
     static EnemyTurnRunner enemyTurnRunner(
-            Set<BehaviorBinding> behaviors, EnemyCatalog enemies, ActionRules actions) {
-        return new EnemyTurnRunner(behaviors, enemies, actions);
+            Set<BehaviorBinding> behaviors,
+            EnemyCatalog enemies,
+            ActionRules actions,
+            RangedRules ranged) {
+        return new EnemyTurnRunner(behaviors, enemies, actions, ranged);
     }
 
     @Provides

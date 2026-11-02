@@ -23,6 +23,7 @@ import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
 import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
 import io.github.matteocardarelli.simpleroguelike.rules.LevelingRules;
+import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
 import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
@@ -76,6 +77,12 @@ public final class ContentModule {
     @Singleton
     static ActionRules actionRules(CombatRules combat) {
         return new ActionRules(combat);
+    }
+
+    @Provides
+    @Singleton
+    static RangedRules rangedRules(DamageRules damage) {
+        return new RangedRules(damage);
     }
 
     @Provides
@@ -161,6 +168,18 @@ public final class ContentModule {
                         R.string.kind_goblin_name,
                         R.string.kind_goblin_description,
                         R.color.kind_goblin));
+        styles.put(
+                StandardItemCatalog.THROWING_KNIFE,
+                new ContentPresentation.Style(
+                        R.string.kind_throwing_knife_name,
+                        R.string.kind_throwing_knife_description,
+                        R.color.kind_throwing_knife));
+        styles.put(
+                StandardEnemyCatalog.ARCHER,
+                new ContentPresentation.Style(
+                        R.string.kind_archer_name,
+                        R.string.kind_archer_description,
+                        R.color.kind_archer));
         return new ContentPresentation(styles);
     }
 

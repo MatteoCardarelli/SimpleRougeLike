@@ -70,7 +70,9 @@ public final class SnapshotMapper {
                             item.id(),
                             item.kind(),
                             item.equipment().map(Equipment::slot),
-                            player.isEquipped(item.id())));
+                            player.isEquipped(item.id()),
+                            item.throwing().isPresent(),
+                            item.count()));
         }
         PlayerView playerView =
                 new PlayerView(
