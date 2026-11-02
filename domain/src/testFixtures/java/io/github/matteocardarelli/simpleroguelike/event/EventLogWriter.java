@@ -43,6 +43,17 @@ public final class EventLogWriter {
                                 + " at="
                                 + at(e.targetAt()));
         register(
+                Missed.class,
+                e ->
+                        "Missed attacker="
+                                + id(e.attacker())
+                                + " target="
+                                + id(e.target())
+                                + " from="
+                                + at(e.attackerAt())
+                                + " at="
+                                + at(e.targetAt()));
+        register(
                 Damaged.class,
                 e ->
                         "Damaged target="

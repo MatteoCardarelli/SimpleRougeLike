@@ -25,7 +25,8 @@ public final class MoveHandler implements CommandHandler<MoveCommand> {
     @Override
     public CommandOutcome handle(MoveCommand command, Run run) {
         ActionResult result =
-                actions.step(run.floor(), run.floor().playerId(), command.direction());
+                actions.step(
+                        run.floor(), run.floor().playerId(), command.direction(), run.gameplay());
         return new CommandOutcome(result.events(), true);
     }
 }

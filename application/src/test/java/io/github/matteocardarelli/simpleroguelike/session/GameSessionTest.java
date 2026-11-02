@@ -122,9 +122,11 @@ class GameSessionTest {
         GameSession session = session(new FixedFloorSource("####", "#@g#", "####"));
         session.newGame(1);
 
-        session.handle(new MoveCommand(Direction.RIGHT));
-        session.handle(new MoveCommand(Direction.RIGHT));
+        // Un colpo può mancare: si attacca finché il goblin non muore, entro un limite.
         TurnResult kill = session.handle(new MoveCommand(Direction.RIGHT));
+        for (int attempt = 0; attempt < 30 && kill.snapshot().phase() == Phase.PLAYING; attempt++) {
+            kill = session.handle(new MoveCommand(Direction.RIGHT));
+        }
         TurnResult after = session.handle(new MoveCommand(Direction.RIGHT));
 
         assertThat(kill.events()).hasAtLeastOneElementOfType(Died.class);

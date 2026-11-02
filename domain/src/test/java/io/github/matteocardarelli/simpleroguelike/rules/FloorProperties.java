@@ -89,7 +89,7 @@ class FloorProperties {
         switch (action.kind()) {
             case 0, 1, 2, 3, 4, 5 -> {
                 if (alive) {
-                    return ACTIONS.step(floor, id, action.direction()).events();
+                    return ACTIONS.step(floor, id, action.direction(), random).events();
                 }
             }
             case 6 -> {

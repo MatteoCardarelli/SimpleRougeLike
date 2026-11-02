@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La progressione del player. A ogni livello salute massima e attacco crescono di un valore fisso,
- * e l'esperienza per il livello successivo cresce di {@code thresholdGrowthPercent} per cento: con
+ * La progressione del player. A ogni livello le statistiche crescono di un valore fisso, e
+ * l'esperienza per il livello successivo cresce di {@code thresholdGrowthPercent} per cento: con
  * 150 la soglia aumenta del 50%. Solo interi: il risultato si arrotonda per difetto e cresce sempre
  * di almeno 1.
  */
@@ -21,12 +21,12 @@ public final class LevelingRules implements LevelingPolicy {
     private final Stats bonusPerLevel;
     private final int thresholdGrowthPercent;
 
-    public LevelingRules(int healthPerLevel, int attackPerLevel, int thresholdGrowthPercent) {
+    public LevelingRules(Stats bonusPerLevel, int thresholdGrowthPercent) {
         if (thresholdGrowthPercent < 100) {
             throw new IllegalArgumentException(
                     "La soglia non può diminuire: " + thresholdGrowthPercent + "%");
         }
-        this.bonusPerLevel = new Stats(healthPerLevel, attackPerLevel);
+        this.bonusPerLevel = bonusPerLevel;
         this.thresholdGrowthPercent = thresholdGrowthPercent;
     }
 

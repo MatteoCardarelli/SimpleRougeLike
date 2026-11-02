@@ -18,6 +18,7 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.PlayerDefinition;
 import io.github.matteocardarelli.simpleroguelike.feedback.BuildInfo;
 import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
+import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
 import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
@@ -49,11 +50,14 @@ public final class ContentModule {
         return GameConfig.standard();
     }
 
-    /** Ogni livello dà 20 di salute e 2 di attacco, e la soglia successiva cresce del 50%. */
+    /**
+     * Ogni livello dà 20 di salute, 2 di attacco, 1 di difesa, 2 di precisione e 1 di schivata, e
+     * la soglia successiva cresce del 50%.
+     */
     @Provides
     @Singleton
     static LevelingRules levelingRules() {
-        return new LevelingRules(20, 2, 150);
+        return new LevelingRules(new Stats(20, 2, 1, 2, 1), 150);
     }
 
     @Provides

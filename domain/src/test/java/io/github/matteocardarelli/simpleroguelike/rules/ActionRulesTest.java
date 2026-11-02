@@ -1,5 +1,6 @@
 package io.github.matteocardarelli.simpleroguelike.rules;
 
+import static io.github.matteocardarelli.simpleroguelike.random.FixedRandomSource.ALWAYS_HIT;
 import static io.github.matteocardarelli.simpleroguelike.rules.Rules.ACTIONS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,7 +26,7 @@ class ActionRulesTest {
     void step_intoFreeCell_moves() {
         Floor floor = FloorFixtures.parse("@.");
 
-        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT);
+        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT, ALWAYS_HIT);
 
         assertThat(result.performed()).isTrue();
         assertThat(result.events())
@@ -37,7 +38,7 @@ class ActionRulesTest {
     void step_playerOntoItem_picksItUp() {
         Floor floor = FloorFixtures.parse("@!");
 
-        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT);
+        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT, ALWAYS_HIT);
 
         assertThat(result.events())
                 .containsExactly(
@@ -50,7 +51,7 @@ class ActionRulesTest {
         Floor floor = FloorFixtures.parse("@g!");
         EntityId goblin = new EntityId(2);
 
-        ActionResult result = ACTIONS.step(floor, goblin, Direction.RIGHT);
+        ActionResult result = ACTIONS.step(floor, goblin, Direction.RIGHT, ALWAYS_HIT);
 
         assertThat(result.events()).hasSize(1).first().isInstanceOf(Moved.class);
         assertThat(floor.itemAt(new Position(2, 0))).isPresent();
@@ -60,7 +61,7 @@ class ActionRulesTest {
     void step_intoWall_isBlocked() {
         Floor floor = FloorFixtures.parse("#@");
 
-        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.LEFT);
+        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.LEFT, ALWAYS_HIT);
 
         assertThat(result).isEqualTo(ActionResult.blocked());
         assertThat(floor.positionOf(PLAYER)).isEqualTo(new Position(1, 0));
@@ -70,7 +71,7 @@ class ActionRulesTest {
     void step_outsideTheFloor_isBlocked() {
         Floor floor = FloorFixtures.parse("@");
 
-        assertThat(ACTIONS.step(floor, PLAYER, Direction.UP).performed()).isFalse();
+        assertThat(ACTIONS.step(floor, PLAYER, Direction.UP, ALWAYS_HIT).performed()).isFalse();
     }
 
     @Test
@@ -78,12 +79,12 @@ class ActionRulesTest {
         Floor floor = FloorFixtures.parse("@g");
         EntityId goblin = new EntityId(2);
 
-        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT);
+        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT, ALWAYS_HIT);
 
         assertThat(result.events())
                 .startsWith(
                         new Attacked(PLAYER, goblin, new Position(0, 0), new Position(1, 0)),
-                        new Damaged(goblin, new Position(1, 0), 10, 20));
+                        new Damaged(goblin, new Position(1, 0), 9, 21));
         assertThat(floor.positionOf(PLAYER)).isEqualTo(new Position(0, 0));
     }
 
@@ -92,19 +93,19 @@ class ActionRulesTest {
         Floor floor = FloorFixtures.parse("@g");
         EntityId goblin = new EntityId(2);
 
-        ActionResult result = ACTIONS.step(floor, goblin, Direction.LEFT);
+        ActionResult result = ACTIONS.step(floor, goblin, Direction.LEFT, ALWAYS_HIT);
 
         assertThat(result.events())
                 .containsExactly(
                         new Attacked(goblin, PLAYER, new Position(1, 0), new Position(0, 0)),
-                        new Damaged(PLAYER, new Position(0, 0), 5, 95));
+                        new Damaged(PLAYER, new Position(0, 0), 7, 93));
     }
 
     @Test
     void step_intoAlly_isBlocked() {
         Floor floor = FloorFixtures.parse("@gg");
 
-        ActionResult result = ACTIONS.step(floor, new EntityId(2), Direction.RIGHT);
+        ActionResult result = ACTIONS.step(floor, new EntityId(2), Direction.RIGHT, ALWAYS_HIT);
 
         assertThat(result.performed()).isFalse();
         assertThat(floor.enemies()).allMatch(enemy -> enemy.health() == 30);
@@ -115,7 +116,7 @@ class ActionRulesTest {
         Floor floor = FloorFixtures.parse("@g");
         floor.damage(new EntityId(2), 1000);
 
-        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT);
+        ActionResult result = ACTIONS.step(floor, PLAYER, Direction.RIGHT, ALWAYS_HIT);
 
         assertThat(result.events()).hasSize(1).first().isInstanceOf(Moved.class);
     }
@@ -125,7 +126,7 @@ class ActionRulesTest {
         Floor floor = FloorFixtures.parse("@g.");
         floor.damage(new EntityId(2), 1000);
 
-        assertThatThrownBy(() -> ACTIONS.step(floor, new EntityId(2), Direction.RIGHT))
+        assertThatThrownBy(() -> ACTIONS.step(floor, new EntityId(2), Direction.RIGHT, ALWAYS_HIT))
                 .isInstanceOf(IllegalStateException.class);
     }
 

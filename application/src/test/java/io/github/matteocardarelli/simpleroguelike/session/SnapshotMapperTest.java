@@ -72,7 +72,19 @@ class SnapshotMapperTest {
         GameSnapshot snapshot = MAPPER.from(floor, Phase.GAME_OVER, 1, 2);
 
         assertThat(snapshot.player())
-                .isEqualTo(new PlayerView(new EntityId(1), new Position(1, 0), 93, 100, 1, 0, 100));
+                .isEqualTo(
+                        new PlayerView(
+                                new EntityId(1),
+                                new Position(1, 0),
+                                93,
+                                100,
+                                1,
+                                0,
+                                100,
+                                10,
+                                0,
+                                0,
+                                0));
         assertThat(snapshot.inventory())
                 .containsExactly(new InventoryEntry(new EntityId(2), Kind.of("potion")));
     }

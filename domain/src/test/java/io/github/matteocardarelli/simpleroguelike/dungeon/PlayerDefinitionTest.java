@@ -24,7 +24,7 @@ class PlayerDefinitionTest {
     void player_fromDefinition_takesItsValues() {
         Player player = new Player(new EntityId(1), StandardPlayer.DEFINITION);
 
-        assertThat(player.stats()).isEqualTo(new Stats(100, 10));
+        assertThat(player.stats()).isEqualTo(new Stats(100, 10, 2, 10, 5));
         assertThat(player.experienceToNextLevel()).isEqualTo(100);
         assertThat(player.inventory().capacity()).isEqualTo(10);
     }

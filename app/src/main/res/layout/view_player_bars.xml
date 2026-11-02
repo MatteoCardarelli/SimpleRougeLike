@@ -69,4 +69,16 @@
 
     </LinearLayout>
 
+    <!-- Le statistiche di combattimento: solo nell'inventario -->
+    <TextView
+        android:id="@+id/stats_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="Attacco 10 · Difesa 2 · Precisione 10 · Schivata 5"
+        tools:visibility="visible" />
+
 </LinearLayout>

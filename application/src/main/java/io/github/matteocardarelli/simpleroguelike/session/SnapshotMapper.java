@@ -74,7 +74,11 @@ public final class SnapshotMapper {
                         player.stats().maxHealth(),
                         player.level(),
                         player.experience(),
-                        player.experienceToNextLevel());
+                        player.experienceToNextLevel(),
+                        player.stats().attack(),
+                        player.stats().defense(),
+                        player.stats().accuracy(),
+                        player.stats().evasion());
 
         return new GameSnapshot(seed, turn, phase, cells, playerView, enemies, items, inventory);
     }

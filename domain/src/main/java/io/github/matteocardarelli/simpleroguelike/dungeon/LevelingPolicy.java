@@ -8,7 +8,7 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
  */
 public interface LevelingPolicy {
 
-    /** L'aumento di salute massima e attacco a ogni livello. */
+    /** L'aumento delle statistiche a ogni livello. */
     Stats bonusPerLevel();
 
     /**

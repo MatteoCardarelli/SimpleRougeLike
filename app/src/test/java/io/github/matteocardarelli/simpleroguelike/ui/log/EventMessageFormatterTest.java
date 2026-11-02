@@ -12,6 +12,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
+import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
@@ -71,6 +72,14 @@ class EventMessageFormatterTest {
                 .contains(R.plurals.log_damaged_enemy + "#10[10]");
         assertThat(formatter.format(new Died(PLAYER, Kind.of("player"), AT), PLAYER))
                 .contains(R.string.log_died_player + "[]");
+    }
+
+    @Test
+    void format_missed_saysWhoMissed() {
+        assertThat(formatter.format(new Missed(PLAYER, GOBLIN, AT, AT), PLAYER))
+                .contains(R.string.log_missed_by_player + "[]");
+        assertThat(formatter.format(new Missed(GOBLIN, PLAYER, AT, AT), PLAYER))
+                .contains(R.string.log_missed_player + "[]");
     }
 
     @Test

@@ -11,6 +11,7 @@ import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.LeveledUp;
+import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
@@ -46,6 +47,12 @@ public final class EventMessageFormatter {
         this.content = content;
         muted.add(Moved.class);
         muted.add(Attacked.class);
+        register(
+                Missed.class,
+                (e, player) ->
+                        e.attacker().equals(player)
+                                ? texts.text(R.string.log_missed_by_player)
+                                : texts.text(R.string.log_missed_player));
         register(
                 Damaged.class,
                 (e, player) ->

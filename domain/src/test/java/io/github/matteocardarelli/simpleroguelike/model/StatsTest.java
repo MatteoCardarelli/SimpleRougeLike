@@ -8,8 +8,14 @@ import org.junit.jupiter.api.Test;
 class StatsTest {
 
     @Test
-    void stats_plus_addsBothValues() {
-        assertThat(new Stats(100, 10).plus(new Stats(20, 2))).isEqualTo(new Stats(120, 12));
+    void stats_plus_addsEveryValue() {
+        assertThat(new Stats(100, 10, 2, 10, 5).plus(new Stats(20, 2, 1, 3, 4)))
+                .isEqualTo(new Stats(120, 12, 3, 13, 9));
+    }
+
+    @Test
+    void stats_withHealthAndAttackOnly_hasTheOthersAtZero() {
+        assertThat(new Stats(100, 10)).isEqualTo(new Stats(100, 10, 0, 0, 0));
     }
 
     @Test
@@ -21,5 +27,11 @@ class StatsTest {
     void stats_negative_isRejected() {
         assertThatThrownBy(() -> new Stats(-1, 0)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new Stats(1, -1)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Stats(1, 1, -1, 0, 0))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Stats(1, 1, 0, -1, 0))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Stats(1, 1, 0, 0, -1))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

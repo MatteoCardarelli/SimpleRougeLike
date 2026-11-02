@@ -17,7 +17,7 @@ class EnemyTest {
 
         assertThat(goblin.kind()).isEqualTo(Kind.of("goblin"));
         assertThat(goblin.faction()).isEqualTo(Faction.MONSTERS);
-        assertThat(goblin.stats()).isEqualTo(new Stats(30, 5));
+        assertThat(goblin.stats()).isEqualTo(new Stats(30, 7, 1, 0, 5));
         assertThat(goblin.health()).isEqualTo(30);
         assertThat(goblin.experienceReward()).isEqualTo(25);
         assertThat(goblin.aggroRange()).isEqualTo(8);

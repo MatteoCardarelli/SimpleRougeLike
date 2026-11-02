@@ -381,353 +381,356 @@ t205 Attacked attacker=20 target=1 from=33,35 at=34,35
 t205 Damaged target=1 at=34,35 amount=5 hp=95
 t206 > move left
 t206 Attacked attacker=1 target=20 from=34,35 at=33,35
-t206 Damaged target=20 at=33,35 amount=10 hp=20
+t206 Damaged target=20 at=33,35 amount=9 hp=21
 t206 Attacked attacker=20 target=1 from=33,35 at=34,35
 t206 Damaged target=1 at=34,35 amount=5 hp=90
 t207 > move left
 t207 Attacked attacker=1 target=20 from=34,35 at=33,35
-t207 Damaged target=20 at=33,35 amount=10 hp=10
+t207 Damaged target=20 at=33,35 amount=9 hp=12
 t207 Attacked attacker=20 target=1 from=33,35 at=34,35
-t207 Damaged target=1 at=34,35 amount=5 hp=85
+t207 Missed attacker=20 target=1 from=33,35 at=34,35
 t208 > move left
 t208 Attacked attacker=1 target=20 from=34,35 at=33,35
-t208 Damaged target=20 at=33,35 amount=10 hp=0
-t208 Died actor=20 kind=goblin at=33,35
-t208 ExperienceGained at=34,35 amount=25
-t209 > move down
-t209 Moved actor=1 kind=player from=34,35 to=34,36
+t208 Damaged target=20 at=33,35 amount=9 hp=3
+t208 Attacked attacker=20 target=1 from=33,35 at=34,35
+t208 Damaged target=1 at=34,35 amount=5 hp=85
+t209 > move left
+t209 Attacked attacker=1 target=20 from=34,35 at=33,35
+t209 Damaged target=20 at=33,35 amount=3 hp=0
+t209 Died actor=20 kind=goblin at=33,35
+t209 ExperienceGained at=34,35 amount=25
 t210 > move down
-t211 > move left
-t211 Moved actor=1 kind=player from=34,36 to=33,36
+t210 Moved actor=1 kind=player from=34,35 to=34,36
+t211 > move down
 t212 > move left
-t212 Moved actor=1 kind=player from=33,36 to=32,36
+t212 Moved actor=1 kind=player from=34,36 to=33,36
 t213 > move left
-t213 Moved actor=1 kind=player from=32,36 to=31,36
+t213 Moved actor=1 kind=player from=33,36 to=32,36
 t214 > move left
-t214 Moved actor=1 kind=player from=31,36 to=30,36
+t214 Moved actor=1 kind=player from=32,36 to=31,36
 t215 > move left
-t215 Moved actor=1 kind=player from=30,36 to=29,36
+t215 Moved actor=1 kind=player from=31,36 to=30,36
 t216 > move left
-t216 Moved actor=1 kind=player from=29,36 to=28,36
+t216 Moved actor=1 kind=player from=30,36 to=29,36
 t217 > move left
-t217 Moved actor=1 kind=player from=28,36 to=27,36
+t217 Moved actor=1 kind=player from=29,36 to=28,36
 t218 > move left
-t218 Moved actor=1 kind=player from=27,36 to=26,36
+t218 Moved actor=1 kind=player from=28,36 to=27,36
 t219 > move left
-t220 > move down
-t220 Moved actor=1 kind=player from=26,36 to=26,37
+t219 Moved actor=1 kind=player from=27,36 to=26,36
+t220 > move left
 t221 > move down
-t221 Moved actor=1 kind=player from=26,37 to=26,38
+t221 Moved actor=1 kind=player from=26,36 to=26,37
 t222 > move down
-t223 > move left
-t223 Moved actor=1 kind=player from=26,38 to=25,38
+t222 Moved actor=1 kind=player from=26,37 to=26,38
+t223 > move down
 t224 > move left
-t224 Moved actor=1 kind=player from=25,38 to=24,38
+t224 Moved actor=1 kind=player from=26,38 to=25,38
 t225 > move left
-t225 Moved actor=1 kind=player from=24,38 to=23,38
+t225 Moved actor=1 kind=player from=25,38 to=24,38
 t226 > move left
-t226 Moved actor=1 kind=player from=23,38 to=22,38
+t226 Moved actor=1 kind=player from=24,38 to=23,38
 t227 > move left
-t227 Moved actor=1 kind=player from=22,38 to=21,38
+t227 Moved actor=1 kind=player from=23,38 to=22,38
 t228 > move left
-t229 > move down
-t230 > move up
-t230 Moved actor=1 kind=player from=21,38 to=21,37
+t228 Moved actor=1 kind=player from=22,38 to=21,38
+t229 > move left
+t230 > move down
 t231 > move up
-t231 Moved actor=1 kind=player from=21,37 to=21,36
+t231 Moved actor=1 kind=player from=21,38 to=21,37
 t232 > move up
-t232 Moved actor=1 kind=player from=21,36 to=21,35
+t232 Moved actor=1 kind=player from=21,37 to=21,36
 t233 > move up
+t233 Moved actor=1 kind=player from=21,36 to=21,35
 t234 > move up
-t235 > move down
-t235 Moved actor=1 kind=player from=21,35 to=21,36
+t235 > move up
 t236 > move down
-t236 Moved actor=1 kind=player from=21,36 to=21,37
+t236 Moved actor=1 kind=player from=21,35 to=21,36
 t237 > move down
-t237 Moved actor=1 kind=player from=21,37 to=21,38
+t237 Moved actor=1 kind=player from=21,36 to=21,37
 t238 > move down
+t238 Moved actor=1 kind=player from=21,37 to=21,38
 t239 > move down
-t240 > move left
-t241 > move up
-t241 Moved actor=1 kind=player from=21,38 to=21,37
+t240 > move down
+t241 > move left
 t242 > move up
-t242 Moved actor=1 kind=player from=21,37 to=21,36
+t242 Moved actor=1 kind=player from=21,38 to=21,37
 t243 > move up
-t243 Moved actor=1 kind=player from=21,36 to=21,35
+t243 Moved actor=1 kind=player from=21,37 to=21,36
 t244 > move up
+t244 Moved actor=1 kind=player from=21,36 to=21,35
 t245 > move up
-t246 > move down
-t246 Moved actor=1 kind=player from=21,35 to=21,36
+t246 > move up
 t247 > move down
-t247 Moved actor=1 kind=player from=21,36 to=21,37
+t247 Moved actor=1 kind=player from=21,35 to=21,36
 t248 > move down
-t248 Moved actor=1 kind=player from=21,37 to=21,38
+t248 Moved actor=1 kind=player from=21,36 to=21,37
 t249 > move down
+t249 Moved actor=1 kind=player from=21,37 to=21,38
 t250 > move down
-t251 > move right
-t251 Moved actor=1 kind=player from=21,38 to=22,38
+t251 > move down
 t252 > move right
-t252 Moved actor=1 kind=player from=22,38 to=23,38
+t252 Moved actor=1 kind=player from=21,38 to=22,38
 t253 > move right
-t253 Moved actor=1 kind=player from=23,38 to=24,38
+t253 Moved actor=1 kind=player from=22,38 to=23,38
 t254 > move right
-t254 Moved actor=1 kind=player from=24,38 to=25,38
+t254 Moved actor=1 kind=player from=23,38 to=24,38
 t255 > move right
-t255 Moved actor=1 kind=player from=25,38 to=26,38
+t255 Moved actor=1 kind=player from=24,38 to=25,38
 t256 > move right
-t256 Moved actor=1 kind=player from=26,38 to=27,38
+t256 Moved actor=1 kind=player from=25,38 to=26,38
 t257 > move right
-t257 Moved actor=1 kind=player from=27,38 to=28,38
+t257 Moved actor=1 kind=player from=26,38 to=27,38
 t258 > move right
-t259 > move down
-t260 > move right
-t261 > move left
-t261 Moved actor=1 kind=player from=28,38 to=27,38
+t258 Moved actor=1 kind=player from=27,38 to=28,38
+t259 > move right
+t260 > move down
+t261 > move right
 t262 > move left
-t262 Moved actor=1 kind=player from=27,38 to=26,38
+t262 Moved actor=1 kind=player from=28,38 to=27,38
 t263 > move left
-t263 Moved actor=1 kind=player from=26,38 to=25,38
+t263 Moved actor=1 kind=player from=27,38 to=26,38
 t264 > move left
-t264 Moved actor=1 kind=player from=25,38 to=24,38
+t264 Moved actor=1 kind=player from=26,38 to=25,38
 t265 > move left
-t265 Moved actor=1 kind=player from=24,38 to=23,38
+t265 Moved actor=1 kind=player from=25,38 to=24,38
 t266 > move left
-t266 Moved actor=1 kind=player from=23,38 to=22,38
+t266 Moved actor=1 kind=player from=24,38 to=23,38
 t267 > move left
-t267 Moved actor=1 kind=player from=22,38 to=21,38
+t267 Moved actor=1 kind=player from=23,38 to=22,38
 t268 > move left
-t269 > move right
-t269 Moved actor=1 kind=player from=21,38 to=22,38
+t268 Moved actor=1 kind=player from=22,38 to=21,38
+t269 > move left
 t270 > move right
-t270 Moved actor=1 kind=player from=22,38 to=23,38
+t270 Moved actor=1 kind=player from=21,38 to=22,38
 t271 > move right
-t271 Moved actor=1 kind=player from=23,38 to=24,38
+t271 Moved actor=1 kind=player from=22,38 to=23,38
 t272 > move right
-t272 Moved actor=1 kind=player from=24,38 to=25,38
+t272 Moved actor=1 kind=player from=23,38 to=24,38
 t273 > move right
-t273 Moved actor=1 kind=player from=25,38 to=26,38
+t273 Moved actor=1 kind=player from=24,38 to=25,38
 t274 > move right
-t274 Moved actor=1 kind=player from=26,38 to=27,38
+t274 Moved actor=1 kind=player from=25,38 to=26,38
 t275 > move right
-t275 Moved actor=1 kind=player from=27,38 to=28,38
+t275 Moved actor=1 kind=player from=26,38 to=27,38
 t276 > move right
+t276 Moved actor=1 kind=player from=27,38 to=28,38
 t277 > move right
-t278 > move up
-t278 Moved actor=1 kind=player from=28,38 to=28,37
+t278 > move right
 t279 > move up
-t279 Moved actor=1 kind=player from=28,37 to=28,36
+t279 Moved actor=1 kind=player from=28,38 to=28,37
 t280 > move up
-t280 Moved actor=1 kind=player from=28,36 to=28,35
+t280 Moved actor=1 kind=player from=28,37 to=28,36
 t281 > move up
-t281 Moved actor=1 kind=player from=28,35 to=28,34
+t281 Moved actor=1 kind=player from=28,36 to=28,35
 t282 > move up
-t282 Moved actor=1 kind=player from=28,34 to=28,33
+t282 Moved actor=1 kind=player from=28,35 to=28,34
 t283 > move up
-t283 Moved actor=1 kind=player from=28,33 to=28,32
+t283 Moved actor=1 kind=player from=28,34 to=28,33
 t284 > move up
-t284 Moved actor=1 kind=player from=28,32 to=28,31
+t284 Moved actor=1 kind=player from=28,33 to=28,32
 t285 > move up
+t285 Moved actor=1 kind=player from=28,32 to=28,31
 t286 > move up
-t287 > move right
-t288 > move left
-t288 Moved actor=1 kind=player from=28,31 to=27,31
+t287 > move up
+t288 > move right
 t289 > move left
-t289 Moved actor=1 kind=player from=27,31 to=26,31
+t289 Moved actor=1 kind=player from=28,31 to=27,31
 t290 > move left
-t290 Moved actor=1 kind=player from=26,31 to=25,31
+t290 Moved actor=1 kind=player from=27,31 to=26,31
 t291 > move left
-t291 Moved actor=1 kind=player from=25,31 to=24,31
+t291 Moved actor=1 kind=player from=26,31 to=25,31
 t292 > move left
-t292 Moved actor=1 kind=player from=24,31 to=23,31
+t292 Moved actor=1 kind=player from=25,31 to=24,31
 t293 > move left
-t293 Moved actor=1 kind=player from=23,31 to=22,31
+t293 Moved actor=1 kind=player from=24,31 to=23,31
 t294 > move left
-t294 Moved actor=1 kind=player from=22,31 to=21,31
+t294 Moved actor=1 kind=player from=23,31 to=22,31
 t295 > move left
-t296 > move up
-t297 > move right
-t297 Moved actor=1 kind=player from=21,31 to=22,31
+t295 Moved actor=1 kind=player from=22,31 to=21,31
+t296 > move left
+t297 > move up
 t298 > move right
-t298 Moved actor=1 kind=player from=22,31 to=23,31
+t298 Moved actor=1 kind=player from=21,31 to=22,31
 t299 > move right
-t299 Moved actor=1 kind=player from=23,31 to=24,31
+t299 Moved actor=1 kind=player from=22,31 to=23,31
 t300 > move right
-t300 Moved actor=1 kind=player from=24,31 to=25,31
+t300 Moved actor=1 kind=player from=23,31 to=24,31
 t301 > move right
-t301 Moved actor=1 kind=player from=25,31 to=26,31
+t301 Moved actor=1 kind=player from=24,31 to=25,31
 t302 > move right
-t302 Moved actor=1 kind=player from=26,31 to=27,31
+t302 Moved actor=1 kind=player from=25,31 to=26,31
 t303 > move right
-t303 Moved actor=1 kind=player from=27,31 to=28,31
+t303 Moved actor=1 kind=player from=26,31 to=27,31
 t304 > move right
+t304 Moved actor=1 kind=player from=27,31 to=28,31
 t305 > move right
-t306 > move left
-t306 Moved actor=1 kind=player from=28,31 to=27,31
+t306 > move right
 t307 > move left
-t307 Moved actor=1 kind=player from=27,31 to=26,31
+t307 Moved actor=1 kind=player from=28,31 to=27,31
 t308 > move left
-t308 Moved actor=1 kind=player from=26,31 to=25,31
+t308 Moved actor=1 kind=player from=27,31 to=26,31
 t309 > move left
-t309 Moved actor=1 kind=player from=25,31 to=24,31
+t309 Moved actor=1 kind=player from=26,31 to=25,31
 t310 > move left
-t310 Moved actor=1 kind=player from=24,31 to=23,31
+t310 Moved actor=1 kind=player from=25,31 to=24,31
 t311 > move left
-t311 Moved actor=1 kind=player from=23,31 to=22,31
+t311 Moved actor=1 kind=player from=24,31 to=23,31
 t312 > move left
-t312 Moved actor=1 kind=player from=22,31 to=21,31
+t312 Moved actor=1 kind=player from=23,31 to=22,31
 t313 > move left
-t314 > move up
-t315 > move left
-t316 > move right
-t316 Moved actor=1 kind=player from=21,31 to=22,31
+t313 Moved actor=1 kind=player from=22,31 to=21,31
+t314 > move left
+t315 > move up
+t316 > move left
 t317 > move right
-t317 Moved actor=1 kind=player from=22,31 to=23,31
+t317 Moved actor=1 kind=player from=21,31 to=22,31
 t318 > move right
-t318 Moved actor=1 kind=player from=23,31 to=24,31
+t318 Moved actor=1 kind=player from=22,31 to=23,31
 t319 > move right
-t319 Moved actor=1 kind=player from=24,31 to=25,31
+t319 Moved actor=1 kind=player from=23,31 to=24,31
 t320 > move right
-t320 Moved actor=1 kind=player from=25,31 to=26,31
+t320 Moved actor=1 kind=player from=24,31 to=25,31
 t321 > move right
-t321 Moved actor=1 kind=player from=26,31 to=27,31
+t321 Moved actor=1 kind=player from=25,31 to=26,31
 t322 > move right
-t322 Moved actor=1 kind=player from=27,31 to=28,31
+t322 Moved actor=1 kind=player from=26,31 to=27,31
 t323 > move right
-t324 > move down
-t324 Moved actor=1 kind=player from=28,31 to=28,32
+t323 Moved actor=1 kind=player from=27,31 to=28,31
+t324 > move right
 t325 > move down
-t325 Moved actor=1 kind=player from=28,32 to=28,33
+t325 Moved actor=1 kind=player from=28,31 to=28,32
 t326 > move down
-t326 Moved actor=1 kind=player from=28,33 to=28,34
+t326 Moved actor=1 kind=player from=28,32 to=28,33
 t327 > move down
-t327 Moved actor=1 kind=player from=28,34 to=28,35
+t327 Moved actor=1 kind=player from=28,33 to=28,34
 t328 > move down
-t328 Moved actor=1 kind=player from=28,35 to=28,36
+t328 Moved actor=1 kind=player from=28,34 to=28,35
 t329 > move down
-t329 Moved actor=1 kind=player from=28,36 to=28,37
+t329 Moved actor=1 kind=player from=28,35 to=28,36
 t330 > move down
-t330 Moved actor=1 kind=player from=28,37 to=28,38
+t330 Moved actor=1 kind=player from=28,36 to=28,37
 t331 > move down
-t332 > move up
-t332 Moved actor=1 kind=player from=28,38 to=28,37
+t331 Moved actor=1 kind=player from=28,37 to=28,38
+t332 > move down
 t333 > move up
-t333 Moved actor=1 kind=player from=28,37 to=28,36
+t333 Moved actor=1 kind=player from=28,38 to=28,37
 t334 > move up
-t334 Moved actor=1 kind=player from=28,36 to=28,35
+t334 Moved actor=1 kind=player from=28,37 to=28,36
 t335 > move up
-t335 Moved actor=1 kind=player from=28,35 to=28,34
+t335 Moved actor=1 kind=player from=28,36 to=28,35
 t336 > move up
-t336 Moved actor=1 kind=player from=28,34 to=28,33
+t336 Moved actor=1 kind=player from=28,35 to=28,34
 t337 > move up
-t337 Moved actor=1 kind=player from=28,33 to=28,32
+t337 Moved actor=1 kind=player from=28,34 to=28,33
 t338 > move up
-t338 Moved actor=1 kind=player from=28,32 to=28,31
+t338 Moved actor=1 kind=player from=28,33 to=28,32
 t339 > move up
-t340 > move down
-t340 Moved actor=1 kind=player from=28,31 to=28,32
+t339 Moved actor=1 kind=player from=28,32 to=28,31
+t340 > move up
 t341 > move down
-t341 Moved actor=1 kind=player from=28,32 to=28,33
+t341 Moved actor=1 kind=player from=28,31 to=28,32
 t342 > move down
-t342 Moved actor=1 kind=player from=28,33 to=28,34
+t342 Moved actor=1 kind=player from=28,32 to=28,33
 t343 > move down
-t343 Moved actor=1 kind=player from=28,34 to=28,35
+t343 Moved actor=1 kind=player from=28,33 to=28,34
 t344 > move down
-t344 Moved actor=1 kind=player from=28,35 to=28,36
+t344 Moved actor=1 kind=player from=28,34 to=28,35
 t345 > move down
-t345 Moved actor=1 kind=player from=28,36 to=28,37
+t345 Moved actor=1 kind=player from=28,35 to=28,36
 t346 > move down
-t346 Moved actor=1 kind=player from=28,37 to=28,38
+t346 Moved actor=1 kind=player from=28,36 to=28,37
 t347 > move down
-t348 > move up
-t348 Moved actor=1 kind=player from=28,38 to=28,37
+t347 Moved actor=1 kind=player from=28,37 to=28,38
+t348 > move down
 t349 > move up
-t349 Moved actor=1 kind=player from=28,37 to=28,36
+t349 Moved actor=1 kind=player from=28,38 to=28,37
 t350 > move up
-t350 Moved actor=1 kind=player from=28,36 to=28,35
+t350 Moved actor=1 kind=player from=28,37 to=28,36
 t351 > move up
-t351 Moved actor=1 kind=player from=28,35 to=28,34
+t351 Moved actor=1 kind=player from=28,36 to=28,35
 t352 > move up
-t352 Moved actor=1 kind=player from=28,34 to=28,33
+t352 Moved actor=1 kind=player from=28,35 to=28,34
 t353 > move up
-t353 Moved actor=1 kind=player from=28,33 to=28,32
+t353 Moved actor=1 kind=player from=28,34 to=28,33
 t354 > move up
-t354 Moved actor=1 kind=player from=28,32 to=28,31
+t354 Moved actor=1 kind=player from=28,33 to=28,32
 t355 > move up
-t356 > move right
-t357 > move up
-t358 > move left
-t358 Moved actor=1 kind=player from=28,31 to=27,31
+t355 Moved actor=1 kind=player from=28,32 to=28,31
+t356 > move up
+t357 > move right
+t358 > move up
 t359 > move left
-t359 Moved actor=1 kind=player from=27,31 to=26,31
+t359 Moved actor=1 kind=player from=28,31 to=27,31
 t360 > move left
-t360 Moved actor=1 kind=player from=26,31 to=25,31
+t360 Moved actor=1 kind=player from=27,31 to=26,31
 t361 > move left
-t361 Moved actor=1 kind=player from=25,31 to=24,31
+t361 Moved actor=1 kind=player from=26,31 to=25,31
 t362 > move left
-t362 Moved actor=1 kind=player from=24,31 to=23,31
+t362 Moved actor=1 kind=player from=25,31 to=24,31
 t363 > move left
-t363 Moved actor=1 kind=player from=23,31 to=22,31
+t363 Moved actor=1 kind=player from=24,31 to=23,31
 t364 > move left
-t364 Moved actor=1 kind=player from=22,31 to=21,31
+t364 Moved actor=1 kind=player from=23,31 to=22,31
 t365 > move left
-t366 > move up
+t365 Moved actor=1 kind=player from=22,31 to=21,31
+t366 > move left
 t367 > move up
-t368 > move right
-t368 Moved actor=1 kind=player from=21,31 to=22,31
+t368 > move up
 t369 > move right
-t369 Moved actor=1 kind=player from=22,31 to=23,31
+t369 Moved actor=1 kind=player from=21,31 to=22,31
 t370 > move right
-t370 Moved actor=1 kind=player from=23,31 to=24,31
+t370 Moved actor=1 kind=player from=22,31 to=23,31
 t371 > move right
-t371 Moved actor=1 kind=player from=24,31 to=25,31
+t371 Moved actor=1 kind=player from=23,31 to=24,31
 t372 > move right
-t372 Moved actor=1 kind=player from=25,31 to=26,31
+t372 Moved actor=1 kind=player from=24,31 to=25,31
 t373 > move right
-t373 Moved actor=1 kind=player from=26,31 to=27,31
+t373 Moved actor=1 kind=player from=25,31 to=26,31
 t374 > move right
-t374 Moved actor=1 kind=player from=27,31 to=28,31
+t374 Moved actor=1 kind=player from=26,31 to=27,31
 t375 > move right
+t375 Moved actor=1 kind=player from=27,31 to=28,31
 t376 > move right
-t377 > move up
-t378 > move down
-t378 Moved actor=1 kind=player from=28,31 to=28,32
+t377 > move right
+t378 > move up
 t379 > move down
-t379 Moved actor=1 kind=player from=28,32 to=28,33
+t379 Moved actor=1 kind=player from=28,31 to=28,32
 t380 > move down
-t380 Moved actor=1 kind=player from=28,33 to=28,34
+t380 Moved actor=1 kind=player from=28,32 to=28,33
 t381 > move down
-t381 Moved actor=1 kind=player from=28,34 to=28,35
+t381 Moved actor=1 kind=player from=28,33 to=28,34
 t382 > move down
-t382 Moved actor=1 kind=player from=28,35 to=28,36
+t382 Moved actor=1 kind=player from=28,34 to=28,35
 t383 > move down
-t383 Moved actor=1 kind=player from=28,36 to=28,37
+t383 Moved actor=1 kind=player from=28,35 to=28,36
 t384 > move down
-t384 Moved actor=1 kind=player from=28,37 to=28,38
+t384 Moved actor=1 kind=player from=28,36 to=28,37
 t385 > move down
+t385 Moved actor=1 kind=player from=28,37 to=28,38
 t386 > move down
-t387 > move right
-t388 > move left
-t388 Moved actor=1 kind=player from=28,38 to=27,38
+t387 > move down
+t388 > move right
 t389 > move left
-t389 Moved actor=1 kind=player from=27,38 to=26,38
+t389 Moved actor=1 kind=player from=28,38 to=27,38
 t390 > move left
-t390 Moved actor=1 kind=player from=26,38 to=25,38
+t390 Moved actor=1 kind=player from=27,38 to=26,38
 t391 > move left
-t391 Moved actor=1 kind=player from=25,38 to=24,38
+t391 Moved actor=1 kind=player from=26,38 to=25,38
 t392 > move left
-t392 Moved actor=1 kind=player from=24,38 to=23,38
+t392 Moved actor=1 kind=player from=25,38 to=24,38
 t393 > move left
-t393 Moved actor=1 kind=player from=23,38 to=22,38
+t393 Moved actor=1 kind=player from=24,38 to=23,38
 t394 > move left
-t394 Moved actor=1 kind=player from=22,38 to=21,38
+t394 Moved actor=1 kind=player from=23,38 to=22,38
 t395 > move left
-t396 > move down
-t397 > move right
-t397 Moved actor=1 kind=player from=21,38 to=22,38
+t395 Moved actor=1 kind=player from=22,38 to=21,38
+t396 > move left
+t397 > move down
 t398 > move right
-t398 Moved actor=1 kind=player from=22,38 to=23,38
+t398 Moved actor=1 kind=player from=21,38 to=22,38
 t399 > move right
-t399 Moved actor=1 kind=player from=23,38 to=24,38
+t399 Moved actor=1 kind=player from=22,38 to=23,38
 t400 > move right
-t400 Moved actor=1 kind=player from=24,38 to=25,38
-t401 phase=playing player=25,38 hp=85/100 level=1 xp=25/100 enemies=0 items=1 inventory=0
+t400 Moved actor=1 kind=player from=23,38 to=24,38
+t401 phase=playing player=24,38 hp=85/100 level=1 xp=25/100 enemies=0 items=0 inventory=0
