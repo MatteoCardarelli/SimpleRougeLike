@@ -6,14 +6,19 @@ import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.SystemClock;
 import android.view.MotionEvent;
@@ -30,16 +35,18 @@ import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventorySheet;
+import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsDialog;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jspecify.annotations.Nullable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * L'app vera sul dispositivo: avvio, rotazione, tasto indietro, doppio tap sull'inventario, barre e
- * impostazioni.
+ * L'app vera sul dispositivo: avvio, rotazione, tasto indietro, doppio tap sull'inventario, barre,
+ * impostazioni e partita nuova.
  */
 @RunWith(AndroidJUnit4.class)
 public class GameActivityTest {
@@ -230,12 +237,197 @@ public class GameActivityTest {
 
             onView(withId(R.id.settings_button)).perform(click());
             onView(withId(R.id.log_switch)).inRoot(isDialog()).perform(click());
-            onView(withText(R.string.settings_close)).inRoot(isDialog()).perform(click());
+            onView(withContentDescription(R.string.settings_close))
+                    .inRoot(isDialog())
+                    .perform(click());
 
             onView(withId(R.id.log)).check(matches(withEffectiveVisibility(Visibility.GONE)));
             scenario.recreate();
             onView(withId(R.id.log)).check(matches(withEffectiveVisibility(Visibility.GONE)));
             scenario.onActivity(activity -> assertFalse(viewModel(activity).state().logVisible()));
         }
+    }
+
+    /**
+     * Issue #39: sulla mappa le barre non hanno numeri, solo il livello; TalkBack legge comunque i
+     * valori.
+     */
+    @Test
+    public void map_showsTheLevelWithoutTheValues() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            AtomicReference<String> level = new AtomicReference<>();
+            scenario.onActivity(
+                    activity -> {
+                        PlayerView player =
+                                viewModel(activity).state().result().snapshot().player();
+                        level.set(activity.getString(R.string.hud_level, player.level()));
+                        View healthBar = activity.findViewById(R.id.health_bar);
+                        assertEquals(
+                                activity.getString(
+                                        R.string.a11y_health_value,
+                                        player.health(),
+                                        player.maxHealth()),
+                                String.valueOf(healthBar.getStateDescription()));
+                    });
+
+            onView(withId(R.id.health_value))
+                    .check(matches(withEffectiveVisibility(Visibility.GONE)));
+            onView(withId(R.id.xp_value)).check(matches(withText(level.get())));
+        }
+    }
+
+    /** Issue #39: le impostazioni occupano tutto lo schermo e si chiudono con la X. */
+    @Test
+    public void settings_fillTheScreen_andCloseWithTheX() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            onView(withId(R.id.settings_button)).perform(click());
+            onView(withId(R.id.toolbar)).inRoot(isDialog()).check(matches(isDisplayed()));
+            scenario.onActivity(
+                    activity -> {
+                        View screen = activity.getWindow().getDecorView();
+                        View settings = settingsDialog(activity).requireView();
+                        assertEquals(screen.getWidth(), settings.getWidth());
+                        assertEquals(screen.getHeight(), settings.getHeight());
+                    });
+
+            onView(withContentDescription(R.string.settings_close))
+                    .inRoot(isDialog())
+                    .perform(click());
+
+            scenario.onActivity(activity -> assertNull(settingsDialogOrNull(activity)));
+        }
+    }
+
+    /** Issue #39: anche indietro chiude le impostazioni. */
+    @Test
+    public void settings_closeWithBack() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            onView(withId(R.id.settings_button)).perform(click());
+            onView(withId(R.id.toolbar)).inRoot(isDialog()).perform(pressBack());
+
+            scenario.onActivity(activity -> assertNull(settingsDialogOrNull(activity)));
+            assertEquals(Lifecycle.State.RESUMED, scenario.getState());
+        }
+    }
+
+    /** Issue #39: le impostazioni aperte restano aperte dopo una rotazione. */
+    @Test
+    public void settings_stayOpenAfterARotation() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            onView(withId(R.id.settings_button)).perform(click());
+            onView(withId(R.id.toolbar)).inRoot(isDialog()).check(matches(isDisplayed()));
+
+            scenario.recreate();
+
+            onView(withId(R.id.toolbar)).inRoot(isDialog()).check(matches(isDisplayed()));
+        }
+    }
+
+    /**
+     * Issue #39: le impostazioni mostrano il seed della partita, e "Copia" lo mette negli appunti.
+     */
+    @Test
+    public void settings_showTheSeed_andCopyIt() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            AtomicLong seed = new AtomicLong();
+            scenario.onActivity(
+                    activity -> seed.set(viewModel(activity).state().result().snapshot().seed()));
+
+            onView(withId(R.id.settings_button)).perform(click());
+            onView(withId(R.id.seed_value))
+                    .inRoot(isDialog())
+                    .check(matches(withText(Long.toString(seed.get()))));
+            onView(withId(R.id.copy_seed)).inRoot(isDialog()).perform(click());
+
+            scenario.onActivity(
+                    activity -> {
+                        ClipboardManager clipboard =
+                                activity.getSystemService(ClipboardManager.class);
+                        ClipData clip = clipboard.getPrimaryClip();
+                        assertNotNull(clip);
+                        assertEquals(
+                                Long.toString(seed.get()),
+                                String.valueOf(clip.getItemAt(0).getText()));
+                    });
+        }
+    }
+
+    /** Issue #39: annullando la conferma, la partita in corso resta com'è. */
+    @Test
+    public void settings_newGame_cancelled_keepsTheGame() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            AtomicLong seed = new AtomicLong();
+            AtomicLong turn = new AtomicLong();
+            scenario.onActivity(
+                    activity -> {
+                        GameViewModel viewModel = viewModel(activity);
+                        viewModel.submit(new MoveCommand(Direction.UP));
+                        seed.set(viewModel.state().result().snapshot().seed());
+                        turn.set(viewModel.state().result().snapshot().turn());
+                    });
+
+            onView(withId(R.id.settings_button)).perform(click());
+            onView(withId(R.id.new_game)).inRoot(isDialog()).perform(click());
+            onView(withId(android.R.id.button2)).inRoot(isDialog()).perform(click());
+
+            onView(withId(R.id.toolbar)).inRoot(isDialog()).check(matches(isDisplayed()));
+            scenario.onActivity(
+                    activity -> {
+                        GameViewModel viewModel = viewModel(activity);
+                        assertEquals(seed.get(), viewModel.state().result().snapshot().seed());
+                        assertEquals(turn.get(), viewModel.state().result().snapshot().turn());
+                    });
+        }
+    }
+
+    /**
+     * Issue #39: la conferma sopravvive a una rotazione e, confermata, chiude le impostazioni e
+     * inizia un'altra partita.
+     */
+    @Test
+    public void settings_newGame_confirmedAfterARotation_startsAnotherGame() {
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            AtomicLong seed = new AtomicLong();
+            scenario.onActivity(
+                    activity -> {
+                        GameViewModel viewModel = viewModel(activity);
+                        viewModel.submit(new MoveCommand(Direction.UP));
+                        seed.set(viewModel.state().result().snapshot().seed());
+                    });
+
+            onView(withId(R.id.settings_button)).perform(click());
+            onView(withId(R.id.new_game)).inRoot(isDialog()).perform(click());
+            onView(withId(android.R.id.button1)).inRoot(isDialog()).check(matches(isDisplayed()));
+            scenario.recreate();
+            onView(withId(android.R.id.button1)).inRoot(isDialog()).perform(click());
+
+            scenario.onActivity(
+                    activity -> {
+                        assertNull(settingsDialogOrNull(activity));
+                        GameViewModel viewModel = viewModel(activity);
+                        assertNotEquals(seed.get(), viewModel.state().result().snapshot().seed());
+                        // Una partita nuova parte dal primo turno.
+                        assertEquals(1, viewModel.state().result().snapshot().turn());
+                    });
+        }
+    }
+
+    private static @Nullable SettingsDialog settingsDialogOrNull(GameActivity activity) {
+        activity.getSupportFragmentManager().executePendingTransactions();
+        return (SettingsDialog)
+                activity.getSupportFragmentManager().findFragmentByTag(SettingsDialog.TAG);
+    }
+
+    private static SettingsDialog settingsDialog(GameActivity activity) {
+        SettingsDialog settings = settingsDialogOrNull(activity);
+        assertNotNull(settings);
+        return settings;
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Nelle build di debug il pulsante "Nota" scrive le note di collaudo -->
+    <!-- Nelle build di debug le impostazioni hanno "Scrivi una nota di collaudo" -->
     <bool name="feedback_enabled">true</bool>
-    <!-- Nelle build di debug seed e turno sono a schermo -->
+    <!-- Nelle build di debug il turno è a schermo -->
     <bool name="show_debug_info">true</bool>
 </resources>

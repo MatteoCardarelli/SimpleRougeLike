@@ -108,7 +108,7 @@ public final class InventorySheet extends BottomSheetDialogFragment {
         if (binding == null || adapter == null) {
             return;
         }
-        PlayerBars.show(binding.bars, inventory.player());
+        PlayerBars.showWithValues(binding.bars, inventory.player());
         adapter.show(inventory.items(), inventory.selected().orElse(null));
         ContentPresentation content = host().content();
         Optional<InventoryEntry> selected = inventory.selectedEntry();

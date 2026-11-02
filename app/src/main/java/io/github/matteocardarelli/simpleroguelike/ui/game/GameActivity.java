@@ -21,6 +21,7 @@ import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.settings.Settings;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
+import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackHost;
@@ -133,14 +134,14 @@ public class GameActivity extends AppCompatActivity
         playback.show(state.result(), viewModel.claimPlayback(state.result().revision()));
         binding.gameView.show(snapshot, scene);
 
-        PlayerBars.show(binding.bars, snapshot.player());
+        PlayerBars.showOnMap(binding.bars, snapshot.player());
 
         showLog(state);
+        // Il seed sta nelle impostazioni, in tutte le build: qui resta solo il turno.
         boolean debugInfo = getResources().getBoolean(R.bool.show_debug_info);
         if (debugInfo) {
             binding.debugInfo.setVisibility(View.VISIBLE);
-            binding.debugInfo.setText(
-                    getString(R.string.debug_info, snapshot.seed(), snapshot.turn()));
+            binding.debugInfo.setText(getString(R.string.debug_turn, snapshot.turn()));
         }
         // Senza registro e senza informazioni di debug il pannello in basso non resta vuoto.
         binding.bottomPanel.setVisibility(
@@ -266,8 +267,23 @@ public class GameActivity extends AppCompatActivity
     }
 
     @Override
+    public long currentSeed() {
+        return viewModel.state().result().snapshot().seed();
+    }
+
+    @Override
+    public boolean gameInProgress() {
+        return viewModel.state().result().snapshot().phase() == Phase.PLAYING;
+    }
+
+    @Override
     public void onLogVisibilityChanged(boolean visible) {
         viewModel.setLogVisible(visible);
+    }
+
+    @Override
+    public void onNewGameRequested() {
+        viewModel.newGame();
     }
 
     @Override

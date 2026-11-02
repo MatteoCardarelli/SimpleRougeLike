@@ -36,14 +36,30 @@
 
     <string name="hud_health_value">%1$d/%2$d</string>
     <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
+    <string name="hud_level">liv. %1$d</string>
 
-    <string name="debug_info">seed %1$d · turno %2$d</string>
+    <string name="debug_turn">turno %1$d</string>
 
     <string name="settings_button">Impostazioni</string>
     <string name="settings_title">Impostazioni</string>
-    <string name="settings_show_log">Mostra il registro dei messaggi</string>
-    <string name="settings_write_note">Scrivi una nota di collaudo</string>
     <string name="settings_close">Chiudi</string>
+    <string name="settings_section_game">Partita</string>
+    <string name="settings_seed">Seed della partita</string>
+    <string name="settings_seed_value">%1$s</string>
+    <string name="settings_seed_copy">Copia</string>
+    <string name="settings_seed_copy_description">Copia il seed</string>
+    <string name="settings_seed_copied">Seed copiato</string>
+    <string name="settings_new_game_summary">Ricomincia da capo su un piano nuovo</string>
+    <string name="settings_section_screen">Schermata</string>
+    <string name="settings_show_log">Mostra il registro dei messaggi</string>
+    <string name="settings_show_log_summary">Le ultime azioni, in fondo alla mappa</string>
+    <string name="settings_section_testing">Collaudo</string>
+    <string name="settings_write_note">Scrivi una nota di collaudo</string>
+    <string name="settings_write_note_summary">Cosa non va, con la partita per rigiocarla</string>
+
+    <string name="confirm_new_game_title">Iniziare una nuova partita?</string>
+    <string name="confirm_new_game_message">La partita in corso andrà persa.</string>
+    <string name="confirm_new_game_cancel">Annulla</string>
 
     <string name="feedback_title">Nota di collaudo</string>
     <string name="feedback_hint">Cosa hai notato?</string>
