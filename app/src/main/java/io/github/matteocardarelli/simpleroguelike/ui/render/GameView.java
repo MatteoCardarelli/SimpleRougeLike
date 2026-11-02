@@ -14,13 +14,14 @@ import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Sprite;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Disegna la partita: le celle dallo snapshot, già filtrato dalla nebbia di guerra, gli oggetti a
  * terra visibili, e gli attori dalla scena, che durante un'animazione si discosta dallo snapshot.
- * La telecamera segue il player.
+ * La telecamera segue il player; durante un'animazione la vista si ridisegna a ogni fotogramma.
  */
 public final class GameView extends View {
 
@@ -77,13 +78,17 @@ public final class GameView extends View {
             return;
         }
         Grid<CellView> cells = snapshot.cells();
+        // La telecamera segue lo sprite del player, che durante un passo è tra due celle.
+        float centerX = snapshot.player().position().x();
+        float centerY = snapshot.player().position().y();
+        Optional<Sprite> player = scene.sprite(snapshot.player().id());
+        if (player.isPresent()) {
+            centerX = player.get().x();
+            centerY = player.get().y();
+        }
         Viewport viewport =
                 camera.centerOn(
-                        snapshot.player().position(),
-                        getWidth(),
-                        getHeight(),
-                        cells.width(),
-                        cells.height());
+                        centerX, centerY, getWidth(), getHeight(), cells.width(), cells.height());
         float cell = camera.cellSizePx();
 
         canvas.save();
@@ -91,7 +96,11 @@ public final class GameView extends View {
         drawCells(canvas, palette, cells, viewport, cell);
         drawItems(canvas, content, snapshot.visibleItems(), cell);
         drawSprites(canvas, content, scene.sprites(), cell);
+        drawEffects(canvas, content, scene.effects(), cell);
         canvas.restore();
+        if (scene.isAnimating()) {
+            postInvalidateOnAnimation();
+        }
     }
 
     private void drawCells(
@@ -134,5 +143,15 @@ public final class GameView extends View {
                     sprite.x() * cell + cell / 2, sprite.y() * cell + cell / 2, cell / 2.2f, paint);
         }
         paint.setAlpha(255);
+    }
+
+    /** Gli effetti, come un proiettile in volo: piccoli, sopra gli attori. */
+    private void drawEffects(
+            Canvas canvas, ContentPresentation content, List<Sprite> effects, float cell) {
+        for (Sprite effect : effects) {
+            paint.setColor(getContext().getColor(content.colorRes(effect.kind())));
+            canvas.drawCircle(
+                    effect.x() * cell + cell / 2, effect.y() * cell + cell / 2, cell / 6f, paint);
+        }
     }
 }

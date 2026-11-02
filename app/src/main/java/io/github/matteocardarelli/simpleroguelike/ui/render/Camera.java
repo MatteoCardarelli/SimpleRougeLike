@@ -25,8 +25,22 @@ public final class Camera {
      */
     public Viewport centerOn(
             Position target, int viewWidth, int viewHeight, int gridWidth, int gridHeight) {
-        float offsetX = target.x() * cellSizePx - viewWidth / 2f + cellSizePx / 2f;
-        float offsetY = target.y() * cellSizePx - viewHeight / 2f + cellSizePx / 2f;
+        return centerOn(target.x(), target.y(), viewWidth, viewHeight, gridWidth, gridHeight);
+    }
+
+    /**
+     * Come {@link #centerOn(Position, int, int, int, int)}, con il centro anche tra due celle:
+     * durante un passo la telecamera segue lo sprite del player mentre scivola.
+     */
+    public Viewport centerOn(
+            float targetX,
+            float targetY,
+            int viewWidth,
+            int viewHeight,
+            int gridWidth,
+            int gridHeight) {
+        float offsetX = targetX * cellSizePx - viewWidth / 2f + cellSizePx / 2f;
+        float offsetY = targetY * cellSizePx - viewHeight / 2f + cellSizePx / 2f;
         int firstX = Math.max(0, (int) Math.floor(offsetX / cellSizePx));
         int firstY = Math.max(0, (int) Math.floor(offsetY / cellSizePx));
         int lastX = Math.min(gridWidth - 1, (int) Math.floor((offsetX + viewWidth) / cellSizePx));
