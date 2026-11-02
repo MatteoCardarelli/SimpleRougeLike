@@ -2,8 +2,10 @@ package io.github.matteocardarelli.simpleroguelike.ui.log;
 
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
+import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
@@ -14,6 +16,7 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.LeveledUp;
+import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -91,6 +94,14 @@ public final class EventMessageFormatter {
                 InventoryFull.class,
                 (e, player) -> texts.text(R.string.log_inventory_full, name(e.kind())));
         register(ItemUsed.class, (e, player) -> texts.text(R.string.log_item_used, name(e.kind())));
+        register(DoorOpened.class, (e, player) -> texts.text(R.string.log_door_opened));
+        register(LeverPulled.class, (e, player) -> texts.text(R.string.log_lever_pulled));
+        register(
+                ChestOpened.class,
+                (e, player) ->
+                        e.contents()
+                                .map(kind -> texts.text(R.string.log_chest_opened, name(kind)))
+                                .orElseGet(() -> texts.text(R.string.log_chest_empty)));
         register(
                 ItemEquipped.class,
                 (e, player) -> texts.text(R.string.log_item_equipped, name(e.kind())));

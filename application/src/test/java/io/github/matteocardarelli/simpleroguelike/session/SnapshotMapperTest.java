@@ -12,6 +12,7 @@ import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.CellView;
+import io.github.matteocardarelli.simpleroguelike.snapshot.FixtureView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ItemView;
@@ -87,6 +88,17 @@ class SnapshotMapperTest {
                                 0));
         assertThat(snapshot.inventory())
                 .containsExactly(new InventoryEntry(new EntityId(2), Kind.of("potion")));
+    }
+
+    @Test
+    void from_fixtures_onlyInExploredCells_withTheirState() {
+        Floor floor = FloorFixtures.parse("@+.$");
+        floor.updateVisibility(visible(floor, 0, 1));
+
+        GameSnapshot snapshot = MAPPER.from(floor, Phase.PLAYING, 1, 1);
+
+        assertThat(snapshot.fixtures())
+                .containsExactly(new FixtureView(new Position(1, 0), Kind.of("door"), false));
     }
 
     @Test

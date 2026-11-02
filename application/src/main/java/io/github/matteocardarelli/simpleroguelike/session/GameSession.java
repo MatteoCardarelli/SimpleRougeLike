@@ -141,7 +141,8 @@ public final class GameSession {
     private void updateVisibility(Run current) {
         Floor floor = current.floor();
         floor.updateVisibility(
-                fov.visibleFrom(floor.terrain(), floor.positionOf(floor.playerId()), visionRadius));
+                fov.visibleFrom(
+                        floor.sightGrid(), floor.positionOf(floor.playerId()), visionRadius));
     }
 
     private TurnResult remember(boolean accepted, List<GameEvent> events, Run current) {

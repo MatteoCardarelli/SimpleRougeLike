@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyDefinition;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EntityIdSequence;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Fixture;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorBuilder;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
@@ -17,14 +18,18 @@ import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Mette player, nemici e oggetti su un terreno, secondo le regole di comparsa: ogni nemico ad
- * almeno {@code minSpawnDistance} passi dal player, mai due attori o due oggetti nella stessa
- * cella, mai un oggetto sotto un attore. Il tipo di ogni nemico e di ogni oggetto si sceglie a
- * caso, in proporzione al suo peso.
+ * Mette oggetti fissi, player, nemici e oggetti su un terreno, secondo le regole di comparsa: prima
+ * porte, cancelli con le loro leve e scrigni ({@link FixtureLayout}), poi il player fuori dalle
+ * zone chiuse, ogni nemico ad almeno {@code minSpawnDistance} passi dal player, mai due attori o
+ * due oggetti nella stessa cella, mai un oggetto sotto un attore o un oggetto fisso. Il tipo di
+ * ogni nemico e di ogni oggetto, anche negli scrigni, si sceglie a caso, in proporzione al suo
+ * peso.
  *
- * <p>Gli id si assegnano solo a piano riuscito, in quest'ordine: player, nemici, oggetti.
+ * <p>Gli id si assegnano solo a piano riuscito, in quest'ordine: player, nemici, oggetti, contenuto
+ * degli scrigni.
  */
 public final class FloorPopulator {
 
@@ -54,7 +59,15 @@ public final class FloorPopulator {
         if (free.isEmpty()) {
             throw new FloorGenerationException("Il terreno non ha celle attraversabili");
         }
-        Position playerAt = free.remove(random.nextInt(free.size()));
+        FixtureLayout layout = FixtureLayout.plan(terrain, spec, random);
+        free.removeAll(layout.floorCells());
+        List<Position> playerCells = new ArrayList<>(free);
+        playerCells.removeAll(layout.closed());
+        if (playerCells.isEmpty()) {
+            throw new FloorGenerationException("Nessuna cella per il player");
+        }
+        Position playerAt = playerCells.get(random.nextInt(playerCells.size()));
+        free.remove(playerAt);
 
         List<Position> farEnough = new ArrayList<>();
         for (Position cell : free) {
@@ -76,6 +89,10 @@ public final class FloorPopulator {
             itemTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
         }
 
+        List<ItemDefinition> chestTypes = new ArrayList<>();
+        for (int i = 0; i < layout.chests().size(); i++) {
+            chestTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
+        }
         FloorBuilder builder =
                 new FloorBuilder()
                         .terrain(terrain)
@@ -85,6 +102,18 @@ public final class FloorPopulator {
         }
         for (int i = 0; i < itemCells.size(); i++) {
             builder.item(new Item(ids.next(), itemTypes.get(i)), itemCells.get(i));
+        }
+        for (int i = 0; i < layout.chests().size(); i++) {
+            builder.fixture(
+                    Fixture.chest(Optional.of(new Item(ids.next(), chestTypes.get(i)))),
+                    layout.chests().get(i));
+        }
+        for (FixtureLayout.Gate gate : layout.gates()) {
+            builder.fixture(Fixture.gate(), gate.at());
+            builder.fixture(Fixture.lever(List.of(gate.at())), gate.lever());
+        }
+        for (Position door : layout.doors()) {
+            builder.fixture(Fixture.door(), door);
         }
         return builder.build();
     }

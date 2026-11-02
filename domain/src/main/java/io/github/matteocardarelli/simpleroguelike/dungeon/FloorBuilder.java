@@ -11,7 +11,9 @@ import org.jspecify.annotations.Nullable;
 /**
  * L'unico modo di creare un {@link Floor}. {@link #build()} controlla le invarianti del piano:
  * attori e oggetti dentro il terreno e su celle attraversabili, mai due attori o due oggetti nella
- * stessa cella, id tutti diversi.
+ * stessa cella, id tutti diversi. Gli oggetti fissi stanno sul pavimento, tranne la leva che sta in
+ * un muro accanto al pavimento; nessun attore su un oggetto fisso che blocca e nessun oggetto a
+ * terra su un oggetto fisso.
  */
 public final class FloorBuilder {
 
@@ -21,6 +23,7 @@ public final class FloorBuilder {
     private final TreeMap<EntityId, Position> positions = new TreeMap<>();
     private final LinkedHashMap<Position, Item> groundItems = new LinkedHashMap<>();
     private final TreeSet<EntityId> itemIds = new TreeSet<>();
+    private final LinkedHashMap<Position, Fixture> fixtures = new LinkedHashMap<>();
 
     public FloorBuilder terrain(Grid<TileType> terrain) {
         this.terrain = terrain;
@@ -52,6 +55,19 @@ public final class FloorBuilder {
         return this;
     }
 
+    public FloorBuilder fixture(Fixture fixture, Position at) {
+        if (fixtures.containsKey(at)) {
+            throw new IllegalArgumentException("C'è già un oggetto fisso in " + at);
+        }
+        fixtures.put(at, fixture);
+        if (fixture.contents().isPresent()) {
+            Item inside = fixture.contents().get();
+            requireNewId(inside.id());
+            itemIds.add(inside.id());
+        }
+        return this;
+    }
+
     /**
      * Crea il piano. Il builder si può riusare: il piano copia quello che ha ricevuto.
      *
@@ -66,7 +82,24 @@ public final class FloorBuilder {
         }
         positions.forEach((id, at) -> requireWalkable(terrain, at, id.toString()));
         groundItems.forEach((at, item) -> requireWalkable(terrain, at, item.id().toString()));
-        return new Floor(terrain, player, enemies, positions, groundItems);
+        fixtures.forEach(
+                (at, fixture) -> {
+                    if (fixture.type().onFloor()) {
+                        requireWalkable(terrain, at, fixture.kind().value());
+                    } else if (!terrain.isInside(at) || terrain.get(at).isWalkable()) {
+                        throw new IllegalStateException(
+                                fixture.kind().value() + " in " + at + " deve stare in un muro");
+                    }
+                    if (groundItems.containsKey(at)) {
+                        throw new IllegalStateException(
+                                "Un oggetto a terra sotto " + fixture.kind().value() + " in " + at);
+                    }
+                    if (fixture.blocksMovement() && positions.containsValue(at)) {
+                        throw new IllegalStateException(
+                                "Un attore dentro " + fixture.kind().value() + " in " + at);
+                    }
+                });
+        return new Floor(terrain, player, enemies, positions, groundItems, fixtures);
     }
 
     private void placeActor(EntityId id, Position at) {

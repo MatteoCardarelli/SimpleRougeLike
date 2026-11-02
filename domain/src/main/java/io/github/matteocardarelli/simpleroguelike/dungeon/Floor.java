@@ -1,7 +1,9 @@
 package io.github.matteocardarelli.simpleroguelike.dungeon;
 
+import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
@@ -9,6 +11,7 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
+import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
@@ -24,11 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Il piano in cui si gioca: terreno, attori, oggetti a terra, celle visibili ed esplorate. È la
- * radice dell'aggregate: ogni modifica a ciò che contiene passa dai suoi metodi pubblici, che
- * garantiscono le invarianti.
+ * Il piano in cui si gioca: terreno, oggetti fissi, attori, oggetti a terra, celle visibili ed
+ * esplorate. È la radice dell'aggregate: ogni modifica a ciò che contiene passa dai suoi metodi
+ * pubblici, che garantiscono le invarianti.
  *
  * <ul>
  *   <li>Mai due attori vivi nella stessa cella, mai un attore su una cella che non si può
@@ -47,6 +51,9 @@ public final class Floor implements FloorView {
     private final TreeMap<EntityId, Enemy> enemies;
     private final TreeMap<EntityId, Position> positions;
     private final LinkedHashMap<Position, Item> groundItems;
+    private final LinkedHashMap<Position, Fixture> fixtures;
+    private @Nullable Grid<TileType> movementGrid;
+    private @Nullable Grid<TileType> sightGrid;
     private CellSet visible;
     private CellSet explored;
 
@@ -56,12 +63,14 @@ public final class Floor implements FloorView {
             Player player,
             Map<EntityId, Enemy> enemies,
             Map<EntityId, Position> positions,
-            Map<Position, Item> groundItems) {
+            Map<Position, Item> groundItems,
+            Map<Position, Fixture> fixtures) {
         this.terrain = terrain;
         this.player = player;
         this.enemies = new TreeMap<>(enemies);
         this.positions = new TreeMap<>(positions);
         this.groundItems = new LinkedHashMap<>(groundItems);
+        this.fixtures = new LinkedHashMap<>(fixtures);
         this.visible = CellSet.empty(terrain.width(), terrain.height());
         this.explored = visible;
     }
@@ -139,7 +148,54 @@ public final class Floor implements FloorView {
 
     @Override
     public boolean isWalkable(Position position) {
-        return terrain.isInside(position) && terrain.get(position).isWalkable();
+        if (!terrain.isInside(position) || !terrain.get(position).isWalkable()) {
+            return false;
+        }
+        Fixture fixture = fixtures.get(position);
+        return fixture == null || !fixture.blocksMovement();
+    }
+
+    @Override
+    public Optional<Fixture> fixtureAt(Position position) {
+        return Optional.ofNullable(fixtures.get(position));
+    }
+
+    @Override
+    public Map<Position, Fixture> fixtures() {
+        return Collections.unmodifiableMap(fixtures);
+    }
+
+    @Override
+    public Grid<TileType> movementGrid() {
+        Grid<TileType> grid = movementGrid;
+        if (grid == null) {
+            grid =
+                    Grid.of(
+                            terrain.width(),
+                            terrain.height(),
+                            p -> isWalkable(p) ? TileType.FLOOR : TileType.WALL);
+            movementGrid = grid;
+        }
+        return grid;
+    }
+
+    @Override
+    public Grid<TileType> sightGrid() {
+        Grid<TileType> grid = sightGrid;
+        if (grid == null) {
+            grid =
+                    Grid.of(
+                            terrain.width(),
+                            terrain.height(),
+                            p -> {
+                                Fixture fixture = fixtures.get(p);
+                                return fixture != null && fixture.blocksSight()
+                                        ? TileType.WALL
+                                        : terrain.get(p);
+                            });
+            sightGrid = grid;
+        }
+        return grid;
     }
 
     @Override
@@ -335,6 +391,57 @@ public final class Floor implements FloorView {
         return player.inventory()
                 .find(itemId)
                 .orElseThrow(() -> new IllegalArgumentException(itemId + " non è nell'inventario"));
+    }
+
+    /**
+     * Il player usa l'oggetto fisso nella cella accanto: apre una porta o uno scrigno, tira una
+     * leva. Un cancello si apre solo con la sua leva, e un oggetto già aperto non fa niente.
+     *
+     * @return gli eventi di quello che è successo; vuoto se non è successo niente
+     * @throws IllegalArgumentException se {@code user} non è il player o la cella non è accanto
+     * @throws IllegalStateException se il player è morto
+     */
+    public List<GameEvent> interact(EntityId user, Position at) {
+        requirePlayer(user);
+        requireAlive(user);
+        if (!positionOf(user).isAdjacentTo(at)) {
+            throw new IllegalArgumentException(at + " non è accanto al player");
+        }
+        Fixture fixture = fixtures.get(at);
+        if (fixture == null || fixture.isOpen()) {
+            return List.of();
+        }
+        return switch (fixture.type()) {
+            case DOOR -> {
+                fixture.open();
+                changed();
+                yield List.of(new DoorOpened(at));
+            }
+            case LEVER -> {
+                fixture.open();
+                for (Position gate : fixture.linked()) {
+                    Fixture linked = fixtures.get(gate);
+                    if (linked != null) {
+                        linked.open();
+                    }
+                }
+                changed();
+                yield List.of(new LeverPulled(at, fixture.linked()));
+            }
+            case CHEST -> {
+                Optional<Item> item = fixture.open();
+                item.ifPresent(found -> groundItems.put(at, found));
+                changed();
+                yield List.of(new ChestOpened(at, item.map(Item::kind)));
+            }
+            case GATE -> List.of();
+        };
+    }
+
+    /** Gli oggetti fissi sono cambiati: le griglie combinate vanno ricalcolate. */
+    private void changed() {
+        movementGrid = null;
+        sightGrid = null;
     }
 
     /**

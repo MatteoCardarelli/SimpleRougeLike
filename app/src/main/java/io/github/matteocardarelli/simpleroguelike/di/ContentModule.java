@@ -12,6 +12,7 @@ import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.content.StandardPlayer;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyCatalog;
+import io.github.matteocardarelli.simpleroguelike.dungeon.FixtureType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.PlayerDefinition;
@@ -180,6 +181,31 @@ public final class ContentModule {
                         R.string.kind_archer_name,
                         R.string.kind_archer_description,
                         R.color.kind_archer));
+        // Gli oggetti fissi del piano.
+        styles.put(
+                FixtureType.DOOR.kind(),
+                new ContentPresentation.Style(
+                        R.string.kind_door_name,
+                        R.string.kind_door_description,
+                        R.color.kind_door));
+        styles.put(
+                FixtureType.GATE.kind(),
+                new ContentPresentation.Style(
+                        R.string.kind_gate_name,
+                        R.string.kind_gate_description,
+                        R.color.kind_gate));
+        styles.put(
+                FixtureType.LEVER.kind(),
+                new ContentPresentation.Style(
+                        R.string.kind_lever_name,
+                        R.string.kind_lever_description,
+                        R.color.kind_lever));
+        styles.put(
+                FixtureType.CHEST.kind(),
+                new ContentPresentation.Style(
+                        R.string.kind_chest_name,
+                        R.string.kind_chest_description,
+                        R.color.kind_chest));
         // Non è un contenuto dei cataloghi, ma si disegna in volo.
         styles.put(
                 RangedRules.ARROW,

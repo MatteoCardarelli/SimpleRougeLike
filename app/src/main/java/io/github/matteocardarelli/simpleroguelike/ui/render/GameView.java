@@ -8,8 +8,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.snapshot.CellView;
+import io.github.matteocardarelli.simpleroguelike.snapshot.FixtureView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ItemView;
+import io.github.matteocardarelli.simpleroguelike.snapshot.Visibility;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Sprite;
@@ -94,6 +96,7 @@ public final class GameView extends View {
         canvas.save();
         canvas.translate(-viewport.offsetX(), -viewport.offsetY());
         drawCells(canvas, palette, cells, viewport, cell);
+        drawFixtures(canvas, content, cells, snapshot.fixtures(), cell);
         drawItems(canvas, content, snapshot.visibleItems(), cell);
         drawSprites(canvas, content, scene.sprites(), cell);
         drawEffects(canvas, content, scene.effects(), cell);
@@ -121,6 +124,78 @@ public final class GameView extends View {
                 }
             }
         }
+    }
+
+    /**
+     * Gli oggetti fissi visti almeno una volta, più tenui fuori dal campo visivo. Una porta chiusa
+     * riempie la cella, aperta resta solo il telaio; un cancello sono sbarre; una leva è una tacca
+     * nel muro, abbassata se tirata; uno scrigno aperto è solo il contorno.
+     */
+    private void drawFixtures(
+            Canvas canvas,
+            ContentPresentation content,
+            Grid<CellView> cells,
+            List<FixtureView> fixtures,
+            float cell) {
+        for (FixtureView fixture : fixtures) {
+            boolean visible = cells.get(fixture.position()).visibility() == Visibility.VISIBLE;
+            paint.setColor(getContext().getColor(content.colorRes(fixture.kind())));
+            paint.setAlpha(visible ? 255 : 120);
+            float x = fixture.position().x() * cell;
+            float y = fixture.position().y() * cell;
+            float inset = cell * 0.15f;
+            switch (fixture.kind().value()) {
+                case "door" -> {
+                    if (fixture.open()) {
+                        frame(canvas, x + inset, y + inset, x + cell - inset, y + cell - inset);
+                    } else {
+                        canvas.drawRect(x + inset, y, x + cell - inset, y + cell, paint);
+                    }
+                }
+                case "gate" -> {
+                    if (!fixture.open()) {
+                        float bar = cell / 10f;
+                        for (int i = 1; i <= 3; i++) {
+                            float bx = x + cell * i / 4f;
+                            canvas.drawRect(bx - bar / 2, y, bx + bar / 2, y + cell, paint);
+                        }
+                    }
+                }
+                case "lever" -> {
+                    float top = fixture.open() ? y + cell * 0.55f : y + cell * 0.2f;
+                    canvas.drawRect(
+                            x + cell * 0.4f, top, x + cell * 0.6f, top + cell * 0.25f, paint);
+                }
+                case "chest" -> {
+                    if (fixture.open()) {
+                        frame(
+                                canvas,
+                                x + inset,
+                                y + cell * 0.3f,
+                                x + cell - inset,
+                                y + cell - inset);
+                    } else {
+                        canvas.drawRect(
+                                x + inset,
+                                y + cell * 0.3f,
+                                x + cell - inset,
+                                y + cell - inset,
+                                paint);
+                    }
+                }
+                default ->
+                        canvas.drawRect(
+                                x + inset, y + inset, x + cell - inset, y + cell - inset, paint);
+            }
+        }
+        paint.setAlpha(255);
+    }
+
+    private void frame(Canvas canvas, float left, float top, float right, float bottom) {
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(Math.max(2f, (right - left) / 10f));
+        canvas.drawRect(left, top, right, bottom, paint);
+        paint.setStyle(Paint.Style.FILL);
     }
 
     private void drawItems(

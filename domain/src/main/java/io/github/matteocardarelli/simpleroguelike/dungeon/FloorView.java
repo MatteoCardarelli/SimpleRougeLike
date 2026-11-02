@@ -48,8 +48,28 @@ public interface FloorView {
     /** Gli oggetti a terra, nell'ordine in cui sono stati messi sul piano. */
     Map<Position, Item> itemsOnGround();
 
-    /** Vero se la cella è dentro il piano e il suo terreno si può attraversare. */
+    /**
+     * Vero se la cella è dentro il piano, il suo terreno si può attraversare e nessun oggetto fisso
+     * chiuso la blocca.
+     */
     boolean isWalkable(Position position);
+
+    Optional<Fixture> fixtureAt(Position position);
+
+    /** Gli oggetti fissi, nell'ordine in cui sono stati messi sul piano. */
+    Map<Position, Fixture> fixtures();
+
+    /**
+     * Il terreno come lo vede chi cammina: le celle bloccate da un oggetto fisso chiuso sono muri.
+     * È la griglia per cercare un percorso.
+     */
+    Grid<TileType> movementGrid();
+
+    /**
+     * Il terreno come lo vede lo sguardo: le porte chiuse sono muri. È la griglia per il campo
+     * visivo.
+     */
+    Grid<TileType> sightGrid();
 
     /** Vero se la cella si può attraversare e non c'è un attore vivo. */
     boolean isFree(Position position);

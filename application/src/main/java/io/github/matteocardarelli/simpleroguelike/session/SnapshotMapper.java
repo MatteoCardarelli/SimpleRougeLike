@@ -2,6 +2,7 @@ package io.github.matteocardarelli.simpleroguelike.session;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Equipment;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Fixture;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorView;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
@@ -11,6 +12,7 @@ import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.CellView;
+import io.github.matteocardarelli.simpleroguelike.snapshot.FixtureView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ItemView;
@@ -88,7 +90,16 @@ public final class SnapshotMapper {
                         player.stats().accuracy(),
                         player.stats().evasion());
 
-        return new GameSnapshot(seed, turn, phase, cells, playerView, enemies, items, inventory);
+        List<FixtureView> fixtures = new ArrayList<>();
+        for (Map.Entry<Position, Fixture> entry : floor.fixtures().entrySet()) {
+            if (explored.contains(entry.getKey())) {
+                Fixture fixture = entry.getValue();
+                fixtures.add(new FixtureView(entry.getKey(), fixture.kind(), fixture.isOpen()));
+            }
+        }
+
+        return new GameSnapshot(
+                seed, turn, phase, cells, playerView, enemies, items, inventory, fixtures);
     }
 
     private static Visibility visibility(Position cell, CellSet visible, CellSet explored) {

@@ -8,6 +8,7 @@ import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Piani per i test disegnati in ASCII, una stringa per riga:
@@ -18,6 +19,8 @@ import java.util.List;
  * !  pozione a terra    /  spada a terra
  * [  armatura di cuoio   =  anello del vigore
  * a  arciere            -  coltello da lancio
+ * +  porta chiusa        $  scrigno con una pozione
+ * G  cancello chiuso     L  leva nel muro, che apre tutti i cancelli del disegno
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -48,6 +51,8 @@ public final class FloorFixtures {
         int height = rows.length;
         List<TileType> tiles = new ArrayList<>(width * height);
         FloorBuilder builder = new FloorBuilder();
+        List<Position> gates = new ArrayList<>();
+        List<Position> levers = new ArrayList<>();
         for (int y = 0; y < height; y++) {
             if (rows[y].length() != width) {
                 throw new IllegalArgumentException("Le righe devono avere la stessa lunghezza");
@@ -55,9 +60,18 @@ public final class FloorFixtures {
             for (int x = 0; x < width; x++) {
                 char cell = rows[y].charAt(x);
                 Position at = new Position(x, y);
-                tiles.add(cell == '#' ? TileType.WALL : TileType.FLOOR);
+                tiles.add(cell == '#' || cell == 'L' ? TileType.WALL : TileType.FLOOR);
                 switch (cell) {
                     case '#', '.' -> {}
+                    case '+' -> builder.fixture(Fixture.door(), at);
+                    case 'G' -> {
+                        builder.fixture(Fixture.gate(), at);
+                        gates.add(at);
+                    }
+                    case 'L' -> levers.add(at);
+                    case '$' ->
+                            builder.fixture(
+                                    Fixture.chest(Optional.of(new Item(ids.next(), potion()))), at);
                     case '@' ->
                             builder.player(
                                     new Player(
@@ -88,6 +102,9 @@ public final class FloorFixtures {
                                     "Carattere sconosciuto '" + cell + "' in " + at);
                 }
             }
+        }
+        for (Position lever : levers) {
+            builder.fixture(Fixture.lever(gates), lever);
         }
         return builder.terrain(new Grid<>(width, height, tiles)).build();
     }

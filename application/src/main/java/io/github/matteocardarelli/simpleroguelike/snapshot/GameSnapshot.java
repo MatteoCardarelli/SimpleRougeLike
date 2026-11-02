@@ -12,6 +12,8 @@ import java.util.List;
  * @param visibleEnemies i nemici vivi nelle celle visibili, in ordine di id
  * @param visibleItems gli oggetti a terra nelle celle visibili
  * @param inventory gli oggetti del player, in ordine di raccolta
+ * @param fixtures gli oggetti fissi nelle celle esplorate, come il player li ha visti l'ultima
+ *     volta: chi li ha già visti li ricorda anche fuori dal campo visivo
  */
 public record GameSnapshot(
         long seed,
@@ -21,11 +23,13 @@ public record GameSnapshot(
         PlayerView player,
         List<ActorView> visibleEnemies,
         List<ItemView> visibleItems,
-        List<InventoryEntry> inventory) {
+        List<InventoryEntry> inventory,
+        List<FixtureView> fixtures) {
 
     public GameSnapshot {
         visibleEnemies = List.copyOf(visibleEnemies);
         visibleItems = List.copyOf(visibleItems);
         inventory = List.copyOf(inventory);
+        fixtures = List.copyOf(fixtures);
     }
 }
