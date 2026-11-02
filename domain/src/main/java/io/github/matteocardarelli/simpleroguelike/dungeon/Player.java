@@ -1,19 +1,28 @@
 package io.github.matteocardarelli.simpleroguelike.dungeon;
 
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
+import io.github.matteocardarelli.simpleroguelike.model.EquipmentSlot;
 import io.github.matteocardarelli.simpleroguelike.model.Faction;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Stats;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Il personaggio del giocatore. Parte dal livello 1 con l'inventario vuoto. Vale sempre {@code
  * experience() < experienceToNextLevel()}.
+ *
+ * <p>Gli oggetti equipaggiati restano nell'inventario, uno per spazio, e le loro statistiche si
+ * sommano a quelle di base in {@link #stats()}.
  */
 public final class Player extends Actor {
 
     public static final Kind KIND = Kind.of("player");
 
     private final Inventory inventory;
+    private final Map<EquipmentSlot, Item> equipped = new EnumMap<>(EquipmentSlot.class);
     private int level = 1;
     private int experience;
     private int experienceToNextLevel;
@@ -63,6 +72,62 @@ public final class Player extends Actor {
 
     public Inventory inventory() {
         return inventory;
+    }
+
+    /** Le statistiche di base più i bonus di tutto quello che il player ha equipaggiato. */
+    @Override
+    public Stats stats() {
+        Stats total = baseStats();
+        for (Item item : equipped.values()) {
+            total = total.plus(equipmentOf(item).bonus());
+        }
+        return total;
+    }
+
+    /** Gli oggetti equipaggiati, per spazio, nell'ordine degli spazi. */
+    public Map<EquipmentSlot, Item> equipped() {
+        return Collections.unmodifiableMap(equipped);
+    }
+
+    public boolean isEquipped(EntityId itemId) {
+        for (Item item : equipped.values()) {
+            if (item.id().equals(itemId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Equipaggia un oggetto dell'inventario nel suo spazio.
+     *
+     * @return l'oggetto che occupava lo spazio, se c'era
+     */
+    Optional<Item> equip(Item item) {
+        Equipment equipment = equipmentOf(item);
+        Optional<Item> replaced = Optional.ofNullable(equipped.put(equipment.slot(), item));
+        clampHealth();
+        return replaced;
+    }
+
+    /** Toglie l'oggetto dal suo spazio; la salute resta entro il nuovo massimo. */
+    Optional<Item> unequip(Item item) {
+        EquipmentSlot slot = equipmentOf(item).slot();
+        Item current = equipped.get(slot);
+        if (current == null || !current.id().equals(item.id())) {
+            return Optional.empty();
+        }
+        equipped.remove(slot);
+        clampHealth();
+        return Optional.of(item);
+    }
+
+    private static Equipment equipmentOf(Item item) {
+        return item.equipment()
+                .orElseThrow(
+                        () ->
+                                new IllegalArgumentException(
+                                        item.kind().value() + " non si equipaggia"));
     }
 
     /**

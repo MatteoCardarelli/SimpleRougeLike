@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.session;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Equipment;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorView;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
@@ -64,7 +65,12 @@ public final class SnapshotMapper {
         Player player = floor.player();
         List<InventoryEntry> inventory = new ArrayList<>();
         for (Item item : player.inventory().items()) {
-            inventory.add(new InventoryEntry(item.id(), item.kind()));
+            inventory.add(
+                    new InventoryEntry(
+                            item.id(),
+                            item.kind(),
+                            item.equipment().map(Equipment::slot),
+                            player.isEquipped(item.id())));
         }
         PlayerView playerView =
                 new PlayerView(

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyDefinition;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemDefinition;
 import io.github.matteocardarelli.simpleroguelike.effect.HealEffect;
+import io.github.matteocardarelli.simpleroguelike.model.EquipmentSlot;
 import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import org.junit.jupiter.api.Test;
 
@@ -13,11 +14,26 @@ class StandardCatalogsTest {
     @Test
     void items_containThePotionAndTheGreaterPotion() {
         assertThat(new StandardItemCatalog().all())
-                .containsExactly(
+                .startsWith(
                         new ItemDefinition(
                                 StandardItemCatalog.POTION, new HealEffect(25), true, 10),
                         new ItemDefinition(
                                 StandardItemCatalog.GREATER_POTION, new HealEffect(60), true, 3));
+    }
+
+    @Test
+    void items_haveAWeaponAnArmorAndARing_rarerThanThePotion() {
+        var equipment =
+                new StandardItemCatalog()
+                        .all().stream()
+                                .filter(definition -> definition.equipment().isPresent())
+                                .toList();
+
+        assertThat(equipment)
+                .extracting(definition -> definition.equipment().orElseThrow().slot())
+                .contains(EquipmentSlot.WEAPON, EquipmentSlot.ARMOR, EquipmentSlot.RING);
+        assertThat(equipment).allMatch(definition -> definition.spawnWeight() < 10);
+        assertThat(equipment).noneMatch(ItemDefinition::consumable);
     }
 
     @Test

@@ -7,6 +7,18 @@
     <string name="kind_potion_description">Un liquido luminoso che rimargina le ferite: cura 25 punti di salute.</string>
     <string name="kind_greater_potion_name">Pozione grande</string>
     <string name="kind_greater_potion_description">Densa e amara, ma ne basta poca: cura 60 punti di salute.</string>
+    <string name="kind_sword_name">Spada</string>
+    <string name="kind_sword_description">Una lama dritta e ben bilanciata: +4 attacco. Arma.</string>
+    <string name="kind_axe_name">Ascia</string>
+    <string name="kind_axe_description">Pesante, ma ogni colpo lascia il segno: +7 attacco. Arma.</string>
+    <string name="kind_leather_armor_name">Armatura di cuoio</string>
+    <string name="kind_leather_armor_description">Leggera e silenziosa: +2 difesa. Armatura.</string>
+    <string name="kind_chain_mail_name">Cotta di maglia</string>
+    <string name="kind_chain_mail_description">Anelli di ferro intrecciati: +4 difesa. Armatura.</string>
+    <string name="kind_ring_of_accuracy_name">Anello della mira</string>
+    <string name="kind_ring_of_accuracy_description">Guida la mano verso il bersaglio: +10 precisione. Anello.</string>
+    <string name="kind_ring_of_vigor_name">Anello del vigore</string>
+    <string name="kind_ring_of_vigor_description">Scalda il sangue: +20 salute massima. Anello.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -14,6 +26,10 @@
     <string name="inventory_empty">Il tuo inventario è vuoto.</string>
     <string name="inventory_select">Tocca un oggetto per vederne la scheda.</string>
     <string name="inventory_use">Usa</string>
+    <string name="inventory_equip">Equipaggia</string>
+    <string name="inventory_unequip">Togli</string>
+    <string name="inventory_equipped_badge">E</string>
+    <string name="inventory_equipped">%1$s, equipaggiato</string>
 
     <string name="end_game_over">Sei morto.</string>
     <string name="end_victory">Hai sconfitto tutti i nemici!</string>
@@ -30,6 +46,8 @@
     <string name="log_item_picked_up">Raccogli: %1$s.</string>
     <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
     <string name="log_item_used">Usi: %1$s.</string>
+    <string name="log_item_equipped">Equipaggi: %1$s.</string>
+    <string name="log_item_unequipped">Togli: %1$s.</string>
 
     <string name="a11y_health">Salute</string>
     <string name="a11y_health_value">%1$d su %2$d</string>

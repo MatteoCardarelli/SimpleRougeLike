@@ -9,6 +9,9 @@ import java.util.List;
  */
 public interface ItemEffect {
 
+    /** Nessun effetto: per gli oggetti che si equipaggiano invece di usarsi. */
+    ItemEffect NONE = context -> List.of();
+
     /** Applica l'effetto e restituisce gli eventi prodotti, vuoti se non è cambiato niente. */
     List<GameEvent> apply(EffectContext context);
 }

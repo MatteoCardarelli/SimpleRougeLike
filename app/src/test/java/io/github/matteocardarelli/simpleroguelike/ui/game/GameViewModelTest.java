@@ -151,6 +151,29 @@ class GameViewModelTest {
         assertThat(viewModel.state().result().snapshot().inventory()).isEmpty();
     }
 
+    /**
+     * Scegliere un'arma la equipaggia senza far passare il turno; sceglierla di nuovo la toglie.
+     */
+    @Test
+    void chooseItem_onAWeapon_equipsAndUnequipsIt_withoutPlayingATurn() {
+        GameViewModel viewModel = drawn("############", "#@/.......g#", "############");
+        viewModel.submit(new MoveCommand(Direction.RIGHT));
+        EntityId sword = viewModel.state().result().snapshot().inventory().get(0).id();
+        int turn = viewModel.state().result().snapshot().turn();
+        int attack = viewModel.state().result().snapshot().player().attack();
+
+        viewModel.chooseItem(sword);
+
+        assertThat(viewModel.state().result().snapshot().inventory().get(0).equipped()).isTrue();
+        assertThat(viewModel.state().result().snapshot().player().attack()).isEqualTo(attack + 4);
+        assertThat(viewModel.state().result().snapshot().turn()).isEqualTo(turn);
+
+        viewModel.chooseItem(sword);
+
+        assertThat(viewModel.state().result().snapshot().inventory().get(0).equipped()).isFalse();
+        assertThat(viewModel.state().result().snapshot().player().attack()).isEqualTo(attack);
+    }
+
     /** Un tocco seleziona e mostra la scheda; "Usa" consuma l'oggetto, che esce dalla selezione. */
     @Test
     void selectItem_thenChooseIt_usesThePotion_andClearsTheSelection() {

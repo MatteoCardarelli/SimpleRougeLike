@@ -122,6 +122,40 @@ public final class ContentModule {
                         R.string.kind_greater_potion_description,
                         R.color.kind_greater_potion));
         styles.put(
+                StandardItemCatalog.SWORD,
+                new ContentPresentation.Style(
+                        R.string.kind_sword_name,
+                        R.string.kind_sword_description,
+                        R.color.kind_sword));
+        styles.put(
+                StandardItemCatalog.AXE,
+                new ContentPresentation.Style(
+                        R.string.kind_axe_name, R.string.kind_axe_description, R.color.kind_axe));
+        styles.put(
+                StandardItemCatalog.LEATHER_ARMOR,
+                new ContentPresentation.Style(
+                        R.string.kind_leather_armor_name,
+                        R.string.kind_leather_armor_description,
+                        R.color.kind_leather_armor));
+        styles.put(
+                StandardItemCatalog.CHAIN_MAIL,
+                new ContentPresentation.Style(
+                        R.string.kind_chain_mail_name,
+                        R.string.kind_chain_mail_description,
+                        R.color.kind_chain_mail));
+        styles.put(
+                StandardItemCatalog.RING_OF_ACCURACY,
+                new ContentPresentation.Style(
+                        R.string.kind_ring_of_accuracy_name,
+                        R.string.kind_ring_of_accuracy_description,
+                        R.color.kind_ring_of_accuracy));
+        styles.put(
+                StandardItemCatalog.RING_OF_VIGOR,
+                new ContentPresentation.Style(
+                        R.string.kind_ring_of_vigor_name,
+                        R.string.kind_ring_of_vigor_description,
+                        R.color.kind_ring_of_vigor));
+        styles.put(
                 StandardEnemyCatalog.GOBLIN,
                 new ContentPresentation.Style(
                         R.string.kind_goblin_name,

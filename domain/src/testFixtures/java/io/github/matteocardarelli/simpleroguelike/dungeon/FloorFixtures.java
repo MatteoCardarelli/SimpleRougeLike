@@ -3,6 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.dungeon;
 import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
+import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import java.util.ArrayList;
@@ -14,7 +15,8 @@ import java.util.List;
  * <pre>
  * #  muro            .  pavimento
  * &#64;  player          g  goblin
- * !  pozione a terra
+ * !  pozione a terra    /  spada a terra
+ * [  armatura di cuoio   =  anello del vigore
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -65,6 +67,16 @@ public final class FloorFixtures {
                                     at);
                     case 'g' -> builder.enemy(new Enemy(ids.next(), goblin()), at);
                     case '!' -> builder.item(new Item(ids.next(), potion()), at);
+                    case '/' ->
+                            builder.item(new Item(ids.next(), item(StandardItemCatalog.SWORD)), at);
+                    case '[' ->
+                            builder.item(
+                                    new Item(ids.next(), item(StandardItemCatalog.LEATHER_ARMOR)),
+                                    at);
+                    case '=' ->
+                            builder.item(
+                                    new Item(ids.next(), item(StandardItemCatalog.RING_OF_VIGOR)),
+                                    at);
                     default ->
                             throw new IllegalArgumentException(
                                     "Carattere sconosciuto '" + cell + "' in " + at);
@@ -95,5 +107,15 @@ public final class FloorFixtures {
 
     public static ItemDefinition potion() {
         return new StandardItemCatalog().all().get(0);
+    }
+
+    /** La definizione di un oggetto del catalogo del gioco. */
+    public static ItemDefinition item(Kind kind) {
+        for (ItemDefinition definition : new StandardItemCatalog().all()) {
+            if (definition.kind().equals(kind)) {
+                return definition;
+            }
+        }
+        throw new IllegalArgumentException("Nessun oggetto " + kind.value());
     }
 }

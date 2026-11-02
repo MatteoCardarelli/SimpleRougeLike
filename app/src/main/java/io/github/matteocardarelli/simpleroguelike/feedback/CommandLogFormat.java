@@ -1,7 +1,9 @@
 package io.github.matteocardarelli.simpleroguelike.feedback;
 
 import io.github.matteocardarelli.simpleroguelike.command.Command;
+import io.github.matteocardarelli.simpleroguelike.command.EquipCommand;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
+import io.github.matteocardarelli.simpleroguelike.command.UnequipCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -33,6 +35,16 @@ public final class CommandLogFormat {
                 "use",
                 command -> "item=" + command.itemId().value(),
                 arguments -> new UseItemCommand(new EntityId(itemId(arguments))));
+        register(
+                EquipCommand.class,
+                "equip",
+                command -> "item=" + command.itemId().value(),
+                arguments -> new EquipCommand(new EntityId(itemId(arguments))));
+        register(
+                UnequipCommand.class,
+                "unequip",
+                command -> "item=" + command.itemId().value(),
+                arguments -> new UnequipCommand(new EntityId(itemId(arguments))));
     }
 
     /**
