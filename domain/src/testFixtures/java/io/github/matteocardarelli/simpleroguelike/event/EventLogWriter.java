@@ -146,6 +146,7 @@ public final class EventLogWriter {
                                 + " at="
                                 + at(e.at()));
         register(DoorOpened.class, e -> "DoorOpened at=" + at(e.at()));
+        register(FloorChanged.class, e -> "FloorChanged depth=" + e.depth());
         register(
                 LeverPulled.class,
                 e -> "LeverPulled at=" + at(e.at()) + " opened=" + path(e.opened()));

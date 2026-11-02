@@ -3,7 +3,9 @@ package io.github.matteocardarelli.simpleroguelike.session;
 import io.github.matteocardarelli.simpleroguelike.command.Command;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
 import io.github.matteocardarelli.simpleroguelike.command.CommandOutcome;
+import io.github.matteocardarelli.simpleroguelike.dungeon.FixtureType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
+import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorSource;
 import io.github.matteocardarelli.simpleroguelike.generation.FloorSpec;
@@ -35,7 +37,7 @@ public final class GameSession {
     private final EnemyTurnRunner enemies;
     private final FieldOfView fov;
     private final List<TurnHook> hooks;
-    private final FloorSpec spec;
+    private final List<FloorSpec> floorSpecs;
     private final int visionRadius;
     private final VisibilityFilter visibility = new VisibilityFilter();
     private final SnapshotMapper mapper = new SnapshotMapper();
@@ -60,6 +62,27 @@ public final class GameSession {
             Collection<TurnHook> hooks,
             FloorSpec spec,
             int visionRadius) {
+        this(floors, commands, enemies, fov, hooks, List.of(spec), visionRadius);
+    }
+
+    /**
+     * Crea la sessione per una partita su più piani, uno per specifica: si scende con le scale e si
+     * vince solo sull'ultimo.
+     *
+     * @throws IllegalArgumentException se due hook hanno lo stesso ordine, il raggio non è positivo
+     *     o non c'è nessun piano
+     */
+    public GameSession(
+            FloorSource floors,
+            CommandDispatcher commands,
+            EnemyTurnRunner enemies,
+            FieldOfView fov,
+            Collection<TurnHook> hooks,
+            List<FloorSpec> floorSpecs,
+            int visionRadius) {
+        if (floorSpecs.isEmpty()) {
+            throw new IllegalArgumentException("Una partita ha almeno un piano");
+        }
         if (visionRadius <= 0) {
             throw new IllegalArgumentException("Raggio visivo non valido: " + visionRadius);
         }
@@ -76,17 +99,17 @@ public final class GameSession {
         this.enemies = enemies;
         this.fov = fov;
         this.hooks = List.copyOf(sorted);
-        this.spec = spec;
+        this.floorSpecs = List.copyOf(floorSpecs);
         this.visionRadius = visionRadius;
     }
 
     /** Inizia una partita nuova: dallo stesso seed esce sempre la stessa. */
     public TurnResult newGame(long seed) {
-        Run started = Run.start(seed, spec, floors);
+        Run started = Run.start(seed, floorSpecs.get(0), floors);
         this.run = started;
         this.seed = seed;
         updateVisibility(started);
-        this.state = new PlayingState().next(started.view());
+        this.state = new PlayingState().next(started.view(), floorSpecs.size() == 1);
         return remember(true, List.of(), started);
     }
 
@@ -106,6 +129,18 @@ public final class GameSession {
         CellSet visibleBefore = floor.visible();
         CommandOutcome outcome = commands.dispatch(command, current);
         List<GameEvent> events = new ArrayList<>(outcome.events());
+        if (outcome.turnConsumed() && onStairs(current)) {
+            // Le scale chiudono il turno: i nemici del piano di prima non agiscono più. Gli eventi
+            // del passo si filtrano sul piano di prima, la discesa la vede sempre.
+            List<GameEvent> seen =
+                    new ArrayList<>(visibility.filter(events, visibleBefore, visibleBefore));
+            current.descend(floors, floorSpecs.get(current.depth()));
+            seen.add(new FloorChanged(current.depth()));
+            current.endTurn();
+            updateVisibility(current);
+            state = state.next(current.view(), isLastFloor(current));
+            return remember(true, seen, current);
+        }
         if (outcome.turnConsumed()) {
             if (floor.player().isAlive()) {
                 events.addAll(enemies.run(current));
@@ -120,7 +155,7 @@ public final class GameSession {
             current.endTurn();
         }
         updateVisibility(current);
-        state = state.next(current.view());
+        state = state.next(current.view(), isLastFloor(current));
         return remember(true, visibility.filter(events, visibleBefore, floor.visible()), current);
     }
 
@@ -138,6 +173,21 @@ public final class GameSession {
         return result;
     }
 
+    /** Vero se il player vivo sta sulle scale e c'è un piano sotto. */
+    private boolean onStairs(Run current) {
+        Floor floor = current.floor();
+        if (!floor.player().isAlive() || current.depth() >= floorSpecs.size()) {
+            return false;
+        }
+        return floor.fixtureAt(floor.positionOf(floor.playerId()))
+                .map(fixture -> fixture.type() == FixtureType.STAIRS)
+                .orElse(false);
+    }
+
+    private boolean isLastFloor(Run current) {
+        return current.depth() >= floorSpecs.size();
+    }
+
     private void updateVisibility(Run current) {
         Floor floor = current.floor();
         floor.updateVisibility(
@@ -151,7 +201,13 @@ public final class GameSession {
                         ++revision,
                         accepted,
                         events,
-                        mapper.from(current.view(), state.phase(), seed, current.turn()));
+                        mapper.from(
+                                current.view(),
+                                state.phase(),
+                                seed,
+                                current.turn(),
+                                current.depth(),
+                                floorSpecs.size()));
         last = result;
         return result;
     }

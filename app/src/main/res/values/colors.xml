@@ -21,6 +21,7 @@
     <color name="kind_door">#FF8D6E63</color>
     <color name="kind_gate">#FF9E9E9E</color>
     <color name="kind_lever">#FFFFCA28</color>
+    <color name="kind_stairs">#FFE0E0E0</color>
     <color name="kind_chest">#FFD4A017</color>
     <color name="kind_throwing_knife">#FFCFD8DC</color>
     <color name="kind_archer">#FFFFA000</color>

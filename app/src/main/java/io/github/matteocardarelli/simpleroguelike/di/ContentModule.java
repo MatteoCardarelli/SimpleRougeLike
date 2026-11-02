@@ -183,6 +183,12 @@ public final class ContentModule {
                         R.color.kind_archer));
         // Gli oggetti fissi del piano.
         styles.put(
+                FixtureType.STAIRS.kind(),
+                new ContentPresentation.Style(
+                        R.string.kind_stairs_name,
+                        R.string.kind_stairs_description,
+                        R.color.kind_stairs));
+        styles.put(
                 FixtureType.DOOR.kind(),
                 new ContentPresentation.Style(
                         R.string.kind_door_name,

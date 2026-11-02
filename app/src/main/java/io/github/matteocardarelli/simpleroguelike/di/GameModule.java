@@ -157,6 +157,6 @@ public abstract class GameModule {
             Set<TurnHook> hooks,
             GameConfig config) {
         return new GameSession(
-                floors, commands, enemies, fov, hooks, config.floorSpec(), config.visionRadius());
+                floors, commands, enemies, fov, hooks, config.floorSpecs(), config.visionRadius());
     }
 }

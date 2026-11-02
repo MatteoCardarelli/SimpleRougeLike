@@ -9,6 +9,8 @@ import java.util.List;
  *
  * @param seed il seed della partita, per riprodurla
  * @param turn il turno in corso, da 1
+ * @param depth il piano in cui si gioca, da 1
+ * @param floors quanti piani ha la partita
  * @param visibleEnemies i nemici vivi nelle celle visibili, in ordine di id
  * @param visibleItems gli oggetti a terra nelle celle visibili
  * @param inventory gli oggetti del player, in ordine di raccolta
@@ -24,7 +26,9 @@ public record GameSnapshot(
         List<ActorView> visibleEnemies,
         List<ItemView> visibleItems,
         List<InventoryEntry> inventory,
-        List<FixtureView> fixtures) {
+        List<FixtureView> fixtures,
+        int depth,
+        int floors) {
 
     public GameSnapshot {
         visibleEnemies = List.copyOf(visibleEnemies);

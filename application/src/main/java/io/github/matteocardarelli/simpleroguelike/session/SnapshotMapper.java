@@ -30,6 +30,12 @@ import java.util.Map;
 public final class SnapshotMapper {
 
     public GameSnapshot from(FloorView floor, Phase phase, long seed, int turn) {
+        return from(floor, phase, seed, turn, 1, 1);
+    }
+
+    /** Come l'altro, per il piano {@code depth} di una partita di {@code floors} piani. */
+    public GameSnapshot from(
+            FloorView floor, Phase phase, long seed, int turn, int depth, int floors) {
         CellSet visible = floor.visible();
         CellSet explored = floor.explored();
         Grid<TileType> terrain = floor.terrain();
@@ -99,7 +105,17 @@ public final class SnapshotMapper {
         }
 
         return new GameSnapshot(
-                seed, turn, phase, cells, playerView, enemies, items, inventory, fixtures);
+                seed,
+                turn,
+                phase,
+                cells,
+                playerView,
+                enemies,
+                items,
+                inventory,
+                fixtures,
+                depth,
+                floors);
     }
 
     private static Visibility visibility(Position cell, CellSet visible, CellSet explored) {

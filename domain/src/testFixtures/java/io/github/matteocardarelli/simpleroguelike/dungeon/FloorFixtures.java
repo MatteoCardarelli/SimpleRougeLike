@@ -21,6 +21,7 @@ import java.util.Optional;
  * a  arciere            -  coltello da lancio
  * +  porta chiusa        $  scrigno con una pozione
  * G  cancello chiuso     L  leva nel muro, che apre tutti i cancelli del disegno
+ * >  scale
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -44,6 +45,15 @@ public final class FloorFixtures {
 
     /** Come {@link #parse(String...)}, prendendo gli id da una sequenza esistente. */
     public static Floor parse(EntityIdSequence ids, int inventoryCapacity, String... rows) {
+        return parse(ids, inventoryCapacity, Optional.empty(), rows);
+    }
+
+    /** Come gli altri, ma con un player che esiste già al posto di {@code @}. */
+    public static Floor parse(
+            EntityIdSequence ids,
+            int inventoryCapacity,
+            Optional<Player> existing,
+            String... rows) {
         if (rows.length == 0) {
             throw new IllegalArgumentException("Serve almeno una riga");
         }
@@ -64,6 +74,7 @@ public final class FloorFixtures {
                 switch (cell) {
                     case '#', '.' -> {}
                     case '+' -> builder.fixture(Fixture.door(), at);
+                    case '>' -> builder.fixture(Fixture.stairs(), at);
                     case 'G' -> {
                         builder.fixture(Fixture.gate(), at);
                         gates.add(at);
@@ -74,11 +85,13 @@ public final class FloorFixtures {
                                     Fixture.chest(Optional.of(new Item(ids.next(), potion()))), at);
                     case '@' ->
                             builder.player(
-                                    new Player(
-                                            ids.next(),
-                                            PLAYER_STATS,
-                                            PLAYER_FIRST_THRESHOLD,
-                                            inventoryCapacity),
+                                    existing.orElseGet(
+                                            () ->
+                                                    new Player(
+                                                            ids.next(),
+                                                            PLAYER_STATS,
+                                                            PLAYER_FIRST_THRESHOLD,
+                                                            inventoryCapacity)),
                                     at);
                     case 'g' -> builder.enemy(new Enemy(ids.next(), goblin()), at);
                     case 'a' -> builder.enemy(new Enemy(ids.next(), archer()), at);

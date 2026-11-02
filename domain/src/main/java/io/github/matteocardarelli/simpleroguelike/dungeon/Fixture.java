@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Un oggetto fisso del piano: una porta, un cancello, una leva o uno scrigno. Sta in una cella e
- * cambia solo aprendosi, una volta sola, con i metodi di {@link Floor}. La posizione non è qui: la
- * tiene il piano.
+ * Un oggetto fisso del piano: una porta, un cancello, una leva, uno scrigno o le scale. Sta in una
+ * cella e cambia solo aprendosi, una volta sola, con i metodi di {@link Floor}. La posizione non è
+ * qui: la tiene il piano.
  */
 public final class Fixture {
 
@@ -34,6 +34,11 @@ public final class Fixture {
     /** Una leva che apre i cancelli nelle celle {@code gates}. */
     public static Fixture lever(List<Position> gates) {
         return new Fixture(FixtureType.LEVER, gates, Optional.empty());
+    }
+
+    /** Le scale per il piano successivo. */
+    public static Fixture stairs() {
+        return new Fixture(FixtureType.STAIRS, List.of(), Optional.empty());
     }
 
     /** Uno scrigno con dentro {@code contents}, o vuoto. */

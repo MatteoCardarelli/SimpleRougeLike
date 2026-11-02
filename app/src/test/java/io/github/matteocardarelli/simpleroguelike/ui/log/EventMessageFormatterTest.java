@@ -13,6 +13,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
+import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
@@ -113,6 +114,8 @@ class EventMessageFormatterTest {
     void format_fixtures_sayWhatHappened() {
         assertThat(formatter.format(new DoorOpened(AT), PLAYER))
                 .contains(R.string.log_door_opened + "[]");
+        assertThat(formatter.format(new FloorChanged(3), PLAYER))
+                .contains(R.string.log_floor_changed + "[3]");
         assertThat(formatter.format(new LeverPulled(AT, List.of(AT)), PLAYER))
                 .contains(R.string.log_lever_pulled + "[]");
         assertThat(

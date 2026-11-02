@@ -22,7 +22,7 @@ class GameStateTest {
 
         assertThat(playing.accepts(MOVE)).isTrue();
         assertThat(playing.phase()).isEqualTo(Phase.PLAYING);
-        assertThat(playing.next(floor)).isSameAs(playing);
+        assertThat(playing.next(floor, true)).isSameAs(playing);
     }
 
     @Test
@@ -30,7 +30,7 @@ class GameStateTest {
         Floor floor = FloorFixtures.parse("@g");
         floor.damage(new EntityId(1), 1000);
 
-        assertThat(new PlayingState().next(floor)).isEqualTo(new GameOverState());
+        assertThat(new PlayingState().next(floor, true)).isEqualTo(new GameOverState());
     }
 
     @Test
@@ -38,7 +38,16 @@ class GameStateTest {
         Floor floor = FloorFixtures.parse("@g");
         floor.damage(new EntityId(2), 1000);
 
-        assertThat(new PlayingState().next(floor)).isEqualTo(new VictoryState());
+        assertThat(new PlayingState().next(floor, true)).isEqualTo(new VictoryState());
+    }
+
+    @Test
+    void playing_noEnemyLeft_beforeTheLastFloor_goesOn() {
+        Floor floor = FloorFixtures.parse("@g");
+        floor.damage(new EntityId(2), 1000);
+        PlayingState playing = new PlayingState();
+
+        assertThat(playing.next(floor, false)).isSameAs(playing);
     }
 
     @Test
@@ -47,7 +56,7 @@ class GameStateTest {
         floor.damage(new EntityId(2), 1000);
         floor.damage(new EntityId(1), 1000);
 
-        assertThat(new PlayingState().next(floor)).isEqualTo(new GameOverState());
+        assertThat(new PlayingState().next(floor, true)).isEqualTo(new GameOverState());
     }
 
     @Test
@@ -56,7 +65,7 @@ class GameStateTest {
 
         for (GameState terminal : new GameState[] {new GameOverState(), new VictoryState()}) {
             assertThat(terminal.accepts(MOVE)).isFalse();
-            assertThat(terminal.next(floor)).isSameAs(terminal);
+            assertThat(terminal.next(floor, true)).isSameAs(terminal);
         }
         assertThat(new GameOverState().phase()).isEqualTo(Phase.GAME_OVER);
         assertThat(new VictoryState().phase()).isEqualTo(Phase.VICTORY);

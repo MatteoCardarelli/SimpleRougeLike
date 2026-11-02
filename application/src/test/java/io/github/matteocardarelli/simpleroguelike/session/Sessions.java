@@ -57,6 +57,21 @@ final class Sessions {
                 visionRadius);
     }
 
+    /** Una sessione su più piani, uno per specifica: scende dai disegni di {@code floors}. */
+    static GameSession multiFloorSession(FloorSource floors, int floorCount) {
+        List<CommandHandler<?>> handlers = new ArrayList<>();
+        handlers.add(new MoveHandler(ACTIONS));
+        handlers.add(new UseItemHandler());
+        return new GameSession(
+                floors,
+                new CommandDispatcher(handlers),
+                enemyTurnRunner(),
+                new OpenFieldOfView(),
+                List.of(),
+                java.util.Collections.nCopies(floorCount, SPEC),
+                20);
+    }
+
     static EnemyTurnRunner enemyTurnRunner() {
         BehaviorBinding chaseOrWander =
                 new BehaviorBinding(

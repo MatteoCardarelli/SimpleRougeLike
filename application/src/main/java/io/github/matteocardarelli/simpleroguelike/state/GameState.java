@@ -12,8 +12,12 @@ public sealed interface GameState permits PlayingState, GameOverState, VictorySt
 
     boolean accepts(Command command);
 
-    /** La fase dopo un turno, guardando il piano com'è adesso. */
-    GameState next(FloorView floor);
+    /**
+     * La fase dopo un turno, guardando il piano com'è adesso.
+     *
+     * @param lastFloor vero sull'ultimo piano della partita, l'unico dove si può vincere
+     */
+    GameState next(FloorView floor, boolean lastFloor);
 
     Phase phase();
 }

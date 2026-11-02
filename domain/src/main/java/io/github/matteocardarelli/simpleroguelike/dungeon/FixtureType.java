@@ -14,7 +14,9 @@ public enum FixtureType {
     /** Sta nel muro: si tira urtandola, una volta sola, e apre i suoi cancelli. */
     LEVER("lever", false, false, false),
     /** Si apre urtandolo e lascia a terra quello che contiene; chiuso blocca il passaggio. */
-    CHEST("chest", true, false, true);
+    CHEST("chest", true, false, true),
+    /** Si scende al piano successivo passandoci sopra; non blocca niente. */
+    STAIRS("stairs", false, false, true);
 
     private final String kind;
     private final boolean blocksWhileClosed;

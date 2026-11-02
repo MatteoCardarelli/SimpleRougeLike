@@ -13,6 +13,7 @@ import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
+import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.generation.FixedFloorSource;
@@ -136,6 +137,45 @@ class GameSessionTest {
         assertThat(after.accepted()).isFalse();
         assertThat(after.events()).isEmpty();
         assertThat(after.revision()).isEqualTo(kill.revision() + 1);
+    }
+
+    @Test
+    void handle_onTheStairs_descends_keepsThePlayer_andTheEnemiesOfTheOldFloorDoNotAct() {
+        GameSession session =
+                Sessions.multiFloorSession(
+                        FixedFloorSource.floors(
+                                new String[] {"#####", "#@>g#", "#####"},
+                                new String[] {"######", "#...@#", "#g...#", "######"}),
+                        2);
+        session.newGame(1);
+
+        TurnResult descended = session.handle(new MoveCommand(Direction.RIGHT));
+
+        assertThat(descended.events()).last().isEqualTo(new FloorChanged(2));
+        assertThat(descended.events()).noneMatch(Attacked.class::isInstance);
+        assertThat(descended.snapshot().depth()).isEqualTo(2);
+        assertThat(descended.snapshot().floors()).isEqualTo(2);
+        assertThat(descended.snapshot().player().position()).isEqualTo(new Position(4, 1));
+        assertThat(descended.snapshot().player().id()).isEqualTo(PLAYER);
+        assertThat(descended.snapshot().phase()).isEqualTo(Phase.PLAYING);
+    }
+
+    @Test
+    void handle_noEnemyLeft_beforeTheLastFloor_isNotAVictory() {
+        GameSession session =
+                Sessions.multiFloorSession(
+                        FixedFloorSource.floors(new String[] {"####", "#@g#", "####"}), 2);
+        session.newGame(1);
+
+        TurnResult kill = session.handle(new MoveCommand(Direction.RIGHT));
+        for (int attempt = 0;
+                attempt < 30 && !kill.snapshot().visibleEnemies().isEmpty();
+                attempt++) {
+            kill = session.handle(new MoveCommand(Direction.RIGHT));
+        }
+
+        assertThat(kill.snapshot().visibleEnemies()).isEmpty();
+        assertThat(kill.snapshot().phase()).isEqualTo(Phase.PLAYING);
     }
 
     /** Bug #2: da morti si poteva continuare a giocare, e una pozione riportava in vita. */
