@@ -86,7 +86,8 @@ public final class FloorCodec {
                             enemy.health(),
                             jump,
                             enemy.isTired() ? 1 : 0,
-                            enemy.isAngry() ? 1 : 0));
+                            enemy.isAngry() ? 1 : 0,
+                            enemy.hasJustRetreated() ? 1 : 0));
         }
         for (Map.Entry<Position, Item> entry : floor.itemsOnGround().entrySet()) {
             Item item = entry.getValue();
@@ -207,6 +208,8 @@ public final class FloorCodec {
                             ? Optional.empty()
                             : Optional.of(new Position(integer(e[6]), integer(e[7])));
             enemy.restoreState(jump, integer(e[8]) == 1, integer(e[9]) == 1);
+            // Il campo è arrivato dopo il formato 1: un salvataggio di prima non ce l'ha.
+            enemy.retreated(e.length > 10 && integer(e[10]) == 1);
             builder.enemy(enemy, new Position(integer(e[3]), integer(e[4])));
         }
         while (in.peek("ground")) {

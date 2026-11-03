@@ -56,7 +56,16 @@ class KiteBehaviorTest {
     void decide_playerNextToIt_stepsAway() {
         Floor floor = FloorFixtures.parse("@a.");
 
-        assertThat(decide(floor, 2)).isEqualTo(new StepIntent(Direction.RIGHT));
+        assertThat(decide(floor, 2)).isEqualTo(new RetreatIntent(Direction.RIGHT));
+    }
+
+    /** Issue #54: subito dopo essersi allontanato, chi lo raggiunge lo trova a combattere. */
+    @Test
+    void decide_playerNextToIt_rightAfterARetreat_attacksUpClose() {
+        Floor floor = FloorFixtures.parse("@a.");
+        floor.recordRetreat(new EntityId(2), true);
+
+        assertThat(decide(floor, 2)).isEqualTo(new StepIntent(Direction.LEFT));
     }
 
     @Test

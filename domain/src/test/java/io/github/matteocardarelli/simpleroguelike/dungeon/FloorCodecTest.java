@@ -59,6 +59,7 @@ class FloorCodecTest {
         Enemy goblin = floor.enemies().get(0);
         floor.damage(goblin.id(), 3);
         goblin.restoreState(Optional.of(new Position(6, 2)), true, false);
+        floor.recordRetreat(goblin.id(), true);
         Enemy merchant = floor.enemies().get(1);
         merchant.restoreState(Optional.empty(), false, true);
         Set<Position> zone = new LinkedHashSet<>();
@@ -120,6 +121,8 @@ class FloorCodecTest {
         assertThat(read.shop().orElseThrow().bill()).isEqualTo(25);
         assertThat(read.enemies().get(1).isAngry()).isTrue();
         assertThat(read.enemies().get(0).pendingJump()).contains(new Position(6, 2));
+        assertThat(read.enemies().get(0).hasJustRetreated()).isTrue();
+        assertThat(read.enemies().get(1).hasJustRetreated()).isFalse();
     }
 
     @Test
@@ -131,6 +134,19 @@ class FloorCodecTest {
         assertThat(read.visible().positions()).isEqualTo(floor.visible().positions());
         assertThat(read.explored().positions()).isEqualTo(floor.explored().positions());
         assertThat(read.explored().positions()).hasSize(5);
+    }
+
+    /** Un salvataggio scritto prima della fuga con pausa non ha l'ultimo campo dei nemici. */
+    @Test
+    void read_ofAnEnemyLineWithoutTheRetreat_readsIt() {
+        List<String> lines = new ArrayList<>();
+        for (String line : CODEC.write(played())) {
+            lines.add(line.startsWith("enemy ") ? line.substring(0, line.lastIndexOf(' ')) : line);
+        }
+
+        Floor read = CODEC.read(lines);
+
+        assertThat(read.enemies().get(0).hasJustRetreated()).isFalse();
     }
 
     @Test

@@ -9,9 +9,9 @@ import java.util.Optional;
 
 /**
  * La strategia di chi colpisce da lontano. Se il player è in linea retta, entro la portata e senza
- * niente in mezzo, tira. Se il player è accanto, si allontana di un passo, e combatte da vicino
- * solo se non può. Altrimenti si avvicina con la strategia di inseguimento, finché non lo ha in
- * linea.
+ * niente in mezzo, tira. Se il player è accanto, si allontana di un passo; combatte da vicino se
+ * non può, o se si è appena allontanato: chi lo insegue subito riesce a colpirlo. Altrimenti si
+ * avvicina con la strategia di inseguimento, finché non lo ha in linea.
  */
 public final class KiteBehavior implements EnemyBehavior {
 
@@ -35,8 +35,10 @@ public final class KiteBehavior implements EnemyBehavior {
         if (distance == 1) {
             for (Direction direction : Direction.values()) {
                 Position away = at.translate(direction);
-                if (floor.isFree(away) && away.distanceTo(player) > distance) {
-                    return new StepIntent(direction);
+                if (!enemy.hasJustRetreated()
+                        && floor.isFree(away)
+                        && away.distanceTo(player) > distance) {
+                    return new RetreatIntent(direction);
                 }
             }
             return new StepIntent(at.directionTo(player).orElseThrow(IllegalStateException::new));

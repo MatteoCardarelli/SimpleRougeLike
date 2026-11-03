@@ -7,6 +7,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.JumpIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.LandIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.RangedAttackIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.RestIntent;
+import io.github.matteocardarelli.simpleroguelike.ai.RetreatIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.StepIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.WaitIntent;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
@@ -99,11 +100,18 @@ public final class EnemyTurnRunner {
                             && floor.player().isAlive();
                     action++) {
                 EnemyIntent intent = behavior.decide(enemy, run.view(), run.gameplay());
+                boolean retreating = false;
                 switch (intent) {
                     case StepIntent(Direction direction) ->
                             events.addAll(
                                     actions.step(floor, enemy.id(), direction, run.gameplay())
                                             .events());
+                    case RetreatIntent(Direction direction) -> {
+                        events.addAll(
+                                actions.step(floor, enemy.id(), direction, run.gameplay())
+                                        .events());
+                        retreating = true;
+                    }
                     case RangedAttackIntent(Direction direction) ->
                             events.addAll(
                                     ranged.shoot(
@@ -119,6 +127,9 @@ public final class EnemyTurnRunner {
                     case LandIntent() -> events.addAll(jumps.land(floor, enemy.id()));
                     case RestIntent() -> floor.rest(enemy.id());
                     case WaitIntent() -> {}
+                }
+                if (enemy.isAlive()) {
+                    floor.recordRetreat(enemy.id(), retreating);
                 }
             }
         }

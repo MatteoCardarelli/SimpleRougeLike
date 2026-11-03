@@ -738,6 +738,11 @@ public final class Floor implements FloorView {
         return List.copyOf(events);
     }
 
+    /** Ricorda se l'ultima azione del nemico è stata allontanarsi dal player. */
+    public void recordRetreat(EntityId enemy, boolean retreated) {
+        requireLivingEnemy(enemy).retreated(retreated);
+    }
+
     /** Il nemico ha riposato dopo un atterraggio. */
     public void rest(EntityId jumper) {
         requireLivingEnemy(jumper).rested();
