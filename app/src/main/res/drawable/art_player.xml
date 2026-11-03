@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "player", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF2E7D32" android:pathData="M6,22L12,8L18,22z" />
+    <path android:fillColor="#FFFFCC99" android:pathData="M8,7a4,4 0 1,0 8,0a4,4 0 1,0 -8,0z" />
+    <path android:fillColor="#FF1B5E20" android:pathData="M8,7L12,1.5L16,7z" />
+    <path android:fillColor="#FF111111" android:pathData="M9.8,7.5a0.7,0.7 0 1,0 1.4,0a0.7,0.7 0 1,0 -1.4,0z" />
+    <path android:fillColor="#FF111111" android:pathData="M12.8,7.5a0.7,0.7 0 1,0 1.4,0a0.7,0.7 0 1,0 -1.4,0z" />
+</vector>

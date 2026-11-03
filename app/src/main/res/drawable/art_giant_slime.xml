@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "giant_slime", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF66BB6A" android:pathData="M2,20L3,12L7,6L12,4L17,6L21,12L22,20z" />
+    <path android:fillColor="#FF43A047" android:pathData="M2,19h20v3h-20z" />
+    <path android:fillColor="#FFFFD54F" android:pathData="M6.2,4.8a1.8,1.8 0 1,0 3.6,0a1.8,1.8 0 1,0 -3.6,0z" />
+    <path android:fillColor="#FFFFD54F" android:pathData="M10.2,3.2a1.8,1.8 0 1,0 3.6,0a1.8,1.8 0 1,0 -3.6,0z" />
+    <path android:fillColor="#FFFFD54F" android:pathData="M14.2,4.8a1.8,1.8 0 1,0 3.6,0a1.8,1.8 0 1,0 -3.6,0z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M7,12a2,2 0 1,0 4,0a2,2 0 1,0 -4,0z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M13,12a2,2 0 1,0 4,0a2,2 0 1,0 -4,0z" />
+    <path android:fillColor="#FF111111" android:pathData="M8.5,12.5a1,1 0 1,0 2,0a1,1 0 1,0 -2,0z" />
+    <path android:fillColor="#FF111111" android:pathData="M14.5,12.5a1,1 0 1,0 2,0a1,1 0 1,0 -2,0z" />
+    <path android:fillColor="#FF1B5E20" android:pathData="M9,16h6v1.2h-6z" />
+</vector>

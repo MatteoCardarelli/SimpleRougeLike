@@ -1,6 +1,5 @@
 package io.github.matteocardarelli.simpleroguelike.ui.inventory;
 
-import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +17,8 @@ import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Le caselle della griglia: una per oggetto, con il colore del suo {@code Kind}, il nome e, se il
- * player lo porta, il segno dell'equipaggiamento.
+ * Le caselle della griglia: una per oggetto, con l'illustrazione del suo {@code Kind}, il nome e,
+ * se il player lo porta, il segno dell'equipaggiamento.
  */
 final class InventoryAdapter extends ListAdapter<InventoryEntry, InventoryAdapter.Holder> {
 
@@ -76,9 +75,7 @@ final class InventoryAdapter extends ListAdapter<InventoryEntry, InventoryAdapte
                                 .getString(R.string.inventory_count, kindName, entry.count())
                         : kindName;
         binding.name.setText(name);
-        binding.art.setBackgroundTintList(
-                ColorStateList.valueOf(
-                        binding.getRoot().getContext().getColor(content.colorRes(entry.kind()))));
+        binding.art.setImageResource(content.artRes(entry.kind()));
         binding.equipped.setVisibility(entry.equipped() ? View.VISIBLE : View.GONE);
         binding.getRoot()
                 .setContentDescription(

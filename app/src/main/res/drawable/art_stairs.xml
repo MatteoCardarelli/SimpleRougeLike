@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "stairs", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FFBDBDBD" android:pathData="M3,18h18v3h-18z" />
+    <path android:fillColor="#FF9E9E9E" android:pathData="M7,13h14v5h-14z" />
+    <path android:fillColor="#FF757575" android:pathData="M11,8h10v5h-10z" />
+    <path android:fillColor="#FF616161" android:pathData="M15,3h6v5h-6z" />
+</vector>

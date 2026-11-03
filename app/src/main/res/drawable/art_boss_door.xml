@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "boss_door", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FFB71C1C" android:pathData="M4,2h16v21h-16z" />
+    <path android:fillColor="#FF7F0000" android:pathData="M4,2h16v2h-16z" />
+    <path android:fillColor="#FFFFD54F" android:pathData="M9,9a3,3 0 1,0 6,0a3,3 0 1,0 -6,0z" />
+    <path android:fillColor="#FF111111" android:pathData="M10.1,8.5a0.7,0.7 0 1,0 1.4,0a0.7,0.7 0 1,0 -1.4,0z" />
+    <path android:fillColor="#FF111111" android:pathData="M12.5,8.5a0.7,0.7 0 1,0 1.4,0a0.7,0.7 0 1,0 -1.4,0z" />
+    <path android:fillColor="#FFFFC107" android:pathData="M10.4,16a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0z" />
+</vector>

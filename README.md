@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: `v1.11.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, ognuna con la sua release, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
+> **Stato: `v1.12.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, ognuna con la sua release, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -87,7 +87,8 @@ La CI, su ogni push e pull request, controlla formattazione, Lint (senza eccezio
   - [x] Porte chiuse a chiave con le loro chiavi, e bottino dei nemici (`v1.9.0`).
   - [x] Il boss: uno slime gigante che salta e schiaccia, nella sua arena sul quinto piano (`v1.10.0`).
   - [x] Monete e mercanti: la merce si prende, si paga urtando il mercante, e chi scappa senza pagare se ne pente (`v1.11.0`).
-  - [ ] Illustrazioni e salvataggio della partita.
+  - [x] Illustrazioni vettoriali di personaggi, oggetti e oggetti fissi (`v1.12.0`).
+  - [ ] Salvataggio della partita.
 
 ## Compilare ed eseguire
 

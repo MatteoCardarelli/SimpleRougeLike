@@ -37,11 +37,10 @@
         android:minHeight="160dp"
         android:orientation="horizontal">
 
-        <View
+        <ImageView
             android:id="@+id/detail_art"
             android:layout_width="96dp"
             android:layout_height="96dp"
-            android:background="@drawable/shape_item_art"
             android:importantForAccessibility="no" />
 
         <LinearLayout

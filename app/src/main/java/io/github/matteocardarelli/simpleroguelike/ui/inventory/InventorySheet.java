@@ -2,7 +2,6 @@ package io.github.matteocardarelli.simpleroguelike.ui.inventory;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -115,9 +114,7 @@ public final class InventorySheet extends BottomSheetDialogFragment {
         if (selected.isPresent()) {
             InventoryEntry entry = selected.get();
             binding.detailArt.setVisibility(View.VISIBLE);
-            binding.detailArt.setBackgroundTintList(
-                    ColorStateList.valueOf(
-                            requireContext().getColor(content.colorRes(entry.kind()))));
+            binding.detailArt.setImageResource(content.artRes(entry.kind()));
             binding.detailName.setText(content.nameRes(entry.kind()));
             binding.detailDescription.setText(content.descriptionRes(entry.kind()));
             // Una chiave non si usa: la consuma la porta che apre.

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "merchant", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF8E24AA" android:pathData="M5,22L12,9L19,22z" />
+    <path android:fillColor="#FFFFCC99" android:pathData="M8.5,7.5a3.5,3.5 0 1,0 7,0a3.5,3.5 0 1,0 -7,0z" />
+    <path android:fillColor="#FF6A1B9A" android:pathData="M7,5.5L17,5.5L12,0.5z" />
+    <path android:fillColor="#FFFFC107" android:pathData="M6.5,5h11v1.2h-11z" />
+    <path android:fillColor="#FFA1887F" android:pathData="M14,17a3,3 0 1,0 6,0a3,3 0 1,0 -6,0z" />
+    <path android:fillColor="#FFFFC107" android:pathData="M16,17a1,1 0 1,0 2,0a1,1 0 1,0 -2,0z" />
+</vector>
