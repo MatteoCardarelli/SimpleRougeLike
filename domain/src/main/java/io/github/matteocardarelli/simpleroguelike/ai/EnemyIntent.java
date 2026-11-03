@@ -10,4 +10,10 @@ package io.github.matteocardarelli.simpleroguelike.ai;
  * nuova non compila finché non viene gestita.
  */
 public sealed interface EnemyIntent
-        permits StepIntent, RangedAttackIntent, JumpIntent, LandIntent, RestIntent, WaitIntent {}
+        permits StepIntent,
+                RetreatIntent,
+                RangedAttackIntent,
+                JumpIntent,
+                LandIntent,
+                RestIntent,
+                WaitIntent {}

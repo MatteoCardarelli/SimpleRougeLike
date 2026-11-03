@@ -14,6 +14,7 @@ public final class Enemy extends Actor {
     private Optional<Position> pendingJump = Optional.empty();
     private boolean tired;
     private boolean angry;
+    private boolean retreated;
 
     public Enemy(EntityId id, EnemyDefinition definition) {
         super(id, definition.stats());
@@ -77,6 +78,15 @@ public final class Enemy extends Actor {
     /** Vero subito dopo un atterraggio: il turno dopo riposa. */
     public boolean isTired() {
         return tired;
+    }
+
+    /** Vero se la sua ultima azione è stata allontanarsi dal player: per ora non scappa più. */
+    public boolean hasJustRetreated() {
+        return retreated;
+    }
+
+    void retreated(boolean value) {
+        retreated = value;
     }
 
     /** Rimette lo stato salvato; solo per riprendere una partita. */
