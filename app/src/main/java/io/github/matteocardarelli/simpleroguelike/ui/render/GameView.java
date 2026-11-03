@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
+import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.snapshot.CellView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.FixtureView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
@@ -26,6 +27,9 @@ import org.jspecify.annotations.Nullable;
  * La telecamera segue il player; durante un'animazione la vista si ridisegna a ogni fotogramma.
  */
 public final class GameView extends View {
+
+    /** Il rosso semitrasparente delle celle dove sta per atterrare un nemico. */
+    private static final int DANGER = 0x66FF1744;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private @Nullable Camera camera;
@@ -98,6 +102,7 @@ public final class GameView extends View {
         drawCells(canvas, palette, cells, viewport, cell);
         drawFixtures(canvas, content, cells, snapshot.fixtures(), cell);
         drawItems(canvas, content, snapshot.visibleItems(), cell);
+        drawDanger(canvas, snapshot.danger(), cell);
         drawSprites(canvas, content, scene.sprites(), cell);
         drawEffects(canvas, content, scene.effects(), cell);
         canvas.restore();
@@ -231,10 +236,23 @@ public final class GameView extends View {
         for (Sprite sprite : sprites) {
             paint.setColor(getContext().getColor(content.colorRes(sprite.kind())));
             paint.setAlpha(Math.round(sprite.alpha() * 255));
+            float half = sprite.size() * cell / 2;
             canvas.drawCircle(
-                    sprite.x() * cell + cell / 2, sprite.y() * cell + cell / 2, cell / 2.2f, paint);
+                    sprite.x() * cell + half,
+                    sprite.y() * cell + half,
+                    sprite.size() * cell / 2.2f,
+                    paint);
         }
         paint.setAlpha(255);
+    }
+
+    /** Le celle dove un nemico atterrerà al prossimo turno, in rosso. */
+    private void drawDanger(Canvas canvas, List<Position> danger, float cell) {
+        paint.setColor(DANGER);
+        for (Position at : danger) {
+            canvas.drawRect(
+                    at.x() * cell, at.y() * cell, (at.x() + 1) * cell, (at.y() + 1) * cell, paint);
+        }
     }
 
     /** Gli effetti, come un proiettile in volo: piccoli, sopra gli attori. */

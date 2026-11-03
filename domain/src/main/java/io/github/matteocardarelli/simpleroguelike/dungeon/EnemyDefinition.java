@@ -15,6 +15,8 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
  *     vicino
  * @param packSize quanti nemici di questo tipo nascono insieme, vicini: 1 per chi va da solo
  * @param dropChance la probabilità, in percentuale, che alla morte lasci cadere un oggetto
+ * @param footprint le celle che occupa
+ * @param boss vero per il boss dell'ultimo piano: sconfiggerlo vince la partita
  */
 public record EnemyDefinition(
         Kind kind,
@@ -25,7 +27,9 @@ public record EnemyDefinition(
         int spawnWeight,
         int range,
         int packSize,
-        int dropChance) {
+        int dropChance,
+        Footprint footprint,
+        boolean boss) {
 
     public EnemyDefinition {
         if (stats.maxHealth() <= 0) {
@@ -52,6 +56,31 @@ public record EnemyDefinition(
                             + ", dropChance="
                             + dropChance);
         }
+    }
+
+    /** Un nemico di una cella, che non è un boss. */
+    public EnemyDefinition(
+            Kind kind,
+            Stats stats,
+            int experienceReward,
+            int aggroRange,
+            BehaviorKey behavior,
+            int spawnWeight,
+            int range,
+            int packSize,
+            int dropChance) {
+        this(
+                kind,
+                stats,
+                experienceReward,
+                aggroRange,
+                behavior,
+                spawnWeight,
+                range,
+                packSize,
+                dropChance,
+                Footprint.SINGLE,
+                false);
     }
 
     /** Un nemico che combatte solo da vicino e va da solo. */

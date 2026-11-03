@@ -2,6 +2,7 @@ package io.github.matteocardarelli.simpleroguelike.content;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.EnemyDefinition;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Footprint;
 import io.github.matteocardarelli.simpleroguelike.model.BehaviorKey;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Stats;
@@ -26,6 +27,12 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
     /** Accerchia il player con il resto del branco; se il player è lontano, vaga. */
     public static final BehaviorKey PACK = BehaviorKey.of("pack");
 
+    /** Il boss dell'ultimo piano: uno slime grande come un cerchio di 4 celle. */
+    public static final Kind GIANT_SLIME = Kind.of("giant_slime");
+
+    /** Salta sul player e lo schiaccia, poi riposa un turno. */
+    public static final BehaviorKey JUMP_AND_CRUSH = BehaviorKey.of("jump_and_crush");
+
     /** Tiene la distanza e tira; se il player è lontano, vaga. */
     public static final BehaviorKey KEEP_DISTANCE = BehaviorKey.of("keep_distance");
 
@@ -44,7 +51,19 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
                     new EnemyDefinition(
                             ARCHER, new Stats(20, 6, 0, 5, 10), 30, 8, KEEP_DISTANCE, 4, 5, 1, 30),
                     new EnemyDefinition(
-                            WOLF, new Stats(14, 5, 0, 5, 10), 15, 10, PACK, 3, 0, 3, 15));
+                            WOLF, new Stats(14, 5, 0, 5, 10), 15, 10, PACK, 3, 0, 3, 15),
+                    new EnemyDefinition(
+                            GIANT_SLIME,
+                            new Stats(220, 16, 4, 10, 0),
+                            300,
+                            14,
+                            JUMP_AND_CRUSH,
+                            0,
+                            0,
+                            1,
+                            0,
+                            Footprint.circle(4),
+                            true));
 
     @Override
     public List<EnemyDefinition> all() {

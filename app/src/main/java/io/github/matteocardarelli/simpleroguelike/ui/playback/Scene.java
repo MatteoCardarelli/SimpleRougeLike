@@ -40,7 +40,12 @@ public final class Scene {
      * Aggiunge uno sprite, per esempio un nemico che entra nel campo visivo durante un'animazione.
      */
     public Sprite spawn(EntityId id, Kind kind, Position at) {
-        Sprite sprite = new Sprite(id, kind, at.x(), at.y());
+        return spawn(id, kind, at, 1);
+    }
+
+    /** Come l'altro, per un attore grande {@code size} celle per lato. */
+    public Sprite spawn(EntityId id, Kind kind, Position at, int size) {
+        Sprite sprite = new Sprite(id, kind, at.x(), at.y(), size);
         sprites.put(id, sprite);
         return sprite;
     }
@@ -83,7 +88,7 @@ public final class Scene {
         sprites.clear();
         effects.clear();
         for (ActorView enemy : snapshot.visibleEnemies()) {
-            spawn(enemy.id(), enemy.kind(), enemy.position());
+            spawn(enemy.id(), enemy.kind(), enemy.position(), enemy.size());
         }
         spawn(snapshot.player().id(), playerKind, snapshot.player().position());
     }

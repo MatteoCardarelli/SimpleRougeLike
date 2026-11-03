@@ -54,11 +54,19 @@ public final class CombatRules {
             Floor floor, EntityId attacker, EntityId defender, RandomSource random) {
         Actor attackerActor = requireAlive(floor, attacker);
         Actor defenderActor = requireAlive(floor, defender);
+        // Con un attore grande conta la cella toccata, non la sua cella di riferimento.
+        Position defenderAt =
+                floor.contactCell(attacker, defender)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalStateException(
+                                                attacker + " non è adiacente a " + defender));
         Position attackerAt = floor.positionOf(attacker);
-        Position defenderAt = floor.positionOf(defender);
-        if (!attackerAt.isAdjacentTo(defenderAt)) {
-            throw new IllegalStateException(
-                    attacker + " in " + attackerAt + " non è adiacente a " + defenderAt);
+        for (Position cell : floor.cellsOf(attacker)) {
+            if (cell.isAdjacentTo(defenderAt)) {
+                attackerAt = cell;
+                break;
+            }
         }
         List<GameEvent> events = new ArrayList<>();
         events.add(new Attacked(attacker, defender, attackerAt, defenderAt));

@@ -13,6 +13,8 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
+import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
+import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
@@ -38,7 +40,8 @@ import org.jspecify.annotations.Nullable;
  *
  * <ul>
  *   <li>Mai due attori vivi nella stessa cella, mai un attore su una cella che non si può
- *       attraversare.
+ *       attraversare. Un attore grande occupa tutte le celle della sua impronta, a partire dalla
+ *       cella di riferimento che il piano tiene come sua posizione.
  *   <li>Al massimo un oggetto a terra per cella.
  *   <li>La morte è definitiva: un attore morto non si cura e non si muove.
  *   <li>Le celle esplorate contengono sempre quelle visibili.
@@ -56,6 +59,7 @@ public final class Floor implements FloorView {
     private final LinkedHashMap<Position, Fixture> fixtures;
     private @Nullable Grid<TileType> movementGrid;
     private @Nullable Grid<TileType> sightGrid;
+    private @Nullable EntityId defeatedBoss;
     private CellSet visible;
     private CellSet explored;
 
@@ -128,14 +132,75 @@ public final class Floor implements FloorView {
     @Override
     public Optional<Actor> actorAt(Position position) {
         for (Map.Entry<EntityId, Position> entry : positions.entrySet()) {
-            if (entry.getValue().equals(position)) {
-                Actor actor = requireActor(entry.getKey());
-                if (actor.isAlive()) {
-                    return Optional.of(actor);
+            Actor actor = requireActor(entry.getKey());
+            if (actor.isAlive() && actor.footprint().at(entry.getValue()).contains(position)) {
+                return Optional.of(actor);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Position> cellsOf(EntityId id) {
+        return requireActor(id).footprint().at(positionOf(id));
+    }
+
+    @Override
+    public boolean canOccupy(EntityId id, Position anchor) {
+        return fits(id, anchor, false);
+    }
+
+    @Override
+    public boolean canLand(EntityId id, Position anchor) {
+        return fits(id, anchor, true);
+    }
+
+    /**
+     * Ogni cella dell'impronta attraversabile e libera, salvo l'attore stesso e forse il player.
+     */
+    private boolean fits(EntityId id, Position anchor, boolean ignoringPlayer) {
+        for (Position cell : requireActor(id).footprint().at(anchor)) {
+            if (!isWalkable(cell)) {
+                return false;
+            }
+            Optional<Actor> occupant = actorAt(cell);
+            if (occupant.isPresent()
+                    && !occupant.get().id().equals(id)
+                    && !(ignoringPlayer && occupant.get().id().equals(player.id()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Optional<Position> contactCell(EntityId attacker, EntityId defender) {
+        List<Position> defenderCells = cellsOf(defender);
+        for (Position cell : cellsOf(attacker)) {
+            for (Direction direction : Direction.values()) {
+                Position next = cell.translate(direction);
+                if (defenderCells.contains(next)) {
+                    return Optional.of(next);
                 }
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<EntityId> bossId() {
+        for (Enemy enemy : enemies.values()) {
+            if (enemy.isBoss()) {
+                return Optional.of(enemy.id());
+            }
+        }
+        return Optional.ofNullable(defeatedBoss);
+    }
+
+    @Override
+    public boolean isBossDefeated() {
+        Optional<EntityId> boss = bossId();
+        return boss.isPresent() && enemy(boss.get()).map(e -> !e.isAlive()).orElse(true);
     }
 
     @Override
@@ -230,7 +295,7 @@ public final class Floor implements FloorView {
         Actor actor = requireAlive(id);
         Position from = positionOf(id);
         Position to = from.translate(direction);
-        if (!isFree(to)) {
+        if (!canOccupy(id, to)) {
             throw new IllegalStateException(id + " non può entrare in " + to + ": non è libera");
         }
         positions.put(id, to);
@@ -511,6 +576,95 @@ public final class Floor implements FloorView {
     }
 
     /**
+     * Un nemico grande annuncia un salto: al prossimo turno atterrerà con la cella di riferimento
+     * in {@code anchor}.
+     *
+     * @throws IllegalStateException se il nemico è morto o non può atterrare lì
+     */
+    public JumpAnnounced announceJump(EntityId jumper, Position anchor) {
+        Enemy enemy = requireLivingEnemy(jumper);
+        if (!canLand(jumper, anchor)) {
+            throw new IllegalStateException(jumper + " non può atterrare in " + anchor);
+        }
+        enemy.announceJump(anchor);
+        return new JumpAnnounced(jumper, enemy.footprint().at(anchor));
+    }
+
+    /**
+     * Il nemico atterra dove aveva annunciato: chi era sotto viene spinto nella cella libera più
+     * vicina fuori dall'impronta. Dopo l'atterraggio il nemico riposa un turno.
+     *
+     * @return {@code Landed} seguito da un {@code Moved} per ogni attore spinto via; vuoto se non
+     *     c'era un salto annunciato o la cella non è più buona
+     */
+    public List<GameEvent> land(EntityId jumper) {
+        Enemy enemy = requireLivingEnemy(jumper);
+        Optional<Position> target = enemy.pendingJump();
+        if (!target.isPresent() || !canLand(jumper, target.get())) {
+            enemy.landed();
+            return List.of();
+        }
+        Position from = positionOf(jumper);
+        List<Position> cells = enemy.footprint().at(target.get());
+        Position playerAt = positionOf(player.id());
+        boolean crushed = player.isAlive() && cells.contains(playerAt);
+        Optional<Position> out = Optional.empty();
+        if (crushed) {
+            out = nearestFreeOutside(playerAt, cells);
+            if (!out.isPresent()) {
+                // Nessuna cella dove spingere il player: il salto va a vuoto.
+                enemy.landed();
+                return List.of();
+            }
+        }
+        List<GameEvent> events = new ArrayList<>();
+        positions.put(jumper, target.get());
+        enemy.landed();
+        events.add(new Landed(jumper, enemy.kind(), from, target.get()));
+        if (out.isPresent()) {
+            positions.put(player.id(), out.get());
+            events.add(new Moved(player.id(), player.kind(), playerAt, out.get()));
+        }
+        return List.copyOf(events);
+    }
+
+    /** Il nemico ha riposato dopo un atterraggio. */
+    public void rest(EntityId jumper) {
+        requireLivingEnemy(jumper).rested();
+    }
+
+    /** La cella libera più vicina a {@code from}, fuori da {@code forbidden}. */
+    private Optional<Position> nearestFreeOutside(Position from, List<Position> forbidden) {
+        java.util.ArrayDeque<Position> queue = new java.util.ArrayDeque<>();
+        java.util.LinkedHashSet<Position> seen = new java.util.LinkedHashSet<>();
+        queue.add(from);
+        seen.add(from);
+        while (!queue.isEmpty()) {
+            Position cell = queue.poll();
+            for (Direction direction : Direction.values()) {
+                Position next = cell.translate(direction);
+                if (!terrain.isInside(next) || !isWalkable(next) || !seen.add(next)) {
+                    continue;
+                }
+                if (!forbidden.contains(next) && !actorAt(next).isPresent()) {
+                    return Optional.of(next);
+                }
+                queue.add(next);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Enemy requireLivingEnemy(EntityId id) {
+        Enemy enemy =
+                enemy(id).orElseThrow(() -> new IllegalArgumentException("Nessun nemico " + id));
+        if (!enemy.isAlive()) {
+            throw new IllegalStateException(id + " è morto");
+        }
+        return enemy;
+    }
+
+    /**
      * Toglie dal piano i nemici morti. Si chiama a fine turno.
      *
      * @return i nemici rimossi, in ordine di id
@@ -521,6 +675,9 @@ public final class Floor implements FloorView {
         while (iterator.hasNext()) {
             Enemy enemy = iterator.next();
             if (!enemy.isAlive()) {
+                if (enemy.isBoss()) {
+                    defeatedBoss = enemy.id();
+                }
                 iterator.remove();
                 positions.remove(enemy.id());
                 removed.add(enemy);

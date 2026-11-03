@@ -47,7 +47,9 @@ class EventLogWriterTest {
                         "t12 FloorChanged depth=2",
                         "t12 DoorUnlocked at=3,4",
                         "t12 DoorLocked at=3,4",
-                        "t12 ItemDropped item=7 kind=goblin at=3,4");
+                        "t12 ItemDropped item=7 kind=goblin at=3,4",
+                        "t12 JumpAnnounced jumper=1 cells=3,4;4,4",
+                        "t12 Landed jumper=1 kind=goblin from=3,4 to=4,4");
     }
 
     @Test
@@ -101,7 +103,9 @@ class EventLogWriterTest {
                         List.of(),
                         List.of(P),
                         List.of(P),
-                        List.of(P));
+                        List.of(P),
+                        List.of(P, Q),
+                        List.of(P, Q));
     }
 
     private static List<GameEvent> everyEvent() {
@@ -127,6 +131,8 @@ class EventLogWriterTest {
                 new FloorChanged(2),
                 new DoorUnlocked(P),
                 new DoorLocked(P),
-                new ItemDropped(B, GOBLIN, P));
+                new ItemDropped(B, GOBLIN, P),
+                new JumpAnnounced(A, List.of(P, Q)),
+                new Landed(A, GOBLIN, P, Q));
     }
 }

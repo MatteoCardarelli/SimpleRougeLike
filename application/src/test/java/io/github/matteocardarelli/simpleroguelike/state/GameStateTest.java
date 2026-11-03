@@ -51,6 +51,19 @@ class GameStateTest {
     }
 
     @Test
+    void playing_onTheBossFloor_winsWhenTheBossDies_evenWithOtherEnemiesAlive() {
+        Floor floor =
+                FloorFixtures.parse(
+                        "@....g", "......", "..S...", "......", "......", "......", "......");
+        PlayingState playing = new PlayingState();
+        EntityId boss = floor.bossId().orElseThrow();
+
+        assertThat(playing.next(floor, true)).isSameAs(playing);
+        floor.damage(boss, 10_000);
+        assertThat(playing.next(floor, true)).isEqualTo(new VictoryState());
+    }
+
+    @Test
     void playing_playerAndLastEnemyBothDead_defeatWins() {
         Floor floor = FloorFixtures.parse("@g");
         floor.damage(new EntityId(2), 1000);

@@ -36,6 +36,11 @@ public abstract class Actor {
 
     public abstract Faction faction();
 
+    /** Le celle che occupa: una sola, tranne per chi è più grande, come un boss. */
+    public Footprint footprint() {
+        return Footprint.SINGLE;
+    }
+
     /** Le statistiche con cui l'attore combatte: quelle di base, per chi non ha bonus. */
     public Stats stats() {
         return stats;

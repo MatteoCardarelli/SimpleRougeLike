@@ -4,11 +4,15 @@ import io.github.matteocardarelli.simpleroguelike.model.BehaviorKey;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Faction;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
+import io.github.matteocardarelli.simpleroguelike.model.Position;
+import java.util.Optional;
 
 /** Un nemico. I suoi valori vengono dalla definizione del suo tipo. */
 public final class Enemy extends Actor {
 
     private final EnemyDefinition definition;
+    private Optional<Position> pendingJump = Optional.empty();
+    private boolean tired;
 
     public Enemy(EntityId id, EnemyDefinition definition) {
         super(id, definition.stats());
@@ -40,6 +44,38 @@ public final class Enemy extends Actor {
 
     public BehaviorKey behavior() {
         return definition.behavior();
+    }
+
+    @Override
+    public Footprint footprint() {
+        return definition.footprint();
+    }
+
+    public boolean isBoss() {
+        return definition.boss();
+    }
+
+    /** Dove atterrerà al prossimo turno, se ha annunciato un salto. */
+    public Optional<Position> pendingJump() {
+        return pendingJump;
+    }
+
+    /** Vero subito dopo un atterraggio: il turno dopo riposa. */
+    public boolean isTired() {
+        return tired;
+    }
+
+    void announceJump(Position anchor) {
+        pendingJump = Optional.of(anchor);
+    }
+
+    void landed() {
+        pendingJump = Optional.empty();
+        tired = true;
+    }
+
+    void rested() {
+        tired = false;
     }
 
     public EnemyDefinition definition() {

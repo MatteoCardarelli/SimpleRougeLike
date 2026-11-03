@@ -178,6 +178,44 @@ class FloorPopulatorTest {
     }
 
     @Test
+    void populate_theBossFloor_hasTheArenaTheBossItsDoorAndItsKey() {
+        StringBuilder wall = new StringBuilder();
+        StringBuilder open = new StringBuilder("#");
+        for (int x = 0; x < 40; x++) {
+            wall.append('#');
+        }
+        for (int x = 0; x < 38; x++) {
+            open.append('.');
+        }
+        open.append('#');
+        String[] rows = new String[30];
+        for (int y = 0; y < 30; y++) {
+            rows[y] = y == 0 || y == 29 ? wall.toString() : open.toString();
+        }
+        Grid<TileType> terrain = FloorFixtures.terrain(rows);
+        FloorSpec spec = new FloorSpec(40, 30, 5, 3, 0, 1, 0, 0, 0, 0, 0, 1);
+
+        for (long seed = 1; seed <= 10; seed++) {
+            Floor floor =
+                    POPULATOR.populate(
+                            terrain, spec, new SeededRandomSource(seed), new EntityIdSequence());
+
+            assertThat(floor.bossId()).isPresent();
+            var boss = floor.enemy(floor.bossId().get()).orElseThrow();
+            assertThat(boss.kind()).isEqualTo(StandardEnemyCatalog.GIANT_SLIME);
+            assertThat(floor.fixtures().values())
+                    .filteredOn(f -> f.type() == FixtureType.BOSS_DOOR)
+                    .hasSize(1);
+            assertThat(floor.itemsOnGround().values())
+                    .filteredOn(i -> i.kind().equals(StandardItemCatalog.BOSS_KEY))
+                    .hasSize(1);
+            Position player = floor.positionOf(floor.playerId());
+            assertThat(floor.cellsOf(boss.id()).get(0).distanceTo(player)).isGreaterThan(1);
+            assertThat(floor.enemies()).hasSize(6);
+        }
+    }
+
+    @Test
     void populate_noWalkableCell_fails() {
         Grid<TileType> rock = FloorFixtures.terrain("###", "###", "###");
 

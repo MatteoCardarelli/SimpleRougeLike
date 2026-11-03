@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
+import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.Optional;
@@ -20,6 +21,7 @@ public final class Animations {
     static final long BUMP_MS = 120;
     static final long FLASH_MS = 140;
     static final long FADE_MS = 180;
+    static final long LANDING_MS = 260;
     static final long PROJECTILE_MS_PER_CELL = 35;
     static final long PROJECTILE_MIN_MS = 90;
 
@@ -35,6 +37,7 @@ public final class Animations {
         player.register(Damaged.class, Animations::flash);
         player.register(Died.class, Animations::fade);
         player.register(Fired.class, Animations::projectile);
+        player.register(Landed.class, Animations::landing);
         return player;
     }
 
@@ -48,6 +51,22 @@ public final class Animations {
                 animation(
                         STEP_MS,
                         f -> sprite.moveTo(lerp(from.x(), to.x(), f), lerp(from.y(), to.y(), f))));
+    }
+
+    /** L'atterraggio di un salto: lo sprite vola fino alla cella nuova, più lento di un passo. */
+    static Optional<Animation> landing(Landed event, Scene scene) {
+        return scene.sprite(event.jumper())
+                .map(
+                        sprite -> {
+                            Position from = event.from();
+                            Position to = event.to();
+                            return animation(
+                                    LANDING_MS,
+                                    f ->
+                                            sprite.moveTo(
+                                                    lerp(from.x(), to.x(), f),
+                                                    lerp(from.y(), to.y(), f)));
+                        });
     }
 
     static Optional<Animation> bump(Attacked event, Scene scene) {

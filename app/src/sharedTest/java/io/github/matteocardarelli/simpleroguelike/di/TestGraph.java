@@ -37,7 +37,12 @@ public final class TestGraph {
                 floors,
                 GameModule.commandDispatcher(commandHandlers(actions, rangedRules())),
                 GameModule.enemyTurnRunner(
-                        behaviors(), ContentModule.enemyCatalog(), actions, rangedRules()),
+                        behaviors(),
+                        ContentModule.enemyCatalog(),
+                        actions,
+                        rangedRules(),
+                        ContentModule.jumpRules(
+                                ContentModule.damageRules(ContentModule.levelingRules()))),
                 GameModule.fieldOfView(),
                 Set.<TurnHook>of(GameModule.lootHook(ContentModule.itemCatalog())),
                 config);
@@ -70,6 +75,7 @@ public final class TestGraph {
         behaviors.add(GameModule.chaseOrWander(GameModule.pathfinder()));
         behaviors.add(GameModule.keepDistance(GameModule.pathfinder()));
         behaviors.add(GameModule.pack(GameModule.pathfinder()));
+        behaviors.add(GameModule.jumpAndCrush());
         return behaviors;
     }
 }

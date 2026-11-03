@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.session;
 
 import static io.github.matteocardarelli.simpleroguelike.session.Sessions.ACTIONS;
+import static io.github.matteocardarelli.simpleroguelike.session.Sessions.JUMPS;
 import static io.github.matteocardarelli.simpleroguelike.session.Sessions.RANGED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -114,7 +115,8 @@ class EnemyTurnRunnerTest {
                                         (e, f, r) -> new RangedAttackIntent(Direction.LEFT))),
                         () -> List.of(FloorFixtures.archer()),
                         ACTIONS,
-                        RANGED);
+                        RANGED,
+                        JUMPS);
 
         List<GameEvent> events = runner.run(run);
 
@@ -134,12 +136,13 @@ class EnemyTurnRunnerTest {
                                         CHASE_OR_WANDER, (e, f, r) -> new WaitIntent())),
                         List::of,
                         ACTIONS,
-                        RANGED);
+                        RANGED,
+                        JUMPS);
         Enemy goblin = run.floor().enemies().get(0);
 
         assertThat(goblin.behavior()).isEqualTo(CHASE_OR_WANDER);
         assertThat(runner.run(run)).isEmpty();
-        EnemyTurnRunner empty = new EnemyTurnRunner(List.of(), List::of, ACTIONS, RANGED);
+        EnemyTurnRunner empty = new EnemyTurnRunner(List.of(), List::of, ACTIONS, RANGED, JUMPS);
         assertThatThrownBy(() -> empty.run(run)).isInstanceOf(IllegalStateException.class);
     }
 
@@ -148,7 +151,11 @@ class EnemyTurnRunnerTest {
         assertThatThrownBy(
                         () ->
                                 new EnemyTurnRunner(
-                                        List.of(), new StandardEnemyCatalog(), ACTIONS, RANGED))
+                                        List.of(),
+                                        new StandardEnemyCatalog(),
+                                        ACTIONS,
+                                        RANGED,
+                                        JUMPS))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("chase_or_wander");
     }
@@ -164,7 +171,8 @@ class EnemyTurnRunnerTest {
                                         List.of(one, two),
                                         new StandardEnemyCatalog(),
                                         ACTIONS,
-                                        RANGED))
+                                        RANGED,
+                                        JUMPS))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -173,7 +181,8 @@ class EnemyTurnRunnerTest {
                 List.of(new BehaviorBinding(CHASE_OR_WANDER, behavior)),
                 () -> List.of(FloorFixtures.goblin()),
                 ACTIONS,
-                RANGED);
+                RANGED,
+                JUMPS);
     }
 
     private static Run run(String... rows) {
