@@ -15,3 +15,7 @@
 # Gli id delle viste che i test cercano con Espresso: R8 li copia nel codice dell'app e toglie la
 # classe.
 -keep class io.github.matteocardarelli.simpleroguelike.R$id { *; }
+
+# Lo store della partita salvata: i test lo usano per cancellare il salvataggio dalla stessa coda
+# delle scritture dell'app, e R8 ne rinominerebbe i metodi.
+-keep class io.github.matteocardarelli.simpleroguelike.save.FileGameStore { *; }

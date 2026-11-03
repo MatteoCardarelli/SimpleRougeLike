@@ -26,6 +26,8 @@ import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
 import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.LevelingRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
+import io.github.matteocardarelli.simpleroguelike.save.FileGameStore;
+import io.github.matteocardarelli.simpleroguelike.save.GameStore;
 import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
 import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
@@ -331,6 +333,13 @@ public final class ContentModule {
     @Singleton
     static FeedbackStore feedbackStore(@ApplicationContext Context context) {
         return new FeedbackStore(new File(context.getFilesDir(), "feedback"));
+    }
+
+    /** La partita salvata, nella memoria privata dell'app. */
+    @Provides
+    @Singleton
+    static GameStore gameStore(@ApplicationContext Context context) {
+        return new FileGameStore(new File(context.getFilesDir(), FileGameStore.FILE));
     }
 
     /** Le impostazioni del giocatore, che restano dopo la chiusura dell'app. */

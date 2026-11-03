@@ -85,6 +85,11 @@ public final class Fixture {
         return contents;
     }
 
+    /** Rimette lo stato aperto salvato, senza toccare il contenuto; solo per riprendere. */
+    void restoreOpen() {
+        open = true;
+    }
+
     /** Apre l'oggetto e restituisce quello che conteneva. */
     Optional<Item> open() {
         open = true;

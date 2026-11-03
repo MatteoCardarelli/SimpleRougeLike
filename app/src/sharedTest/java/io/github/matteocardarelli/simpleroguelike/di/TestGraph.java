@@ -6,6 +6,7 @@ import io.github.matteocardarelli.simpleroguelike.generation.FloorSource;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
+import io.github.matteocardarelli.simpleroguelike.session.SaveCodec;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -46,6 +47,11 @@ public final class TestGraph {
                 GameModule.fieldOfView(),
                 Set.<TurnHook>of(GameModule.lootHook(ContentModule.itemCatalog())),
                 config);
+    }
+
+    /** Il formato del salvataggio, con i cataloghi dell'app. */
+    public static SaveCodec saveCodec() {
+        return GameModule.saveCodec(ContentModule.itemCatalog(), ContentModule.enemyCatalog());
     }
 
     public static RangedRules rangedRules() {

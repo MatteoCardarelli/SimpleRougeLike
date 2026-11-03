@@ -14,6 +14,8 @@ import io.github.matteocardarelli.simpleroguelike.generation.FixedFloorSource;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
+import io.github.matteocardarelli.simpleroguelike.save.GameStore;
+import io.github.matteocardarelli.simpleroguelike.save.SavedGame;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.settings.Settings;
 import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
@@ -26,7 +28,9 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -41,6 +45,27 @@ class GameViewModelTest {
 
     private final AtomicLong seeds = new AtomicLong(100);
     private final MemorySettingsStore settings = new MemorySettingsStore();
+    private final MemoryGameStore games = new MemoryGameStore();
+
+    /** La partita salvata in memoria, come la terrebbe il file tra un avvio e l'altro. */
+    private static final class MemoryGameStore implements GameStore {
+        private @Nullable SavedGame saved;
+
+        @Override
+        public Optional<SavedGame> load() {
+            return Optional.ofNullable(saved);
+        }
+
+        @Override
+        public void save(SavedGame game) {
+            saved = game;
+        }
+
+        @Override
+        public void clear() {
+            saved = null;
+        }
+    }
 
     /** Le impostazioni in memoria, come le terrebbe il telefono tra un avvio e l'altro. */
     private static final class MemorySettingsStore implements SettingsStore {
@@ -75,7 +100,9 @@ class GameViewModelTest {
                 new FeedbackStore(directory.toFile()),
                 new BuildInfo("1.0", "abc"),
                 CLOCK,
-                settings);
+                settings,
+                games,
+                TestGraph.saveCodec());
     }
 
     /** Sconfitta del player: contro il muro aspetta, e i tre goblin attaccano a ogni turno. */
@@ -100,6 +127,68 @@ class GameViewModelTest {
         assertThat(state.result().snapshot().turn()).isEqualTo(1);
         assertThat(state.inventoryOpen()).isFalse();
         assertThat(state.previousGameLost()).isFalse();
+    }
+
+    @Test
+    void submit_savesTheGame_andAnotherViewModelResumesIt() {
+        GameViewModel first = viewModel();
+        for (Direction direction : Direction.values()) {
+            first.submit(new MoveCommand(direction));
+        }
+
+        GameViewModel second = viewModel();
+
+        assertThat(second.state().result().snapshot()).isEqualTo(first.state().result().snapshot());
+        assertThat(second.state().previousGameLost()).isFalse();
+        assertThat(seeds.get()).as("nessun seed nuovo").isEqualTo(101);
+    }
+
+    /** Dopo la ripresa le note di collaudo hanno ancora tutti i comandi dall'inizio. */
+    @Test
+    void resume_keepsTheCommandJournal_forTheFeedbackNotes() throws IOException {
+        GameViewModel first = viewModel();
+        first.submit(new MoveCommand(Direction.LEFT));
+        first.submit(new MoveCommand(Direction.UP));
+
+        GameViewModel second = viewModel();
+        second.submit(new MoveCommand(Direction.RIGHT));
+        second.saveFeedback("dopo la ripresa");
+
+        FeedbackEntry entry =
+                FeedbackStore.read(new FeedbackStore(directory.toFile()).list().get(0));
+        assertThat(entry.seed()).isEqualTo(100);
+        assertThat(entry.commands()).hasSize(3);
+    }
+
+    @Test
+    void gameOver_clearsTheSave_soTheNextStartIsANewGame() {
+        GameViewModel viewModel = drawn("#####", "#g@g#", "##g##", "#####");
+        loseTheGame(viewModel);
+        assertThat(phase(viewModel)).isEqualTo(Phase.GAME_OVER);
+
+        assertThat(games.load()).isEmpty();
+        assertThat(viewModel().state().result().snapshot().turn()).isEqualTo(1);
+    }
+
+    @Test
+    void newGame_replacesTheSave() {
+        GameViewModel viewModel = viewModel();
+        viewModel.submit(new MoveCommand(Direction.LEFT));
+
+        viewModel.newGame();
+
+        assertThat(games.load()).get().extracting(SavedGame::journalSeed).isEqualTo(101L);
+        assertThat(games.load().orElseThrow().commands()).isEmpty();
+    }
+
+    @Test
+    void anUnreadableSave_isCleared_andANewGameStarts() {
+        games.save(new SavedGame(5, List.of(), List.of("format 99")));
+
+        GameViewModel viewModel = viewModel();
+
+        assertThat(viewModel.state().result().snapshot().seed()).isEqualTo(100);
+        assertThat(games.load()).get().extracting(SavedGame::journalSeed).isEqualTo(100L);
     }
 
     @Test

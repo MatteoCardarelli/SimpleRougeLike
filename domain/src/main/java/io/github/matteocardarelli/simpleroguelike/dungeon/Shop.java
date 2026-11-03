@@ -43,6 +43,11 @@ public final class Shop {
         return java.util.Optional.ofNullable(prices.get(item));
     }
 
+    /** Tutti i prezzi, per il salvataggio. */
+    public Map<EntityId, Integer> prices() {
+        return Collections.unmodifiableMap(prices);
+    }
+
     /** Le merci prese e non pagate. */
     public Set<EntityId> unpaid() {
         return Collections.unmodifiableSet(unpaid);

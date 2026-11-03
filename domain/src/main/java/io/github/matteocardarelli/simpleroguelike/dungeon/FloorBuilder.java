@@ -92,7 +92,7 @@ public final class FloorBuilder {
                         throw new IllegalStateException(
                                 fixture.kind().value() + " in " + at + " deve stare in un muro");
                     }
-                    if (groundItems.containsKey(at)) {
+                    if (!fixture.isOpen() && groundItems.containsKey(at)) {
                         throw new IllegalStateException(
                                 "Un oggetto a terra sotto " + fixture.kind().value() + " in " + at);
                     }

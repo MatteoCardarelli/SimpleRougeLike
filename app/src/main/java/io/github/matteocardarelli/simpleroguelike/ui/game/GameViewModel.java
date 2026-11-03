@@ -19,7 +19,10 @@ import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackEntry;
 import io.github.matteocardarelli.simpleroguelike.feedback.FeedbackStore;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
+import io.github.matteocardarelli.simpleroguelike.save.GameStore;
+import io.github.matteocardarelli.simpleroguelike.save.SavedGame;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
+import io.github.matteocardarelli.simpleroguelike.session.SaveCodec;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
 import io.github.matteocardarelli.simpleroguelike.settings.Settings;
 import io.github.matteocardarelli.simpleroguelike.settings.SettingsStore;
@@ -51,8 +54,10 @@ import org.jspecify.annotations.Nullable;
  * <p>Ogni risultato si riproduce una volta sola: {@link #claimPlayback} lo segna, così dopo una
  * rotazione la nuova Activity mostra lo stato finale senza ripetere le animazioni.
  *
- * <p>Se Android chiude l'app la partita non si salva: alla ripartenza {@link SavedStateHandle} ha
- * ancora il segno di una partita in corso, la sessione è nuova, e il giocatore viene avvisato.
+ * <p>La partita si salva dopo ogni comando, finché è in corso, e alla creazione si riprende quella
+ * salvata; a fine partita il salvataggio si cancella. Se Android chiude l'app e il salvataggio
+ * manca o non si legge, alla ripartenza {@link SavedStateHandle} ha ancora il segno di una partita
+ * in corso, la sessione è nuova, e il giocatore viene avvisato.
  *
  * <p>Le impostazioni del giocatore si leggono una volta, alla creazione, e si salvano a ogni
  * cambiamento: restano anche dopo la chiusura dell'app, e una partita nuova non le tocca.
@@ -75,6 +80,8 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private final BuildInfo build;
     private final Clock clock;
     private final SettingsStore settingsStore;
+    private final GameStore games;
+    private final SaveCodec codec;
     private final CommandJournal journal = new CommandJournal();
     private final CommandLogFormat format = new CommandLogFormat();
     private final MutableLiveData<GameUiState> uiState = new MutableLiveData<>();
@@ -86,7 +93,10 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private Settings settings;
     private long lastClaimedRevision;
 
-    /** Inizia subito una partita, e ricorda se Android aveva chiuso l'app durante quella prima. */
+    /**
+     * Riprende la partita salvata o ne inizia una nuova, e ricorda se Android aveva chiuso l'app
+     * durante quella prima senza che si potesse riprendere.
+     */
     @Inject
     public GameViewModel(
             GameSession session,
@@ -95,7 +105,9 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
             FeedbackStore feedback,
             BuildInfo build,
             Clock clock,
-            SettingsStore settingsStore) {
+            SettingsStore settingsStore,
+            GameStore games,
+            SaveCodec codec) {
         this.session = session;
         this.saved = saved;
         this.seeds = seeds;
@@ -103,9 +115,14 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         this.build = build;
         this.clock = clock;
         this.settingsStore = settingsStore;
+        this.games = games;
+        this.codec = codec;
         this.settings = settingsStore.load();
-        this.previousGameLost = Boolean.TRUE.equals(saved.get(GAME_IN_PROGRESS));
-        start();
+        boolean resumed = resume();
+        this.previousGameLost = !resumed && Boolean.TRUE.equals(saved.get(GAME_IN_PROGRESS));
+        if (!resumed) {
+            start();
+        }
     }
 
     public LiveData<GameUiState> uiState() {
@@ -146,6 +163,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         if (log.size() > LOG_SIZE) {
             log.subList(0, log.size() - LOG_SIZE).clear();
         }
+        persist(result);
         publish(result);
     }
 
@@ -288,7 +306,51 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         log.clear();
         TurnResult result = session.newGame(seed);
         saved.set(GAME_IN_PROGRESS, true);
+        persist(result);
         publish(result);
+    }
+
+    /**
+     * Riprende la partita salvata, se c'è: il registro dei comandi continua da dove era, quello dei
+     * messaggi riparte vuoto.
+     *
+     * @return falso se non c'è un salvataggio o non si legge; uno illeggibile si cancella
+     */
+    private boolean resume() {
+        Optional<SavedGame> game = games.load();
+        if (!game.isPresent()) {
+            return false;
+        }
+        try {
+            List<Command> commands = new ArrayList<>();
+            for (String line : game.get().commands()) {
+                commands.add(format.parse(line));
+            }
+            TurnResult result = session.resume(codec, game.get().session());
+            journal.start(game.get().journalSeed());
+            for (Command command : commands) {
+                journal.record(command);
+            }
+            saved.set(GAME_IN_PROGRESS, true);
+            publish(result);
+            return true;
+        } catch (IllegalArgumentException e) {
+            games.clear();
+            return false;
+        }
+    }
+
+    /** Salva la partita in corso, o cancella il salvataggio se è finita: la morte è definitiva. */
+    private void persist(TurnResult result) {
+        if (result.snapshot().phase() != Phase.PLAYING) {
+            games.clear();
+            return;
+        }
+        List<String> commands = new ArrayList<>();
+        for (Command command : journal.commands()) {
+            commands.add(format.line(command));
+        }
+        games.save(new SavedGame(journal.seed(), commands, session.save(codec)));
     }
 
     private void publish(TurnResult result) {

@@ -30,6 +30,42 @@ class SeededRandomSourceTest {
         }
     }
 
+    /**
+     * L'algoritmo è quello di SplittableRandom: stessi numeri per gli stessi seed, anche dopo uno
+     * split. Così le partite di prima restano identiche.
+     */
+    @Test
+    void sequence_isTheSameAsSplittableRandom() {
+        for (long seed : new long[] {0, 1, 42, -7, 20_261_029L, Long.MAX_VALUE}) {
+            SeededRandomSource ours = new SeededRandomSource(seed);
+            java.util.SplittableRandom theirs = new java.util.SplittableRandom(seed);
+            for (int i = 0; i < 200; i++) {
+                int bound = 1 + i * 7;
+                assertThat(ours.nextInt(bound)).isEqualTo(theirs.nextInt(bound));
+                assertThat(ours.nextLong()).isEqualTo(theirs.nextLong());
+            }
+            SeededRandomSource ourSplit = ours.split();
+            java.util.SplittableRandom theirSplit = theirs.split();
+            for (int i = 0; i < 100; i++) {
+                assertThat(ourSplit.nextInt(1000)).isEqualTo(theirSplit.nextInt(1000));
+                assertThat(ours.nextInt(64)).isEqualTo(theirs.nextInt(64));
+            }
+        }
+    }
+
+    @Test
+    void state_restored_continuesTheSameSequence() {
+        SeededRandomSource first = new SeededRandomSource(9);
+        for (int i = 0; i < 37; i++) {
+            first.nextInt(100);
+        }
+        SeededRandomSource second = SeededRandomSource.restore(first.state());
+
+        for (int i = 0; i < 100; i++) {
+            assertThat(second.nextLong()).isEqualTo(first.nextLong());
+        }
+    }
+
     @Test
     void nextInt_nonPositiveBound_isRejected() {
         assertThatThrownBy(() -> new SeededRandomSource(7).nextInt(0))

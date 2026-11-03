@@ -76,6 +76,17 @@ public final class Player extends Actor {
         return coins;
     }
 
+    /** Rimette la progressione salvata; solo per riprendere una partita. */
+    void restoreProgress(int level, int experience, int experienceToNextLevel, int coins) {
+        if (level < 1 || experience < 0 || experience >= experienceToNextLevel || coins < 0) {
+            throw new IllegalArgumentException("Progressione salvata non valida");
+        }
+        this.level = level;
+        this.experience = experience;
+        this.experienceToNextLevel = experienceToNextLevel;
+        this.coins = coins;
+    }
+
     void addCoins(int amount) {
         coins = Math.addExact(coins, amount);
     }

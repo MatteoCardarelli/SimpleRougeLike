@@ -173,6 +173,34 @@ public final class GameSession {
         return result;
     }
 
+    /**
+     * La partita in corso come righe di testo, da salvare: {@link #resume} la riprende da qui.
+     *
+     * @throws IllegalStateException se non c'è ancora una partita
+     */
+    public List<String> save(SaveCodec codec) {
+        return codec.write(requireRun(), seed);
+    }
+
+    /**
+     * Riprende una partita salvata con {@link #save}: da qui continua identica a come sarebbe
+     * continuata. Gli eventi del risultato sono vuoti, come all'inizio di una partita.
+     *
+     * @throws IllegalArgumentException se le righe non sono un salvataggio valido; la partita di
+     *     prima, se c'era, resta quella
+     */
+    public TurnResult resume(SaveCodec codec, List<String> lines) {
+        SaveCodec.Saved saved = codec.read(lines);
+        Run restored = saved.run();
+        if (restored.depth() > floorSpecs.size()) {
+            throw new IllegalArgumentException("Piano salvato oltre l'ultimo: " + restored.depth());
+        }
+        this.run = restored;
+        this.seed = saved.seed();
+        this.state = new PlayingState().next(restored.view(), isLastFloor(restored));
+        return remember(true, List.of(), restored);
+    }
+
     /** Vero se il player vivo sta sulle scale e c'è un piano sotto. */
     private boolean onStairs(Run current) {
         Floor floor = current.floor();

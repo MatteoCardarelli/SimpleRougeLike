@@ -41,6 +41,14 @@ public final class Item {
         return definition.throwing();
     }
 
+    /** Rimette il numero di pezzi salvato; solo per riprendere una partita. */
+    void restoreCount(int value) {
+        if (value < 1 || (value > 1 && !definition.stackable())) {
+            throw new IllegalArgumentException("Pezzi salvati non validi: " + value);
+        }
+        count = value;
+    }
+
     /** Aggiunge i pezzi di un altro oggetto dello stesso tipo. */
     void absorb(Item other) {
         if (!definition.stackable() || !other.kind().equals(kind())) {
