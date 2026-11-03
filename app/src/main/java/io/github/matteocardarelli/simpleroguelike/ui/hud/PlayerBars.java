@@ -23,7 +23,9 @@ public final class PlayerBars {
         fill(bars, player);
         bars.healthValue.setVisibility(View.GONE);
         bars.statsValue.setVisibility(View.GONE);
-        bars.xpValue.setText(context.getString(R.string.hud_level, player.level(), depth, floors));
+        bars.xpValue.setText(
+                context.getString(
+                        R.string.hud_level, player.level(), depth, floors, player.coins()));
     }
 
     /**
@@ -49,7 +51,8 @@ public final class PlayerBars {
                         player.attack(),
                         player.defense(),
                         player.accuracy(),
-                        player.evasion()));
+                        player.evasion(),
+                        player.coins()));
     }
 
     /** Le barre e le loro descrizioni per TalkBack, uguali nei due posti. */

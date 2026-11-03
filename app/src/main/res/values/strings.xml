@@ -47,6 +47,10 @@
     <string name="kind_locked_door_description">Serve una chiave per aprirla.</string>
     <string name="kind_boss_door_name">Porta del boss</string>
     <string name="kind_boss_door_description">Dietro c\'è il boss. La apre solo la sua chiave.</string>
+    <string name="kind_merchant_name">Mercante</string>
+    <string name="kind_merchant_description">Vende quello che ha a terra. Paga prima di uscire: derubato è fortissimo e veloce.</string>
+    <string name="kind_coins_name">Monete</string>
+    <string name="kind_coins_description">Quindici monete: vanno nel tuo contatore.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -59,6 +63,8 @@
     <string name="inventory_throw">Lancia</string>
     <string name="inventory_count">%1$s ×%2$d</string>
     <string name="boss_status">%1$s: %2$d/%3$d</string>
+    <string name="ware_offer">%1$s: %2$d monete</string>
+    <string name="ware_take">Prendi</string>
     <string name="aim_hint">Scorri per lanciare · doppio tap per annullare</string>
     <string name="inventory_equipped_badge">E</string>
     <string name="inventory_equipped">%1$s, equipaggiato</string>
@@ -79,6 +85,12 @@
     <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
     <string name="log_item_used">Usi: %1$s.</string>
     <string name="log_door_opened">Apri la porta.</string>
+    <string name="log_coins">Raccogli %1$d monete.</string>
+    <string name="log_ware_taken">Prendi %1$s: da pagare %2$d monete.</string>
+    <string name="log_wares_paid">Paghi %1$d monete al mercante.</string>
+    <string name="log_not_enough_coins">Servono %1$d monete, ne hai %2$d.</string>
+    <string name="log_merchant_greeted">Il mercante ti saluta.</string>
+    <string name="log_merchant_angered">Il mercante ti ha visto rubare!</string>
     <string name="log_jump_announced">Lo slime gigante si prepara a saltare: spostati!</string>
     <string name="log_landed">%1$s atterra con un tonfo.</string>
     <string name="log_door_unlocked">Apri la porta con la chiave.</string>
@@ -100,8 +112,8 @@
 
     <string name="hud_health_value">%1$d/%2$d</string>
     <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
-    <string name="hud_level">liv. %1$d · piano %2$d/%3$d</string>
-    <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d</string>
+    <string name="hud_level">liv. %1$d · piano %2$d/%3$d · %4$d monete</string>
+    <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d · Monete %5$d</string>
 
     <string name="debug_turn">turno %1$d</string>
 

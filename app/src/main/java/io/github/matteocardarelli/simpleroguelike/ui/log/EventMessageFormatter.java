@@ -3,6 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.ui.log;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
+import io.github.matteocardarelli.simpleroguelike.event.CoinsPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
@@ -23,8 +24,13 @@ import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeveledUp;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
+import io.github.matteocardarelli.simpleroguelike.event.MerchantAngered;
+import io.github.matteocardarelli.simpleroguelike.event.MerchantGreeted;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
+import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
+import io.github.matteocardarelli.simpleroguelike.event.WareTaken;
+import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
@@ -101,6 +107,16 @@ public final class EventMessageFormatter {
                 (e, player) -> texts.text(R.string.log_inventory_full, name(e.kind())));
         register(ItemUsed.class, (e, player) -> texts.text(R.string.log_item_used, name(e.kind())));
         register(DoorOpened.class, (e, player) -> texts.text(R.string.log_door_opened));
+        register(CoinsPickedUp.class, (e, player) -> texts.text(R.string.log_coins, e.amount()));
+        register(
+                WareTaken.class,
+                (e, player) -> texts.text(R.string.log_ware_taken, name(e.kind()), e.price()));
+        register(WaresPaid.class, (e, player) -> texts.text(R.string.log_wares_paid, e.amount()));
+        register(
+                NotEnoughCoins.class,
+                (e, player) -> texts.text(R.string.log_not_enough_coins, e.bill(), e.coins()));
+        register(MerchantGreeted.class, (e, player) -> texts.text(R.string.log_merchant_greeted));
+        register(MerchantAngered.class, (e, player) -> texts.text(R.string.log_merchant_angered));
         register(JumpAnnounced.class, (e, player) -> texts.text(R.string.log_jump_announced));
         register(Landed.class, (e, player) -> texts.text(R.string.log_landed, name(e.kind())));
         register(DoorUnlocked.class, (e, player) -> texts.text(R.string.log_door_unlocked));

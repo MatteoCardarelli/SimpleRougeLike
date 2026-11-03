@@ -13,6 +13,7 @@ public final class Enemy extends Actor {
     private final EnemyDefinition definition;
     private Optional<Position> pendingJump = Optional.empty();
     private boolean tired;
+    private boolean angry;
 
     public Enemy(EntityId id, EnemyDefinition definition) {
         super(id, definition.stats());
@@ -26,7 +27,20 @@ public final class Enemy extends Actor {
 
     @Override
     public Faction faction() {
-        return Faction.MONSTERS;
+        return definition.merchant() && !angry ? Faction.NEUTRAL : Faction.MONSTERS;
+    }
+
+    public boolean isMerchant() {
+        return definition.merchant();
+    }
+
+    /** Vero per un mercante derubato: da lì in poi è un nemico. */
+    public boolean isAngry() {
+        return angry;
+    }
+
+    void anger() {
+        angry = true;
     }
 
     public int experienceReward() {

@@ -9,6 +9,7 @@ import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.di.TestContent;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
+import io.github.matteocardarelli.simpleroguelike.event.CoinsPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
@@ -24,8 +25,11 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
+import io.github.matteocardarelli.simpleroguelike.event.MerchantAngered;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
+import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
+import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
@@ -131,6 +135,14 @@ class EventMessageFormatterTest {
                 .contains(R.string.log_jump_announced + "[]");
         assertThat(formatter.format(new Landed(GOBLIN, Kind.of("giant_slime"), AT, AT), PLAYER))
                 .contains(R.string.log_landed + "[" + R.string.kind_giant_slime_name + "[]]");
+        assertThat(formatter.format(new CoinsPickedUp(15, AT), PLAYER))
+                .contains(R.string.log_coins + "[15]");
+        assertThat(formatter.format(new WaresPaid(60, AT), PLAYER))
+                .contains(R.string.log_wares_paid + "[60]");
+        assertThat(formatter.format(new NotEnoughCoins(60, 10, AT), PLAYER))
+                .contains(R.string.log_not_enough_coins + "[60, 10]");
+        assertThat(formatter.format(new MerchantAngered(GOBLIN, AT), PLAYER))
+                .contains(R.string.log_merchant_angered + "[]");
         assertThat(formatter.format(new FloorChanged(3), PLAYER))
                 .contains(R.string.log_floor_changed + "[3]");
         assertThat(formatter.format(new LeverPulled(AT, List.of(AT)), PLAYER))

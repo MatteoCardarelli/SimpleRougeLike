@@ -23,7 +23,7 @@ class FeedbackEntryTest {
                 15,
                 Phase.PLAYING,
                 new PlayerView(
-                        new EntityId(1), new Position(3, 4), 80, 100, 1, 25, 100, 12, 3, 10, 5),
+                        new EntityId(1), new Position(3, 4), 80, 100, 1, 25, 100, 12, 3, 10, 5, 45),
                 true,
                 text,
                 List.of("move up", "use item=12"));
@@ -47,6 +47,7 @@ class FeedbackEntryTest {
                         "health=80/100",
                         "level=1",
                         "experience=25/100",
+                        "coins=45",
                         "stats=12/3/10/5",
                         "inventory_open=true",
                         "---",

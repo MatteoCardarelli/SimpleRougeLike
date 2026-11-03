@@ -92,27 +92,34 @@ public final class EnemyTurnRunner {
                 throw new IllegalStateException(
                         "Nessuna strategia " + enemy.behavior().value() + " per " + enemy.id());
             }
-            EnemyIntent intent = behavior.decide(enemy, run.view(), run.gameplay());
-            switch (intent) {
-                case StepIntent(Direction direction) ->
-                        events.addAll(
-                                actions.step(floor, enemy.id(), direction, run.gameplay())
-                                        .events());
-                case RangedAttackIntent(Direction direction) ->
-                        events.addAll(
-                                ranged.shoot(
-                                        floor,
-                                        enemy.id(),
-                                        direction,
-                                        enemy.range(),
-                                        RangedRules.ARROW,
-                                        enemy.stats().attack(),
-                                        run.gameplay()));
-                case JumpIntent(Position anchor) ->
-                        events.add(floor.announceJump(enemy.id(), anchor));
-                case LandIntent() -> events.addAll(jumps.land(floor, enemy.id()));
-                case RestIntent() -> floor.rest(enemy.id());
-                case WaitIntent() -> {}
+            // Chi è più veloce, come un mercante arrabbiato, fa più azioni nello stesso turno.
+            for (int action = 0;
+                    action < enemy.definition().speed()
+                            && enemy.isAlive()
+                            && floor.player().isAlive();
+                    action++) {
+                EnemyIntent intent = behavior.decide(enemy, run.view(), run.gameplay());
+                switch (intent) {
+                    case StepIntent(Direction direction) ->
+                            events.addAll(
+                                    actions.step(floor, enemy.id(), direction, run.gameplay())
+                                            .events());
+                    case RangedAttackIntent(Direction direction) ->
+                            events.addAll(
+                                    ranged.shoot(
+                                            floor,
+                                            enemy.id(),
+                                            direction,
+                                            enemy.range(),
+                                            RangedRules.ARROW,
+                                            enemy.stats().attack(),
+                                            run.gameplay()));
+                    case JumpIntent(Position anchor) ->
+                            events.add(floor.announceJump(enemy.id(), anchor));
+                    case LandIntent() -> events.addAll(jumps.land(floor, enemy.id()));
+                    case RestIntent() -> floor.rest(enemy.id());
+                    case WaitIntent() -> {}
+                }
             }
         }
         return List.copyOf(events);

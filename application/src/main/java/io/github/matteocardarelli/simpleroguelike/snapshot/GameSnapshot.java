@@ -3,6 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.snapshot;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * La partita dopo un turno, come la vede il player: le celle mai viste non rivelano niente, e
@@ -14,6 +15,7 @@ import java.util.List;
  * @param floors quanti piani ha la partita
  * @param danger le celle dove un nemico visibile atterrerà al prossimo turno: chi ci resta viene
  *     schiacciato
+ * @param ware la merce del negozio su cui sta il player, se c'è
  * @param visibleEnemies i nemici vivi nelle celle visibili, in ordine di id
  * @param visibleItems gli oggetti a terra nelle celle visibili
  * @param inventory gli oggetti del player, in ordine di raccolta
@@ -32,7 +34,8 @@ public record GameSnapshot(
         List<FixtureView> fixtures,
         int depth,
         int floors,
-        List<Position> danger) {
+        List<Position> danger,
+        Optional<WareView> ware) {
 
     public GameSnapshot {
         visibleEnemies = List.copyOf(visibleEnemies);

@@ -15,4 +15,34 @@ public record PlayerView(
         int attack,
         int defense,
         int accuracy,
-        int evasion) {}
+        int evasion,
+        int coins) {
+
+    /** Un player senza monete. */
+    public PlayerView(
+            EntityId id,
+            Position position,
+            int health,
+            int maxHealth,
+            int level,
+            int experience,
+            int experienceToNextLevel,
+            int attack,
+            int defense,
+            int accuracy,
+            int evasion) {
+        this(
+                id,
+                position,
+                health,
+                maxHealth,
+                level,
+                experience,
+                experienceToNextLevel,
+                attack,
+                defense,
+                accuracy,
+                evasion,
+                0);
+    }
+}

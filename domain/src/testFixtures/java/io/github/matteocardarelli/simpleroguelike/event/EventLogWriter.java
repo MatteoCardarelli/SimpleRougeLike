@@ -147,6 +147,34 @@ public final class EventLogWriter {
                                 + at(e.at()));
         register(DoorOpened.class, e -> "DoorOpened at=" + at(e.at()));
         register(
+                CoinsPickedUp.class,
+                e -> "CoinsPickedUp amount=" + e.amount() + " at=" + at(e.at()));
+        register(
+                WareTaken.class,
+                e ->
+                        "WareTaken item="
+                                + id(e.item())
+                                + " kind="
+                                + e.kind().value()
+                                + " price="
+                                + e.price()
+                                + " at="
+                                + at(e.at()));
+        register(WaresPaid.class, e -> "WaresPaid amount=" + e.amount() + " at=" + at(e.at()));
+        register(
+                NotEnoughCoins.class,
+                e ->
+                        "NotEnoughCoins bill="
+                                + e.bill()
+                                + " coins="
+                                + e.coins()
+                                + " at="
+                                + at(e.at()));
+        register(MerchantGreeted.class, e -> "MerchantGreeted at=" + at(e.at()));
+        register(
+                MerchantAngered.class,
+                e -> "MerchantAngered merchant=" + id(e.merchant()) + " at=" + at(e.at()));
+        register(
                 JumpAnnounced.class,
                 e -> "JumpAnnounced jumper=" + id(e.jumper()) + " cells=" + path(e.cells()));
         register(

@@ -49,7 +49,13 @@ class EventLogWriterTest {
                         "t12 DoorLocked at=3,4",
                         "t12 ItemDropped item=7 kind=goblin at=3,4",
                         "t12 JumpAnnounced jumper=1 cells=3,4;4,4",
-                        "t12 Landed jumper=1 kind=goblin from=3,4 to=4,4");
+                        "t12 Landed jumper=1 kind=goblin from=3,4 to=4,4",
+                        "t12 CoinsPickedUp amount=15 at=3,4",
+                        "t12 WareTaken item=7 kind=goblin price=60 at=3,4",
+                        "t12 WaresPaid amount=60 at=3,4",
+                        "t12 NotEnoughCoins bill=60 coins=10 at=3,4",
+                        "t12 MerchantGreeted at=3,4",
+                        "t12 MerchantAngered merchant=1 at=3,4");
     }
 
     @Test
@@ -105,7 +111,13 @@ class EventLogWriterTest {
                         List.of(P),
                         List.of(P),
                         List.of(P, Q),
-                        List.of(P, Q));
+                        List.of(P, Q),
+                        List.of(P),
+                        List.of(P),
+                        List.of(P),
+                        List.of(P),
+                        List.of(P),
+                        List.of());
     }
 
     private static List<GameEvent> everyEvent() {
@@ -133,6 +145,12 @@ class EventLogWriterTest {
                 new DoorLocked(P),
                 new ItemDropped(B, GOBLIN, P),
                 new JumpAnnounced(A, List.of(P, Q)),
-                new Landed(A, GOBLIN, P, Q));
+                new Landed(A, GOBLIN, P, Q),
+                new CoinsPickedUp(15, P),
+                new WareTaken(B, GOBLIN, 60, P),
+                new WaresPaid(60, P),
+                new NotEnoughCoins(60, 10, P),
+                new MerchantGreeted(P),
+                new MerchantAngered(A, P));
     }
 }

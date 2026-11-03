@@ -65,6 +65,7 @@ public final class TestGraph {
         handlers.add(GameModule.useItemHandler());
         handlers.add(GameModule.throwHandler(ranged));
         handlers.add(GameModule.equipHandler());
+        handlers.add(GameModule.takeWareHandler());
         handlers.add(GameModule.unequipHandler());
         return handlers;
     }
@@ -76,6 +77,7 @@ public final class TestGraph {
         behaviors.add(GameModule.keepDistance(GameModule.pathfinder()));
         behaviors.add(GameModule.pack(GameModule.pathfinder()));
         behaviors.add(GameModule.jumpAndCrush());
+        behaviors.add(GameModule.merchant(GameModule.pathfinder()));
         return behaviors;
     }
 }

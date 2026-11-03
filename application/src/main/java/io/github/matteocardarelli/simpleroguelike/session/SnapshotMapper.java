@@ -19,9 +19,11 @@ import io.github.matteocardarelli.simpleroguelike.snapshot.ItemView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Visibility;
+import io.github.matteocardarelli.simpleroguelike.snapshot.WareView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Fotografa il piano per l'interfaccia, con le stesse celle visibili usate per filtrare gli eventi:
@@ -104,7 +106,8 @@ public final class SnapshotMapper {
                         player.stats().attack(),
                         player.stats().defense(),
                         player.stats().accuracy(),
-                        player.stats().evasion());
+                        player.stats().evasion(),
+                        player.coins());
 
         List<FixtureView> fixtures = new ArrayList<>();
         for (Map.Entry<Position, Fixture> entry : floor.fixtures().entrySet()) {
@@ -126,7 +129,17 @@ public final class SnapshotMapper {
                 fixtures,
                 depth,
                 floors,
-                danger);
+                danger,
+                ware(floor, playerView.position()));
+    }
+
+    private static Optional<WareView> ware(FloorView floor, Position at) {
+        Optional<Item> item = floor.wareAt(at);
+        if (!item.isPresent()) {
+            return Optional.empty();
+        }
+        int price = floor.shop().flatMap(shop -> shop.priceOf(item.get().id())).orElse(0);
+        return Optional.of(new WareView(item.get().id(), item.get().kind(), price));
     }
 
     private static Visibility visibility(Position cell, CellSet visible, CellSet explored) {

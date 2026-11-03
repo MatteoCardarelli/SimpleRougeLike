@@ -18,6 +18,9 @@ public record GameConfig(List<FloorSpec> floorSpecs, int visionRadius, OptionalL
     /** Quanti piani ha una partita. */
     public static final int FLOORS = 5;
 
+    /** La probabilità, in percentuale, di un negozio su un piano: circa uno ogni tre o quattro. */
+    public static final int SHOP_CHANCE = 30;
+
     public GameConfig {
         floorSpecs = List.copyOf(floorSpecs);
         if (floorSpecs.isEmpty()) {
@@ -48,7 +51,8 @@ public record GameConfig(List<FloorSpec> floorSpecs, int visionRadius, OptionalL
                             1,
                             depth < FLOORS ? 1 : 0,
                             2,
-                            depth == FLOORS ? 1 : 0));
+                            depth == FLOORS ? 1 : 0,
+                            depth < FLOORS ? SHOP_CHANCE : 0));
         }
         return new GameConfig(floors, 8, OptionalLong.empty());
     }

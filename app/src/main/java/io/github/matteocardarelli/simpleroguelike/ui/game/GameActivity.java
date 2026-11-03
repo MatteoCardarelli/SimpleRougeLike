@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.github.matteocardarelli.simpleroguelike.R;
+import io.github.matteocardarelli.simpleroguelike.command.TakeWareCommand;
 import io.github.matteocardarelli.simpleroguelike.databinding.ActivityGameBinding;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -23,6 +24,7 @@ import io.github.matteocardarelli.simpleroguelike.settings.Settings;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
+import io.github.matteocardarelli.simpleroguelike.snapshot.WareView;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackHost;
@@ -43,6 +45,7 @@ import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsHost;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 
@@ -75,6 +78,8 @@ public class GameActivity extends AppCompatActivity
     private GatedPlayerInput input;
     private GestureDetector gestures;
     private @Nullable Snackbar lostGameNotice;
+    private @Nullable Snackbar wareNotice;
+    private @Nullable EntityId wareShown;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -158,6 +163,7 @@ public class GameActivity extends AppCompatActivity
 
         syncInventorySheet(state);
         showLostGameNotice(state.previousGameLost());
+        showWare(snapshot);
     }
 
     /** Nome e salute del boss, quando è visibile. */
@@ -225,6 +231,40 @@ public class GameActivity extends AppCompatActivity
     private static InventoryContent inventory(GameUiState state) {
         GameSnapshot snapshot = state.result().snapshot();
         return new InventoryContent(snapshot.inventory(), state.selectedItem(), snapshot.player());
+    }
+
+    /**
+     * La merce del negozio su cui sta il player: nome e prezzo, e "Prendi". L'avviso sparisce
+     * quando il player si sposta o prende la merce.
+     */
+    private void showWare(GameSnapshot snapshot) {
+        Optional<WareView> ware = snapshot.ware();
+        EntityId shown = wareShown;
+        if (ware.isPresent() && ware.get().item().equals(shown)) {
+            return;
+        }
+        Snackbar notice = wareNotice;
+        if (notice != null) {
+            notice.dismiss();
+            wareNotice = null;
+            wareShown = null;
+        }
+        if (ware.isPresent()) {
+            WareView offer = ware.get();
+            Snackbar created =
+                    Snackbar.make(
+                            binding.getRoot(),
+                            getString(
+                                    R.string.ware_offer,
+                                    getString(content.nameRes(offer.kind())),
+                                    offer.price()),
+                            Snackbar.LENGTH_INDEFINITE);
+            created.setAction(
+                    R.string.ware_take, v -> input.submit(new TakeWareCommand(offer.item())));
+            created.show();
+            wareNotice = created;
+            wareShown = offer.item();
+        }
     }
 
     /** L'avviso resta finché il giocatore non lo conferma, anche dopo una rotazione. */

@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.KiteBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.MerchantBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.SlimeBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.SurroundBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
@@ -95,10 +96,14 @@ final class Sessions {
                         new AggroBehavior(
                                 new SurroundBehavior(new StraightLinePathfinder()),
                                 new WanderBehavior()));
+        BehaviorBinding merchant =
+                new BehaviorBinding(
+                        StandardEnemyCatalog.MERCHANT_BEHAVIOR,
+                        new MerchantBehavior(new ChaseBehavior(new StraightLinePathfinder())));
         BehaviorBinding jump =
                 new BehaviorBinding(StandardEnemyCatalog.JUMP_AND_CRUSH, new SlimeBehavior());
         return new EnemyTurnRunner(
-                List.of(chaseOrWander, keepDistance, pack, jump),
+                List.of(chaseOrWander, keepDistance, pack, jump, merchant),
                 new StandardEnemyCatalog(),
                 ACTIONS,
                 RANGED,

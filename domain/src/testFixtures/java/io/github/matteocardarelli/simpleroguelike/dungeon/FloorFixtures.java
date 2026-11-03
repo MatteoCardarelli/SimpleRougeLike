@@ -24,6 +24,7 @@ import java.util.Optional;
  * >  scale              w  lupo
  * K  porta chiusa a chiave   k  chiave a terra
  * S  slime gigante, con la cella di riferimento in alto a sinistra del suo cerchio 4×4
+ * M  mercante           c  mucchio di monete
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -102,6 +103,9 @@ public final class FloorFixtures {
                     case 'a' -> builder.enemy(new Enemy(ids.next(), archer()), at);
                     case 'w' -> builder.enemy(new Enemy(ids.next(), wolf()), at);
                     case 'S' -> builder.enemy(new Enemy(ids.next(), giantSlime()), at);
+                    case 'M' -> builder.enemy(new Enemy(ids.next(), merchant()), at);
+                    case 'c' ->
+                            builder.item(new Item(ids.next(), item(StandardItemCatalog.COINS)), at);
                     case '-' ->
                             builder.item(
                                     new Item(ids.next(), item(StandardItemCatalog.THROWING_KNIFE)),
@@ -158,6 +162,10 @@ public final class FloorFixtures {
 
     public static EnemyDefinition giantSlime() {
         return new StandardEnemyCatalog().all().get(3);
+    }
+
+    public static EnemyDefinition merchant() {
+        return new StandardEnemyCatalog().all().get(4);
     }
 
     public static ItemDefinition potion() {

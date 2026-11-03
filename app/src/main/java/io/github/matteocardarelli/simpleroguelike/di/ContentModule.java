@@ -222,6 +222,18 @@ public final class ContentModule {
                         R.string.kind_boss_door_name,
                         R.string.kind_boss_door_description,
                         R.color.kind_boss_door));
+        styles.put(
+                StandardEnemyCatalog.MERCHANT,
+                new ContentPresentation.Style(
+                        R.string.kind_merchant_name,
+                        R.string.kind_merchant_description,
+                        R.color.kind_merchant));
+        styles.put(
+                StandardItemCatalog.COINS,
+                new ContentPresentation.Style(
+                        R.string.kind_coins_name,
+                        R.string.kind_coins_description,
+                        R.color.kind_coins));
         // Gli oggetti fissi del piano.
         styles.put(
                 FixtureType.STAIRS.kind(),

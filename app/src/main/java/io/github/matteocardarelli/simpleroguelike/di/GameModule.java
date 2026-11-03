@@ -11,6 +11,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.KiteBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.MerchantBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.SlimeBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.SurroundBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
@@ -18,6 +19,7 @@ import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
 import io.github.matteocardarelli.simpleroguelike.command.EquipHandler;
 import io.github.matteocardarelli.simpleroguelike.command.MoveHandler;
+import io.github.matteocardarelli.simpleroguelike.command.TakeWareHandler;
 import io.github.matteocardarelli.simpleroguelike.command.ThrowHandler;
 import io.github.matteocardarelli.simpleroguelike.command.UnequipHandler;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemHandler;
@@ -110,6 +112,21 @@ public abstract class GameModule {
         return new BehaviorBinding(
                 StandardEnemyCatalog.PACK,
                 new AggroBehavior(new SurroundBehavior(pathfinder), new WanderBehavior()));
+    }
+
+    /** Il mercante sta al banco; derubato attacca da vicino e da lontano e insegue. */
+    @Provides
+    @IntoSet
+    static BehaviorBinding merchant(Pathfinder pathfinder) {
+        return new BehaviorBinding(
+                StandardEnemyCatalog.MERCHANT_BEHAVIOR,
+                new MerchantBehavior(new ChaseBehavior(pathfinder)));
+    }
+
+    @Provides
+    @IntoSet
+    static CommandHandler<?> takeWareHandler() {
+        return new TakeWareHandler();
     }
 
     /** Lo slime gigante salta sul player e lo schiaccia, poi riposa un turno. */
