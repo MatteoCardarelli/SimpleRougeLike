@@ -74,10 +74,19 @@ record FixtureLayout(
     }
 
     static FixtureLayout plan(Grid<TileType> terrain, FloorSpec spec, RandomSource random) {
+        return plan(terrain, spec, random, Collections.emptySet());
+    }
+
+    /**
+     * Come l'altro, lasciando stare le celle {@code reserved}, come l'arena del boss: niente
+     * oggetti fissi lì, e il player non ci nasce.
+     */
+    static FixtureLayout plan(
+            Grid<TileType> terrain, FloorSpec spec, RandomSource random, Set<Position> reserved) {
         List<Position> corridors = new ArrayList<>();
         List<Position> walkable = new ArrayList<>();
         for (Position cell : terrain.positions()) {
-            if (walkable(terrain, cell)) {
+            if (walkable(terrain, cell) && !reserved.contains(cell)) {
                 walkable.add(cell);
                 if (isCorridor(terrain, cell)) {
                     corridors.add(cell);
@@ -85,7 +94,7 @@ record FixtureLayout(
             }
         }
         Set<Position> used = new LinkedHashSet<>();
-        Set<Position> closed = new LinkedHashSet<>();
+        Set<Position> closed = new LinkedHashSet<>(reserved);
         List<Gate> gates = new ArrayList<>();
         List<Position> chests = new ArrayList<>();
         List<Position> candidates = new ArrayList<>(corridors);

@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.KiteBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.SlimeBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.SurroundBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
@@ -19,6 +20,7 @@ import io.github.matteocardarelli.simpleroguelike.port.StraightLinePathfinder;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
 import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
+import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.LevelingRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ final class Sessions {
     static final DamageRules DAMAGE = new DamageRules(LEVELING);
     static final ActionRules ACTIONS = new ActionRules(new CombatRules(DAMAGE));
     static final RangedRules RANGED = new RangedRules(DAMAGE);
+    static final JumpRules JUMPS = new JumpRules(DAMAGE);
     static final FloorSpec SPEC = new FloorSpec(15, 10, 3, 2, 3, 1);
 
     private Sessions() {}
@@ -92,10 +95,13 @@ final class Sessions {
                         new AggroBehavior(
                                 new SurroundBehavior(new StraightLinePathfinder()),
                                 new WanderBehavior()));
+        BehaviorBinding jump =
+                new BehaviorBinding(StandardEnemyCatalog.JUMP_AND_CRUSH, new SlimeBehavior());
         return new EnemyTurnRunner(
-                List.of(chaseOrWander, keepDistance, pack),
+                List.of(chaseOrWander, keepDistance, pack, jump),
                 new StandardEnemyCatalog(),
                 ACTIONS,
-                RANGED);
+                RANGED,
+                JUMPS);
     }
 }

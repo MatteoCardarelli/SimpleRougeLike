@@ -21,6 +21,8 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemDropped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
+import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
+import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
@@ -125,6 +127,10 @@ class EventMessageFormatterTest {
                         formatter.format(
                                 new ItemDropped(new EntityId(9), Kind.of("potion"), AT), PLAYER))
                 .contains(R.string.log_item_dropped + "[" + R.string.kind_potion_name + "[]]");
+        assertThat(formatter.format(new JumpAnnounced(GOBLIN, List.of(AT)), PLAYER))
+                .contains(R.string.log_jump_announced + "[]");
+        assertThat(formatter.format(new Landed(GOBLIN, Kind.of("giant_slime"), AT, AT), PLAYER))
+                .contains(R.string.log_landed + "[" + R.string.kind_giant_slime_name + "[]]");
         assertThat(formatter.format(new FloorChanged(3), PLAYER))
                 .contains(R.string.log_floor_changed + "[3]");
         assertThat(formatter.format(new LeverPulled(AT, List.of(AT)), PLAYER))

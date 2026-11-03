@@ -38,6 +38,20 @@
             android:contentDescription="@string/settings_button"
             android:src="@drawable/ic_settings" />
 
+        <!-- La salute del boss, quando si vede -->
+        <TextView
+            android:id="@+id/boss_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/shape_status"
+            android:padding="8dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <!-- Mentre si mira con un oggetto da lanciare: come scegliere la direzione -->
         <TextView
             android:id="@+id/aim_hint"

@@ -3,7 +3,10 @@ package io.github.matteocardarelli.simpleroguelike.session;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.EnemyBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.EnemyIntent;
+import io.github.matteocardarelli.simpleroguelike.ai.JumpIntent;
+import io.github.matteocardarelli.simpleroguelike.ai.LandIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.RangedAttackIntent;
+import io.github.matteocardarelli.simpleroguelike.ai.RestIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.StepIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.WaitIntent;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
@@ -13,7 +16,9 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.BehaviorKey;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
+import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.run.Run;
 import java.util.ArrayList;
@@ -33,6 +38,7 @@ public final class EnemyTurnRunner {
     private final TreeMap<BehaviorKey, EnemyBehavior> behaviors = new TreeMap<>();
     private final ActionRules actions;
     private final RangedRules ranged;
+    private final JumpRules jumps;
 
     /**
      * Registra le strategie.
@@ -44,7 +50,8 @@ public final class EnemyTurnRunner {
             Collection<BehaviorBinding> bindings,
             EnemyCatalog catalog,
             ActionRules actions,
-            RangedRules ranged) {
+            RangedRules ranged,
+            JumpRules jumps) {
         for (BehaviorBinding binding : bindings) {
             if (behaviors.putIfAbsent(binding.key(), binding.behavior()) != null) {
                 throw new IllegalArgumentException("Due strategie per " + binding.key().value());
@@ -61,6 +68,7 @@ public final class EnemyTurnRunner {
         }
         this.actions = actions;
         this.ranged = ranged;
+        this.jumps = jumps;
     }
 
     /**
@@ -100,6 +108,10 @@ public final class EnemyTurnRunner {
                                         RangedRules.ARROW,
                                         enemy.stats().attack(),
                                         run.gameplay()));
+                case JumpIntent(Position anchor) ->
+                        events.add(floor.announceJump(enemy.id(), anchor));
+                case LandIntent() -> events.addAll(jumps.land(floor, enemy.id()));
+                case RestIntent() -> floor.rest(enemy.id());
                 case WaitIntent() -> {}
             }
         }

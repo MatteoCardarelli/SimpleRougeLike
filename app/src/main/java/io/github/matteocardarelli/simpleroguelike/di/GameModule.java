@@ -11,6 +11,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.AggroBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
 import io.github.matteocardarelli.simpleroguelike.ai.ChaseBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.KiteBehavior;
+import io.github.matteocardarelli.simpleroguelike.ai.SlimeBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.SurroundBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
@@ -32,6 +33,7 @@ import io.github.matteocardarelli.simpleroguelike.port.FieldOfView;
 import io.github.matteocardarelli.simpleroguelike.port.Pathfinder;
 import io.github.matteocardarelli.simpleroguelike.port.TerrainGenerator;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
+import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
@@ -110,6 +112,13 @@ public abstract class GameModule {
                 new AggroBehavior(new SurroundBehavior(pathfinder), new WanderBehavior()));
     }
 
+    /** Lo slime gigante salta sul player e lo schiaccia, poi riposa un turno. */
+    @Provides
+    @IntoSet
+    static BehaviorBinding jumpAndCrush() {
+        return new BehaviorBinding(StandardEnemyCatalog.JUMP_AND_CRUSH, new SlimeBehavior());
+    }
+
     @Provides
     @IntoSet
     static CommandHandler<?> moveHandler(ActionRules actions) {
@@ -156,8 +165,9 @@ public abstract class GameModule {
             Set<BehaviorBinding> behaviors,
             EnemyCatalog enemies,
             ActionRules actions,
-            RangedRules ranged) {
-        return new EnemyTurnRunner(behaviors, enemies, actions, ranged);
+            RangedRules ranged,
+            JumpRules jumps) {
+        return new EnemyTurnRunner(behaviors, enemies, actions, ranged, jumps);
     }
 
     @Provides

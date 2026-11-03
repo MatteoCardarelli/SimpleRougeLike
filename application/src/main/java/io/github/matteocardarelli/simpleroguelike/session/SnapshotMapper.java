@@ -49,16 +49,25 @@ public final class SnapshotMapper {
                                         visibility(cell, visible, explored)));
 
         List<ActorView> enemies = new ArrayList<>();
+        List<Position> danger = new ArrayList<>();
         for (Enemy enemy : floor.enemies()) {
-            Position at = floor.positionOf(enemy.id());
-            if (visible.contains(at)) {
+            boolean seen = false;
+            for (Position cell : floor.cellsOf(enemy.id())) {
+                seen = seen || visible.contains(cell);
+            }
+            if (seen) {
                 enemies.add(
                         new ActorView(
                                 enemy.id(),
                                 enemy.kind(),
-                                at,
+                                floor.positionOf(enemy.id()),
                                 enemy.health(),
-                                enemy.stats().maxHealth()));
+                                enemy.stats().maxHealth(),
+                                enemy.footprint().size(),
+                                enemy.isBoss()));
+                if (enemy.pendingJump().isPresent()) {
+                    danger.addAll(enemy.footprint().at(enemy.pendingJump().get()));
+                }
             }
         }
 
@@ -116,7 +125,8 @@ public final class SnapshotMapper {
                 inventory,
                 fixtures,
                 depth,
-                floors);
+                floors,
+                danger);
     }
 
     private static Visibility visibility(Position cell, CellSet visible, CellSet explored) {

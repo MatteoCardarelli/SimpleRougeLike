@@ -17,6 +17,7 @@
     <!-- Gli attori e gli oggetti, finché non arrivano le illustrazioni -->
     <color name="kind_player">#FF00FF00</color>
     <color name="kind_goblin">#FFFF0000</color>
+    <color name="kind_giant_slime">#FF66BB6A</color>
     <color name="kind_wolf">#FF90A4AE</color>
     <color name="kind_key">#FFFFD54F</color>
     <color name="kind_boss_key">#FFE53935</color>

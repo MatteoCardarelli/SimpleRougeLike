@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.snapshot;
 
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
+import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.List;
 
 /**
@@ -11,6 +12,8 @@ import java.util.List;
  * @param turn il turno in corso, da 1
  * @param depth il piano in cui si gioca, da 1
  * @param floors quanti piani ha la partita
+ * @param danger le celle dove un nemico visibile atterrerà al prossimo turno: chi ci resta viene
+ *     schiacciato
  * @param visibleEnemies i nemici vivi nelle celle visibili, in ordine di id
  * @param visibleItems gli oggetti a terra nelle celle visibili
  * @param inventory gli oggetti del player, in ordine di raccolta
@@ -28,12 +31,14 @@ public record GameSnapshot(
         List<InventoryEntry> inventory,
         List<FixtureView> fixtures,
         int depth,
-        int floors) {
+        int floors,
+        List<Position> danger) {
 
     public GameSnapshot {
         visibleEnemies = List.copyOf(visibleEnemies);
         visibleItems = List.copyOf(visibleItems);
         inventory = List.copyOf(inventory);
         fixtures = List.copyOf(fixtures);
+        danger = List.copyOf(danger);
     }
 }

@@ -146,6 +146,20 @@ public final class EventLogWriter {
                                 + " at="
                                 + at(e.at()));
         register(DoorOpened.class, e -> "DoorOpened at=" + at(e.at()));
+        register(
+                JumpAnnounced.class,
+                e -> "JumpAnnounced jumper=" + id(e.jumper()) + " cells=" + path(e.cells()));
+        register(
+                Landed.class,
+                e ->
+                        "Landed jumper="
+                                + id(e.jumper())
+                                + " kind="
+                                + e.kind().value()
+                                + " from="
+                                + at(e.from())
+                                + " to="
+                                + at(e.to()));
         register(DoorUnlocked.class, e -> "DoorUnlocked at=" + at(e.at()));
         register(DoorLocked.class, e -> "DoorLocked at=" + at(e.at()));
         register(

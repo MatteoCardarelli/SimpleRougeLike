@@ -20,6 +20,7 @@ import io.github.matteocardarelli.simpleroguelike.databinding.ActivityGameBindin
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.settings.Settings;
+import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
@@ -138,6 +139,7 @@ public class GameActivity extends AppCompatActivity
 
         showLog(state);
         binding.aimHint.setVisibility(state.aimingItem().isPresent() ? View.VISIBLE : View.GONE);
+        showBoss(snapshot);
         // Il seed sta nelle impostazioni, in tutte le build: qui resta solo il turno.
         boolean debugInfo = getResources().getBoolean(R.bool.show_debug_info);
         if (debugInfo) {
@@ -156,6 +158,23 @@ public class GameActivity extends AppCompatActivity
 
         syncInventorySheet(state);
         showLostGameNotice(state.previousGameLost());
+    }
+
+    /** Nome e salute del boss, quando è visibile. */
+    private void showBoss(GameSnapshot snapshot) {
+        for (ActorView enemy : snapshot.visibleEnemies()) {
+            if (enemy.boss()) {
+                binding.bossStatus.setVisibility(View.VISIBLE);
+                binding.bossStatus.setText(
+                        getString(
+                                R.string.boss_status,
+                                getString(content.nameRes(enemy.kind())),
+                                enemy.health(),
+                                enemy.maxHealth()));
+                return;
+            }
+        }
+        binding.bossStatus.setVisibility(View.GONE);
     }
 
     /** La fine della partita: il risultato, fin dove si è arrivati, e "Nuova partita". */

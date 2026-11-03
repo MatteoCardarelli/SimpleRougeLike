@@ -40,7 +40,15 @@ public final class ActionRules {
                                 () -> new IllegalStateException(actorId + " non è un attore vivo"));
         Position to = floor.positionOf(actorId).translate(direction);
 
-        Optional<Actor> occupant = floor.actorAt(to);
+        // Un attore grande urta chiunque stia in una delle celle della sua impronta spostata.
+        Optional<Actor> occupant = Optional.empty();
+        for (Position cell : actor.footprint().at(to)) {
+            Optional<Actor> other = floor.actorAt(cell);
+            if (other.isPresent() && !other.get().id().equals(actorId)) {
+                occupant = other;
+                break;
+            }
+        }
         if (occupant.isPresent()) {
             if (!actor.faction().isHostileTo(occupant.get().faction())) {
                 return ActionResult.blocked();
@@ -48,7 +56,7 @@ public final class ActionRules {
             return ActionResult.performed(
                     combat.resolveAttack(floor, actorId, occupant.get().id(), random));
         }
-        if (!floor.isFree(to)) {
+        if (!floor.canOccupy(actorId, to)) {
             if (actorId.equals(floor.playerId()) && floor.fixtureAt(to).isPresent()) {
                 List<GameEvent> used = floor.interact(actorId, to);
                 return used.isEmpty() ? ActionResult.blocked() : ActionResult.performed(used);

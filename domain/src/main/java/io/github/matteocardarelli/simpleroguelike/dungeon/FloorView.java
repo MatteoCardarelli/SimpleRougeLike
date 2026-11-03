@@ -40,6 +40,27 @@ public interface FloorView {
      */
     Position positionOf(EntityId id);
 
+    /** Le celle occupate da un attore: la sua impronta a partire dalla sua posizione. */
+    List<Position> cellsOf(EntityId id);
+
+    /**
+     * Vero se l'attore può avere la cella di riferimento in {@code anchor}: tutta la sua impronta
+     * attraversabile e senza altri attori.
+     */
+    boolean canOccupy(EntityId id, Position anchor);
+
+    /** Come {@link #canOccupy}, ma il player sotto l'impronta non conta: verrà spinto via. */
+    boolean canLand(EntityId id, Position anchor);
+
+    /** Una cella di {@code defender} accanto a una cella di {@code attacker}, se si toccano. */
+    Optional<Position> contactCell(EntityId attacker, EntityId defender);
+
+    /** Il boss del piano, vivo o sconfitto, se il piano ne ha uno. */
+    Optional<EntityId> bossId();
+
+    /** Vero se il piano ha un boss ed è morto. */
+    boolean isBossDefeated();
+
     /** L'attore vivo nella cella, se c'è. */
     Optional<Actor> actorAt(Position position);
 

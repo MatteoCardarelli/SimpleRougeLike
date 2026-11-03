@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.jspecify.annotations.Nullable;
@@ -21,6 +22,7 @@ public final class FloorBuilder {
     private @Nullable Player player;
     private final TreeMap<EntityId, Enemy> enemies = new TreeMap<>();
     private final TreeMap<EntityId, Position> positions = new TreeMap<>();
+    private final LinkedHashMap<Position, EntityId> occupied = new LinkedHashMap<>();
     private final LinkedHashMap<Position, Item> groundItems = new LinkedHashMap<>();
     private final TreeSet<EntityId> itemIds = new TreeSet<>();
     private final LinkedHashMap<Position, Fixture> fixtures = new LinkedHashMap<>();
@@ -34,13 +36,13 @@ public final class FloorBuilder {
         if (this.player != null) {
             throw new IllegalStateException("Il player è già sul piano");
         }
-        placeActor(player.id(), at);
+        placeActor(player.id(), player.footprint().at(at), at);
         this.player = player;
         return this;
     }
 
     public FloorBuilder enemy(Enemy enemy, Position at) {
-        placeActor(enemy.id(), at);
+        placeActor(enemy.id(), enemy.footprint().at(at), at);
         enemies.put(enemy.id(), enemy);
         return this;
     }
@@ -80,7 +82,7 @@ public final class FloorBuilder {
         if (terrain == null || player == null) {
             throw new IllegalStateException("Un piano ha bisogno di terreno e player");
         }
-        positions.forEach((id, at) -> requireWalkable(terrain, at, id.toString()));
+        occupied.forEach((at, id) -> requireWalkable(terrain, at, id.toString()));
         groundItems.forEach((at, item) -> requireWalkable(terrain, at, item.id().toString()));
         fixtures.forEach(
                 (at, fixture) -> {
@@ -94,7 +96,7 @@ public final class FloorBuilder {
                         throw new IllegalStateException(
                                 "Un oggetto a terra sotto " + fixture.kind().value() + " in " + at);
                     }
-                    if (fixture.blocksMovement() && positions.containsValue(at)) {
+                    if (fixture.blocksMovement() && occupied.containsKey(at)) {
                         throw new IllegalStateException(
                                 "Un attore dentro " + fixture.kind().value() + " in " + at);
                     }
@@ -102,12 +104,17 @@ public final class FloorBuilder {
         return new Floor(terrain, player, enemies, positions, groundItems, fixtures);
     }
 
-    private void placeActor(EntityId id, Position at) {
+    private void placeActor(EntityId id, List<Position> cells, Position anchor) {
         requireNewId(id);
-        if (positions.containsValue(at)) {
-            throw new IllegalArgumentException("C'è già un attore in " + at);
+        for (Position cell : cells) {
+            if (occupied.containsKey(cell)) {
+                throw new IllegalArgumentException("C'è già un attore in " + cell);
+            }
         }
-        positions.put(id, at);
+        for (Position cell : cells) {
+            occupied.put(cell, id);
+        }
+        positions.put(id, anchor);
     }
 
     private void requireNewId(EntityId id) {

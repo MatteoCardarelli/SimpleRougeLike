@@ -18,8 +18,10 @@ import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Mette oggetti fissi, player, nemici e oggetti su un terreno, secondo le regole di comparsa: prima
@@ -70,6 +72,35 @@ public final class FloorPopulator {
             RandomSource random,
             EntityIdSequence ids,
             Optional<Player> existing) {
+        if (spec.bossCount() == 0) {
+            return populateOn(terrain, spec, random, ids, existing, Optional.empty());
+        }
+        EnemyDefinition boss = bossDefinition();
+        Arena arena = Arena.carve(terrain, boss.footprint().size(), random);
+        return populateOn(arena.terrain(), spec, random, ids, existing, Optional.of(arena));
+    }
+
+    private EnemyDefinition bossDefinition() {
+        for (EnemyDefinition definition : enemies.all()) {
+            if (definition.boss()) {
+                return definition;
+            }
+        }
+        throw new FloorGenerationException("Il catalogo non ha un boss per il suo piano");
+    }
+
+    private Floor populateOn(
+            Grid<TileType> terrain,
+            FloorSpec spec,
+            RandomSource random,
+            EntityIdSequence ids,
+            Optional<Player> existing,
+            Optional<Arena> arena) {
+        Set<Position> reserved = new LinkedHashSet<>();
+        if (arena.isPresent()) {
+            reserved.addAll(arena.get().interior());
+            reserved.add(arena.get().door());
+        }
         List<Position> free = new ArrayList<>();
         for (Position cell : terrain.positions()) {
             if (terrain.get(cell).isWalkable()) {
@@ -79,10 +110,15 @@ public final class FloorPopulator {
         if (free.isEmpty()) {
             throw new FloorGenerationException("Il terreno non ha celle attraversabili");
         }
-        FixtureLayout layout = FixtureLayout.plan(terrain, spec, random);
+        free.removeAll(reserved);
+        FixtureLayout layout = FixtureLayout.plan(terrain, spec, random, reserved);
         free.removeAll(layout.floorCells());
         List<Position> playerCells = new ArrayList<>(free);
         playerCells.removeAll(layout.closed());
+        if (arena.isPresent()) {
+            // Il player nasce dove arriva il corridoio dell'arena.
+            playerCells.retainAll(arena.get().outside());
+        }
         if (playerCells.isEmpty()) {
             throw new FloorGenerationException("Nessuna cella per il player");
         }
@@ -144,7 +180,8 @@ public final class FloorPopulator {
             itemTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
         }
 
-        List<Position> keyCells = keyCells(terrain, layout, playerAt, free, random);
+        List<Position> keyCells =
+                keyCells(terrain, layout, arena.map(Arena::door), playerAt, free, random);
 
         List<ItemDefinition> chestTypes = new ArrayList<>();
         for (int i = 0; i < layout.chests().size(); i++) {
@@ -175,9 +212,13 @@ public final class FloorPopulator {
         for (Position door : layout.lockedDoors()) {
             builder.fixture(Fixture.lockedDoor(), door);
         }
-        ItemDefinition key = commonKey();
-        for (Position cell : keyCells) {
-            builder.item(new Item(ids.next(), key), cell);
+        for (int i = 0; i < keyCells.size(); i++) {
+            KeyType type = i < layout.lockedDoors().size() ? KeyType.COMMON : KeyType.BOSS;
+            builder.item(new Item(ids.next(), key(type)), keyCells.get(i));
+        }
+        if (arena.isPresent()) {
+            builder.fixture(Fixture.bossDoor(), arena.get().door());
+            builder.enemy(new Enemy(ids.next(), bossDefinition()), arena.get().bossAnchor());
         }
         layout.stairs().ifPresent(stairs -> builder.fixture(Fixture.stairs(), stairs));
         return builder.build();
@@ -202,22 +243,26 @@ public final class FloorPopulator {
     }
 
     /**
-     * Una cella per chiave, una per porta chiusa a chiave, tra quelle libere che il player
-     * raggiunge senza passare da porte chiuse a chiave o cancelli: così ogni chiave si trova prima
-     * della porta che apre, e nessun piano resta senza uscita.
+     * Una cella per chiave, una per porta chiusa a chiave più quella del boss, tra quelle libere
+     * che il player raggiunge senza passare da porte chiuse a chiave, cancelli o dalla porta del
+     * boss: così ogni chiave si trova prima della porta che apre, e nessun piano resta senza
+     * uscita.
      *
      * @throws FloorGenerationException se non ci sono abbastanza celle raggiungibili
      */
     private static List<Position> keyCells(
             Grid<TileType> terrain,
             FixtureLayout layout,
+            Optional<Position> bossDoor,
             Position playerAt,
             List<Position> free,
             RandomSource random) {
-        if (layout.lockedDoors().isEmpty()) {
+        int count = layout.lockedDoors().size() + (bossDoor.isPresent() ? 1 : 0);
+        if (count == 0) {
             return List.of();
         }
         List<Position> barriers = new ArrayList<>(layout.lockedDoors());
+        bossDoor.ifPresent(barriers::add);
         for (FixtureLayout.Gate gate : layout.gates()) {
             barriers.add(gate.at());
         }
@@ -244,18 +289,18 @@ public final class FloorPopulator {
                 reachable.add(cell);
             }
         }
-        List<Position> keys = take(reachable, layout.lockedDoors().size(), random, "chiavi");
+        List<Position> keys = take(reachable, count, random, "chiavi");
         free.removeAll(keys);
         return keys;
     }
 
-    private ItemDefinition commonKey() {
+    private ItemDefinition key(KeyType type) {
         for (ItemDefinition definition : items.all()) {
-            if (definition.key().equals(Optional.of(KeyType.COMMON))) {
+            if (definition.key().equals(Optional.of(type))) {
                 return definition;
             }
         }
-        throw new FloorGenerationException("Il catalogo non ha una chiave per le porte chiuse");
+        throw new FloorGenerationException("Il catalogo non ha una chiave " + type);
     }
 
     /** Toglie {@code count} celle a caso da {@code cells} e le restituisce. */

@@ -23,6 +23,7 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
 import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
+import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.LevelingRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
@@ -84,6 +85,12 @@ public final class ContentModule {
     @Singleton
     static RangedRules rangedRules(DamageRules damage) {
         return new RangedRules(damage);
+    }
+
+    @Provides
+    @Singleton
+    static JumpRules jumpRules(DamageRules damage) {
+        return new JumpRules(damage);
     }
 
     @Provides
@@ -181,6 +188,12 @@ public final class ContentModule {
                         R.string.kind_archer_name,
                         R.string.kind_archer_description,
                         R.color.kind_archer));
+        styles.put(
+                StandardEnemyCatalog.GIANT_SLIME,
+                new ContentPresentation.Style(
+                        R.string.kind_giant_slime_name,
+                        R.string.kind_giant_slime_description,
+                        R.color.kind_giant_slime));
         styles.put(
                 StandardEnemyCatalog.WOLF,
                 new ContentPresentation.Style(

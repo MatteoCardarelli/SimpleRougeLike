@@ -39,7 +39,7 @@ class StandardCatalogsTest {
     @Test
     void enemies_containTheGoblinTheArcherAndTheWolf() {
         assertThat(new StandardEnemyCatalog().all())
-                .containsExactly(
+                .startsWith(
                         new EnemyDefinition(
                                 StandardEnemyCatalog.GOBLIN,
                                 new Stats(30, 7, 1, 0, 5),
@@ -70,6 +70,20 @@ class StandardCatalogsTest {
                                 0,
                                 3,
                                 15));
+    }
+
+    @Test
+    void enemies_haveOneBoss_theGiantSlime_thatNeverSpawnsAtRandom() {
+        assertThat(new StandardEnemyCatalog().all())
+                .filteredOn(EnemyDefinition::boss)
+                .singleElement()
+                .satisfies(
+                        slime -> {
+                            assertThat(slime.kind()).isEqualTo(StandardEnemyCatalog.GIANT_SLIME);
+                            assertThat(slime.spawnWeight()).isZero();
+                            assertThat(slime.footprint().offsets()).hasSize(12);
+                            assertThat(slime.footprint().size()).isEqualTo(4);
+                        });
     }
 
     @Test
