@@ -9,6 +9,10 @@ import io.github.matteocardarelli.simpleroguelike.model.Kind;
 public enum FixtureType {
     /** Si apre urtandola; chiusa blocca passaggio e vista. */
     DOOR("door", true, true, true),
+    /** Come una porta, ma si apre solo con una chiave comune, che si consuma. */
+    LOCKED_DOOR("locked_door", true, true, true),
+    /** La porta del piano del boss: la apre solo la chiave del boss. */
+    BOSS_DOOR("boss_door", true, true, true),
     /** Lo apre la sua leva; chiuso blocca il passaggio ma non la vista. */
     GATE("gate", true, false, true),
     /** Sta nel muro: si tira urtandola, una volta sola, e apre i suoi cancelli. */

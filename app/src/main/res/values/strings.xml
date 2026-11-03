@@ -37,6 +37,14 @@
     <string name="kind_stairs_description">Passaci sopra per scendere al piano successivo.</string>
     <string name="kind_wolf_name">Lupo</string>
     <string name="kind_wolf_description">Debole da solo, ma non va mai da solo: il branco ti accerchia.</string>
+    <string name="kind_key_name">Chiave</string>
+    <string name="kind_key_description">Apre una porta chiusa a chiave, e si consuma. Le chiavi si impilano.</string>
+    <string name="kind_boss_key_name">Chiave del boss</string>
+    <string name="kind_boss_key_description">Grande e annerita: apre solo la porta del boss.</string>
+    <string name="kind_locked_door_name">Porta chiusa a chiave</string>
+    <string name="kind_locked_door_description">Serve una chiave per aprirla.</string>
+    <string name="kind_boss_door_name">Porta del boss</string>
+    <string name="kind_boss_door_description">Dietro c\'è il boss. La apre solo la sua chiave.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -68,6 +76,9 @@
     <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
     <string name="log_item_used">Usi: %1$s.</string>
     <string name="log_door_opened">Apri la porta.</string>
+    <string name="log_door_unlocked">Apri la porta con la chiave.</string>
+    <string name="log_door_locked">La porta è chiusa a chiave.</string>
+    <string name="log_item_dropped">A terra cade: %1$s.</string>
     <string name="log_floor_changed">Scendi al piano %1$d.</string>
     <string name="log_lever_pulled">Tiri la leva: in lontananza un cancello si apre.</string>
     <string name="log_chest_opened">Apri lo scrigno: dentro c\'è %1$s.</string>

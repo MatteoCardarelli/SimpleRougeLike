@@ -3,7 +3,9 @@ package io.github.matteocardarelli.simpleroguelike.dungeon;
 import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
+import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
@@ -417,6 +419,18 @@ public final class Floor implements FloorView {
                 changed();
                 yield List.of(new DoorOpened(at));
             }
+            case LOCKED_DOOR, BOSS_DOOR -> {
+                KeyType needed =
+                        fixture.type() == FixtureType.BOSS_DOOR ? KeyType.BOSS : KeyType.COMMON;
+                Optional<Item> key = keyOf(needed);
+                if (!key.isPresent()) {
+                    yield List.of(new DoorLocked(at));
+                }
+                player.inventory().removeOne(key.get().id());
+                fixture.open();
+                changed();
+                yield List.of(new DoorUnlocked(at));
+            }
             case LEVER -> {
                 fixture.open();
                 for (Position gate : fixture.linked()) {
@@ -436,6 +450,44 @@ public final class Floor implements FloorView {
             }
             case GATE, STAIRS -> List.of();
         };
+    }
+
+    /** Una chiave del tipo {@code type} nell'inventario del player, se c'è. */
+    private Optional<Item> keyOf(KeyType type) {
+        for (Item item : player.inventory().items()) {
+            if (item.definition().key().equals(Optional.of(type))) {
+                return Optional.of(item);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Mette un oggetto a terra, per esempio il bottino di un nemico morto.
+     *
+     * @return falso, senza fare niente, se la cella non si attraversa, ha già un oggetto o un
+     *     oggetto fisso
+     */
+    public boolean dropItem(Position at, Item item) {
+        if (!isWalkable(at) || groundItems.containsKey(at) || fixtures.containsKey(at)) {
+            return false;
+        }
+        groundItems.put(at, item);
+        return true;
+    }
+
+    /**
+     * I nemici morti che non sono ancora stati tolti dal piano, cioè quelli morti in questo turno,
+     * in ordine di id.
+     */
+    public List<Enemy> fallen() {
+        List<Enemy> dead = new ArrayList<>();
+        for (Enemy enemy : enemies.values()) {
+            if (!enemy.isAlive()) {
+                dead.add(enemy);
+            }
+        }
+        return List.copyOf(dead);
     }
 
     /** Gli oggetti fissi sono cambiati: le griglie combinate vanno ricalcolate. */

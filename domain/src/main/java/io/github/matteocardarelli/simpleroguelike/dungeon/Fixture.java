@@ -27,6 +27,14 @@ public final class Fixture {
         return new Fixture(FixtureType.DOOR, List.of(), Optional.empty());
     }
 
+    public static Fixture lockedDoor() {
+        return new Fixture(FixtureType.LOCKED_DOOR, List.of(), Optional.empty());
+    }
+
+    public static Fixture bossDoor() {
+        return new Fixture(FixtureType.BOSS_DOOR, List.of(), Optional.empty());
+    }
+
     public static Fixture gate() {
         return new Fixture(FixtureType.GATE, List.of(), Optional.empty());
     }

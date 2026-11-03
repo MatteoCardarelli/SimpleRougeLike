@@ -5,13 +5,16 @@ import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
+import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
 import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
+import io.github.matteocardarelli.simpleroguelike.event.ItemDropped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
@@ -96,6 +99,11 @@ public final class EventMessageFormatter {
                 (e, player) -> texts.text(R.string.log_inventory_full, name(e.kind())));
         register(ItemUsed.class, (e, player) -> texts.text(R.string.log_item_used, name(e.kind())));
         register(DoorOpened.class, (e, player) -> texts.text(R.string.log_door_opened));
+        register(DoorUnlocked.class, (e, player) -> texts.text(R.string.log_door_unlocked));
+        register(DoorLocked.class, (e, player) -> texts.text(R.string.log_door_locked));
+        register(
+                ItemDropped.class,
+                (e, player) -> texts.text(R.string.log_item_dropped, name(e.kind())));
         register(
                 FloorChanged.class,
                 (e, player) -> texts.text(R.string.log_floor_changed, e.depth()));

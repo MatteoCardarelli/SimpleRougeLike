@@ -11,10 +11,13 @@ import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
+import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
+import io.github.matteocardarelli.simpleroguelike.event.ItemDropped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
@@ -114,6 +117,14 @@ class EventMessageFormatterTest {
     void format_fixtures_sayWhatHappened() {
         assertThat(formatter.format(new DoorOpened(AT), PLAYER))
                 .contains(R.string.log_door_opened + "[]");
+        assertThat(formatter.format(new DoorLocked(AT), PLAYER))
+                .contains(R.string.log_door_locked + "[]");
+        assertThat(formatter.format(new DoorUnlocked(AT), PLAYER))
+                .contains(R.string.log_door_unlocked + "[]");
+        assertThat(
+                        formatter.format(
+                                new ItemDropped(new EntityId(9), Kind.of("potion"), AT), PLAYER))
+                .contains(R.string.log_item_dropped + "[" + R.string.kind_potion_name + "[]]");
         assertThat(formatter.format(new FloorChanged(3), PLAYER))
                 .contains(R.string.log_floor_changed + "[3]");
         assertThat(formatter.format(new LeverPulled(AT, List.of(AT)), PLAYER))

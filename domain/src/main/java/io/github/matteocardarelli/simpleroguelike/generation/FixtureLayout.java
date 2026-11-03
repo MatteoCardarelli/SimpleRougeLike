@@ -33,13 +33,15 @@ import java.util.Set;
  * @param chests le celle degli scrigni, compresi quelli nelle zone chiuse
  * @param closed le celle delle zone chiuse, dove il player non nasce
  * @param stairs la cella delle scale, fuori dai corridoi e dalle zone chiuse, se il piano le ha
+ * @param lockedDoors le celle delle porte chiuse a chiave, scelte tra le porte
  */
 record FixtureLayout(
         List<Gate> gates,
         List<Position> doors,
         List<Position> chests,
         Set<Position> closed,
-        Optional<Position> stairs) {
+        Optional<Position> stairs,
+        List<Position> lockedDoors) {
 
     /** Un cancello, la leva nel muro che lo apre e la zona che chiude. */
     record Gate(Position at, Position lever, Set<Position> zone) {}
@@ -53,6 +55,7 @@ record FixtureLayout(
     FixtureLayout {
         gates = List.copyOf(gates);
         doors = List.copyOf(doors);
+        lockedDoors = List.copyOf(lockedDoors);
         chests = List.copyOf(chests);
         closed = Collections.unmodifiableSet(new LinkedHashSet<>(closed));
     }
@@ -64,6 +67,7 @@ record FixtureLayout(
             cells.add(gate.at());
         }
         cells.addAll(doors);
+        cells.addAll(lockedDoors);
         cells.addAll(chests);
         stairs.ifPresent(cells::add);
         return cells;
@@ -133,7 +137,10 @@ record FixtureLayout(
             chests.add(at);
             used.add(at);
         }
-        return new FixtureLayout(gates, doors, chests, closed, stairs);
+        List<Position> locked =
+                new ArrayList<>(doors.subList(0, Math.min(spec.lockedDoorCount(), doors.size())));
+        List<Position> unlocked = new ArrayList<>(doors.subList(locked.size(), doors.size()));
+        return new FixtureLayout(gates, unlocked, chests, closed, stairs, locked);
     }
 
     private static boolean walkable(Grid<TileType> terrain, Position cell) {

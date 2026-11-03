@@ -187,6 +187,28 @@ public final class ContentModule {
                         R.string.kind_wolf_name,
                         R.string.kind_wolf_description,
                         R.color.kind_wolf));
+        styles.put(
+                StandardItemCatalog.KEY,
+                new ContentPresentation.Style(
+                        R.string.kind_key_name, R.string.kind_key_description, R.color.kind_key));
+        styles.put(
+                StandardItemCatalog.BOSS_KEY,
+                new ContentPresentation.Style(
+                        R.string.kind_boss_key_name,
+                        R.string.kind_boss_key_description,
+                        R.color.kind_boss_key));
+        styles.put(
+                FixtureType.LOCKED_DOOR.kind(),
+                new ContentPresentation.Style(
+                        R.string.kind_locked_door_name,
+                        R.string.kind_locked_door_description,
+                        R.color.kind_locked_door));
+        styles.put(
+                FixtureType.BOSS_DOOR.kind(),
+                new ContentPresentation.Style(
+                        R.string.kind_boss_door_name,
+                        R.string.kind_boss_door_description,
+                        R.color.kind_boss_door));
         // Gli oggetti fissi del piano.
         styles.put(
                 FixtureType.STAIRS.kind(),

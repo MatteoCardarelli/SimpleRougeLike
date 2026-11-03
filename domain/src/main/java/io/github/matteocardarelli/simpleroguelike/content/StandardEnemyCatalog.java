@@ -32,10 +32,19 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
     private static final List<EnemyDefinition> ENEMIES =
             List.of(
                     new EnemyDefinition(
-                            GOBLIN, new Stats(30, 7, 1, 0, 5), 25, 8, CHASE_OR_WANDER, 10),
+                            GOBLIN,
+                            new Stats(30, 7, 1, 0, 5),
+                            25,
+                            8,
+                            CHASE_OR_WANDER,
+                            10,
+                            0,
+                            1,
+                            25),
                     new EnemyDefinition(
-                            ARCHER, new Stats(20, 6, 0, 5, 10), 30, 8, KEEP_DISTANCE, 4, 5),
-                    new EnemyDefinition(WOLF, new Stats(14, 5, 0, 5, 10), 15, 10, PACK, 3, 0, 3));
+                            ARCHER, new Stats(20, 6, 0, 5, 10), 30, 8, KEEP_DISTANCE, 4, 5, 1, 30),
+                    new EnemyDefinition(
+                            WOLF, new Stats(14, 5, 0, 5, 10), 15, 10, PACK, 3, 0, 3, 15));
 
     @Override
     public List<EnemyDefinition> all() {

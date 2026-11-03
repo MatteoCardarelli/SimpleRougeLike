@@ -39,7 +39,7 @@ public final class TestGraph {
                 GameModule.enemyTurnRunner(
                         behaviors(), ContentModule.enemyCatalog(), actions, rangedRules()),
                 GameModule.fieldOfView(),
-                Set.<TurnHook>of(),
+                Set.<TurnHook>of(GameModule.lootHook(ContentModule.itemCatalog())),
                 config);
     }
 
