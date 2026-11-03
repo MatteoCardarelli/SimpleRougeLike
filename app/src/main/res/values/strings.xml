@@ -63,7 +63,7 @@
     <string name="inventory_throw">Lancia</string>
     <string name="inventory_count">%1$s ×%2$d</string>
     <string name="boss_status">%1$s: %2$d/%3$d</string>
-    <string name="ware_offer">%1$s: %2$d monete</string>
+    <string name="ware_offer">%1$s · prezzo in monete: %2$d</string>
     <string name="ware_take">Prendi</string>
     <string name="aim_hint">Scorri per lanciare · doppio tap per annullare</string>
     <string name="inventory_equipped_badge">E</string>
@@ -85,10 +85,10 @@
     <string name="log_inventory_full">Inventario pieno: %1$s resta a terra.</string>
     <string name="log_item_used">Usi: %1$s.</string>
     <string name="log_door_opened">Apri la porta.</string>
-    <string name="log_coins">Raccogli %1$d monete.</string>
-    <string name="log_ware_taken">Prendi %1$s: da pagare %2$d monete.</string>
-    <string name="log_wares_paid">Paghi %1$d monete al mercante.</string>
-    <string name="log_not_enough_coins">Servono %1$d monete, ne hai %2$d.</string>
+    <string name="log_coins">Raccogli delle monete: +%1$d.</string>
+    <string name="log_ware_taken">Prendi %1$s: da pagare al mercante, prezzo %2$d.</string>
+    <string name="log_wares_paid">Paghi il mercante: monete −%1$d.</string>
+    <string name="log_not_enough_coins">Non hai abbastanza monete: il conto è %1$d, ne hai %2$d.</string>
     <string name="log_merchant_greeted">Il mercante ti saluta.</string>
     <string name="log_merchant_angered">Il mercante ti ha visto rubare!</string>
     <string name="log_jump_announced">Lo slime gigante si prepara a saltare: spostati!</string>
@@ -112,7 +112,7 @@
 
     <string name="hud_health_value">%1$d/%2$d</string>
     <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
-    <string name="hud_level">liv. %1$d · piano %2$d/%3$d · %4$d monete</string>
+    <string name="hud_level">liv. %1$d · piano %2$d/%3$d · monete %4$d</string>
     <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d · Monete %5$d</string>
 
     <string name="debug_turn">turno %1$d</string>
