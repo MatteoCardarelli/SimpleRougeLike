@@ -90,8 +90,9 @@ class FloorPopulatorTest {
         assertThat(floor.player().stats()).isEqualTo(StandardPlayer.DEFINITION.stats());
         assertThat(floor.player().inventory().capacity()).isEqualTo(10);
         assertThat(floor.enemies().get(0).kind()).isEqualTo(StandardEnemyCatalog.GOBLIN);
-        assertThat(floor.itemsOnGround().values().iterator().next().kind())
-                .isIn(StandardItemCatalog.POTION, StandardItemCatalog.GREATER_POTION);
+        var spawned = floor.itemsOnGround().values().iterator().next().definition();
+        assertThat(new StandardItemCatalog().all()).contains(spawned);
+        assertThat(spawned.spawnWeight()).isPositive();
     }
 
     @Test

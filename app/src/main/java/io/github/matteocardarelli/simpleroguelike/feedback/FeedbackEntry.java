@@ -56,6 +56,7 @@ public record FeedbackEntry(
         lines.add("health=" + player.health() + "/" + player.maxHealth());
         lines.add("level=" + player.level());
         lines.add("experience=" + player.experience() + "/" + player.experienceToNextLevel());
+        lines.add("coins=" + player.coins());
         lines.add(
                 "stats="
                         + player.attack()
@@ -109,7 +110,8 @@ public record FeedbackEntry(
                         Integer.parseInt(stats[0]),
                         Integer.parseInt(stats[1]),
                         Integer.parseInt(stats[2]),
-                        Integer.parseInt(stats[3]));
+                        Integer.parseInt(stats[3]),
+                        Integer.parseInt(key(keys, "coins")));
         List<String> commands = new ArrayList<>();
         for (String line : lines.subList(last + 1, lines.size())) {
             if (!line.trim().isEmpty()) {

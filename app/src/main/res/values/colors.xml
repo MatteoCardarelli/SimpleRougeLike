@@ -23,6 +23,8 @@
     <color name="kind_boss_key">#FFE53935</color>
     <color name="kind_locked_door">#FF6D4C41</color>
     <color name="kind_boss_door">#FFB71C1C</color>
+    <color name="kind_merchant">#FFBA68C8</color>
+    <color name="kind_coins">#FFFFC107</color>
     <color name="kind_arrow">#FFFFE082</color>
     <color name="kind_door">#FF8D6E63</color>
     <color name="kind_gate">#FF9E9E9E</color>

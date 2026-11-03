@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.dungeon;
 
 import io.github.matteocardarelli.simpleroguelike.event.ChestOpened;
+import io.github.matteocardarelli.simpleroguelike.event.CoinsPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
@@ -16,7 +17,12 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
+import io.github.matteocardarelli.simpleroguelike.event.MerchantAngered;
+import io.github.matteocardarelli.simpleroguelike.event.MerchantGreeted;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
+import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
+import io.github.matteocardarelli.simpleroguelike.event.WareTaken;
+import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -60,6 +66,7 @@ public final class Floor implements FloorView {
     private @Nullable Grid<TileType> movementGrid;
     private @Nullable Grid<TileType> sightGrid;
     private @Nullable EntityId defeatedBoss;
+    private @Nullable Shop shop;
     private CellSet visible;
     private CellSet explored;
 
@@ -354,6 +361,16 @@ public final class Floor implements FloorView {
         if (item == null) {
             return Optional.empty();
         }
+        int coins = item.definition().coinValue();
+        if (coins > 0) {
+            groundItems.remove(at);
+            player.addCoins(coins);
+            return Optional.of(new CoinsPickedUp(coins, at));
+        }
+        if (wareAt(at).isPresent()) {
+            // La merce non si raccoglie da sola: il player sceglie se prenderla.
+            return Optional.empty();
+        }
         if (!player.inventory().add(item)) {
             return Optional.of(new InventoryFull(item.id(), item.kind(), at));
         }
@@ -553,6 +570,99 @@ public final class Floor implements FloorView {
             }
         }
         return List.copyOf(dead);
+    }
+
+    /** Il negozio del piano, se c'è. */
+    @Override
+    public Optional<Shop> shop() {
+        return Optional.ofNullable(shop);
+    }
+
+    /** Mette il negozio sul piano; lo fa la generazione. */
+    public void openShop(Shop shop) {
+        if (this.shop != null) {
+            throw new IllegalStateException("Il piano ha già un negozio");
+        }
+        this.shop = shop;
+    }
+
+    /** La merce in vendita a terra nella cella, se c'è. */
+    @Override
+    public Optional<Item> wareAt(Position at) {
+        Item item = groundItems.get(at);
+        Shop current = shop;
+        if (item == null || current == null || !current.priceOf(item.id()).isPresent()) {
+            return Optional.empty();
+        }
+        return current.unpaid().contains(item.id()) ? Optional.empty() : Optional.of(item);
+    }
+
+    /**
+     * Il player prende la merce su cui sta: va nell'inventario, da pagare.
+     *
+     * @return {@code WareTaken}, {@code InventoryFull} o vuoto se lì non c'è merce
+     */
+    public Optional<GameEvent> takeWare(EntityId user) {
+        requirePlayer(user);
+        requireAlive(user);
+        Position at = positionOf(user);
+        Optional<Item> ware = wareAt(at);
+        Shop current = shop;
+        if (!ware.isPresent() || current == null) {
+            return Optional.empty();
+        }
+        Item item = ware.get();
+        if (!player.inventory().add(item)) {
+            return Optional.of(new InventoryFull(item.id(), item.kind(), at));
+        }
+        groundItems.remove(at);
+        current.take(item.id());
+        return Optional.of(
+                new WareTaken(item.id(), item.kind(), current.priceOf(item.id()).orElse(0), at));
+    }
+
+    /**
+     * Il player urta il mercante: paga tutto quello che ha preso, se le monete bastano.
+     *
+     * @return {@code WaresPaid}, {@code NotEnoughCoins} o {@code MerchantGreeted}
+     */
+    public GameEvent trade(EntityId user) {
+        requirePlayer(user);
+        Shop current = shop;
+        Position at = positionOf(user);
+        if (current == null || current.bill() == 0) {
+            return new MerchantGreeted(at);
+        }
+        int bill = current.bill();
+        if (player.coins() < bill) {
+            return new NotEnoughCoins(bill, player.coins(), at);
+        }
+        player.spendCoins(bill);
+        current.settle();
+        return new WaresPaid(bill, at);
+    }
+
+    /**
+     * Dopo un passo del player: se esce dalla zona del negozio con merce non pagata, il mercante si
+     * arrabbia, e la merce presa resta al player.
+     *
+     * @return {@code MerchantAngered}, o vuoto
+     */
+    public Optional<GameEvent> checkTheft() {
+        Shop current = shop;
+        if (current == null || current.unpaid().isEmpty()) {
+            return Optional.empty();
+        }
+        if (current.zone().contains(positionOf(player.id()))) {
+            return Optional.empty();
+        }
+        Optional<Enemy> merchant = enemy(current.merchant());
+        current.settle();
+        if (!merchant.isPresent() || !merchant.get().isAlive()) {
+            return Optional.empty();
+        }
+        merchant.get().anger();
+        return Optional.of(new MerchantAngered(current.merchant(), positionOf(current.merchant())));
     }
 
     /** Gli oggetti fissi sono cambiati: le griglie combinate vanno ricalcolate. */

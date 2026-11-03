@@ -55,6 +55,12 @@ public interface FloorView {
     /** Una cella di {@code defender} accanto a una cella di {@code attacker}, se si toccano. */
     Optional<Position> contactCell(EntityId attacker, EntityId defender);
 
+    /** Il negozio del piano, se c'è. */
+    Optional<Shop> shop();
+
+    /** La merce in vendita a terra nella cella, se c'è. */
+    Optional<Item> wareAt(Position at);
+
     /** Il boss del piano, vivo o sconfitto, se il piano ne ha uno. */
     Optional<EntityId> bossId();
 

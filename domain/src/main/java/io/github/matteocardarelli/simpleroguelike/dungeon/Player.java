@@ -26,6 +26,7 @@ public final class Player extends Actor {
     private int level = 1;
     private int experience;
     private int experienceToNextLevel;
+    private int coins;
 
     /**
      * @param experienceToFirstLevel l'esperienza che serve per arrivare al livello 2
@@ -68,6 +69,22 @@ public final class Player extends Actor {
 
     public int experienceToNextLevel() {
         return experienceToNextLevel;
+    }
+
+    /** Le monete: un contatore, non un oggetto dell'inventario. */
+    public int coins() {
+        return coins;
+    }
+
+    void addCoins(int amount) {
+        coins = Math.addExact(coins, amount);
+    }
+
+    void spendCoins(int amount) {
+        if (amount > coins) {
+            throw new IllegalStateException("Monete insufficienti: " + coins + " < " + amount);
+        }
+        coins -= amount;
     }
 
     public Inventory inventory() {

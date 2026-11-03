@@ -15,6 +15,8 @@ import java.util.Optional;
  * @param equipment lo spazio e il bonus, se l'oggetto si equipaggia
  * @param throwing danno e portata, se l'oggetto si lancia
  * @param key che porte apre, se l'oggetto è una chiave
+ * @param coinValue quante monete vale, per un mucchio di monete che si raccoglie nel contatore; 0
+ *     per tutti gli altri oggetti
  */
 public record ItemDefinition(
         Kind kind,
@@ -23,7 +25,8 @@ public record ItemDefinition(
         int spawnWeight,
         Optional<Equipment> equipment,
         Optional<Throwing> throwing,
-        Optional<KeyType> key) {
+        Optional<KeyType> key,
+        int coinValue) {
 
     public ItemDefinition {
         if (spawnWeight < 0) {
@@ -42,6 +45,34 @@ public record ItemDefinition(
                     "Un oggetto si equipaggia, si lancia o apre porte, una cosa sola: "
                             + kind.value());
         }
+    }
+
+    /** Un oggetto che non è un mucchio di monete. */
+    public ItemDefinition(
+            Kind kind,
+            ItemEffect effect,
+            boolean consumable,
+            int spawnWeight,
+            Optional<Equipment> equipment,
+            Optional<Throwing> throwing,
+            Optional<KeyType> key) {
+        this(kind, effect, consumable, spawnWeight, equipment, throwing, key, 0);
+    }
+
+    /** Un mucchio di {@code value} monete: raccolto, finisce nel contatore del player. */
+    public static ItemDefinition coins(Kind kind, int value, int spawnWeight) {
+        if (value <= 0) {
+            throw new IllegalArgumentException("Monete non positive: " + value);
+        }
+        return new ItemDefinition(
+                kind,
+                ItemEffect.NONE,
+                false,
+                spawnWeight,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                value);
     }
 
     /** Un oggetto che si usa. */
@@ -109,7 +140,10 @@ public record ItemDefinition(
      * Vero per gli oggetti che si usano: non si equipaggiano, non si lanciano e non sono chiavi.
      */
     public boolean usable() {
-        return !equipment.isPresent() && !throwing.isPresent() && !key.isPresent();
+        return !equipment.isPresent()
+                && !throwing.isPresent()
+                && !key.isPresent()
+                && coinValue == 0;
     }
 
     /** Vero per gli oggetti che occupano un solo posto nell'inventario, con un numero. */

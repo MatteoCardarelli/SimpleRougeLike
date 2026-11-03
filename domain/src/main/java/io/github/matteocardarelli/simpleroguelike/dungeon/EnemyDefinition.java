@@ -17,6 +17,8 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
  * @param dropChance la probabilità, in percentuale, che alla morte lasci cadere un oggetto
  * @param footprint le celle che occupa
  * @param boss vero per il boss dell'ultimo piano: sconfiggerlo vince la partita
+ * @param merchant vero per un mercante: neutrale finché il player non lo deruba
+ * @param speed quante azioni fa in un turno: 1 per quasi tutti
  */
 public record EnemyDefinition(
         Kind kind,
@@ -29,7 +31,9 @@ public record EnemyDefinition(
         int packSize,
         int dropChance,
         Footprint footprint,
-        boolean boss) {
+        boolean boss,
+        boolean merchant,
+        int speed) {
 
     public EnemyDefinition {
         if (stats.maxHealth() <= 0) {
@@ -41,7 +45,8 @@ public record EnemyDefinition(
                 || range < 0
                 || packSize < 1
                 || dropChance < 0
-                || dropChance > 100) {
+                || dropChance > 100
+                || speed < 1) {
             throw new IllegalArgumentException(
                     "Valori non validi: experienceReward="
                             + experienceReward
@@ -56,6 +61,35 @@ public record EnemyDefinition(
                             + ", dropChance="
                             + dropChance);
         }
+    }
+
+    /** Un nemico che non è un mercante, con un'azione per turno. */
+    public EnemyDefinition(
+            Kind kind,
+            Stats stats,
+            int experienceReward,
+            int aggroRange,
+            BehaviorKey behavior,
+            int spawnWeight,
+            int range,
+            int packSize,
+            int dropChance,
+            Footprint footprint,
+            boolean boss) {
+        this(
+                kind,
+                stats,
+                experienceReward,
+                aggroRange,
+                behavior,
+                spawnWeight,
+                range,
+                packSize,
+                dropChance,
+                footprint,
+                boss,
+                false,
+                1);
     }
 
     /** Un nemico di una cella, che non è un boss. */

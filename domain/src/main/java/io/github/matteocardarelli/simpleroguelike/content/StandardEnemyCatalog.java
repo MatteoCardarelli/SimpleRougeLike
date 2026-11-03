@@ -33,6 +33,12 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
     /** Salta sul player e lo schiaccia, poi riposa un turno. */
     public static final BehaviorKey JUMP_AND_CRUSH = BehaviorKey.of("jump_and_crush");
 
+    /** Vende la merce del negozio; derubato diventa fortissimo e fa due azioni per turno. */
+    public static final Kind MERCHANT = Kind.of("merchant");
+
+    /** Sta al banco; derubato colpisce da vicino e da lontano e insegue. */
+    public static final BehaviorKey MERCHANT_BEHAVIOR = BehaviorKey.of("merchant");
+
     /** Tiene la distanza e tira; se il player è lontano, vaga. */
     public static final BehaviorKey KEEP_DISTANCE = BehaviorKey.of("keep_distance");
 
@@ -63,7 +69,21 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
                             1,
                             0,
                             Footprint.circle(4),
-                            true));
+                            true),
+                    new EnemyDefinition(
+                            MERCHANT,
+                            new Stats(400, 30, 10, 40, 20),
+                            100,
+                            40,
+                            MERCHANT_BEHAVIOR,
+                            0,
+                            6,
+                            1,
+                            0,
+                            Footprint.SINGLE,
+                            false,
+                            true,
+                            2));
 
     @Override
     public List<EnemyDefinition> all() {

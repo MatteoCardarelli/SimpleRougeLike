@@ -13,13 +13,17 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.ItemDefinition;
 import io.github.matteocardarelli.simpleroguelike.dungeon.KeyType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.PlayerDefinition;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Shop;
 import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
+import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -80,6 +84,26 @@ public final class FloorPopulator {
         return populateOn(arena.terrain(), spec, random, ids, existing, Optional.of(arena));
     }
 
+    private EnemyDefinition merchantDefinition() {
+        for (EnemyDefinition definition : enemies.all()) {
+            if (definition.merchant()) {
+                return definition;
+            }
+        }
+        throw new FloorGenerationException("Il catalogo non ha un mercante per il negozio");
+    }
+
+    /** Quello che si vende: gli oggetti che compaiono a caso, tranne le monete. */
+    private List<ItemDefinition> wares() {
+        List<ItemDefinition> wares = new ArrayList<>();
+        for (ItemDefinition definition : items.all()) {
+            if (definition.spawnWeight() > 0 && definition.coinValue() == 0) {
+                wares.add(definition);
+            }
+        }
+        return wares;
+    }
+
     private EnemyDefinition bossDefinition() {
         for (EnemyDefinition definition : enemies.all()) {
             if (definition.boss()) {
@@ -135,6 +159,17 @@ public final class FloorPopulator {
             }
             if (!distant.isEmpty()) {
                 playerCells = distant;
+            }
+        }
+        Optional<ShopPlan> shopPlan = Optional.empty();
+        if (spec.bossCount() == 0 && random.nextInt(100) < spec.shopChance()) {
+            shopPlan = ShopPlan.find(terrain, free, layout.closed(), random);
+        }
+        if (shopPlan.isPresent()) {
+            free.removeAll(shopPlan.get().room());
+            playerCells.removeAll(shopPlan.get().zone());
+            if (playerCells.isEmpty()) {
+                throw new FloorGenerationException("Nessuna cella per il player fuori dal negozio");
             }
         }
         Position playerAt = playerCells.get(random.nextInt(playerCells.size()));
@@ -221,7 +256,24 @@ public final class FloorPopulator {
             builder.enemy(new Enemy(ids.next(), bossDefinition()), arena.get().bossAnchor());
         }
         layout.stairs().ifPresent(stairs -> builder.fixture(Fixture.stairs(), stairs));
-        return builder.build();
+        Optional<Shop> shop = Optional.empty();
+        if (shopPlan.isPresent()) {
+            ShopPlan plan = shopPlan.get();
+            EntityId merchant = ids.next();
+            builder.enemy(new Enemy(merchant, merchantDefinition()), plan.merchant());
+            Map<EntityId, Integer> prices = new LinkedHashMap<>();
+            for (Position cell : plan.wares()) {
+                ItemDefinition type =
+                        WeightedPicker.pick(wares(), ItemDefinition::spawnWeight, random);
+                Item item = new Item(ids.next(), type);
+                builder.item(item, cell);
+                prices.put(item.id(), ShopPlan.price(type));
+            }
+            shop = Optional.of(new Shop(merchant, plan.zone(), prices));
+        }
+        Floor floor = builder.build();
+        shop.ifPresent(floor::openShop);
+        return floor;
     }
 
     /**

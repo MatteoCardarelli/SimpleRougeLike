@@ -14,6 +14,8 @@ package io.github.matteocardarelli.simpleroguelike.generation;
  * @param lockedDoorCount quante delle porte sono chiuse a chiave; per ognuna c'è una chiave che si
  *     raggiunge senza passare dalle porte chiuse a chiave
  * @param bossCount 1 per il piano del boss: un'arena con il boss, la sua porta e la sua chiave
+ * @param shopChance la probabilità, in percentuale, che il piano abbia un negozio; mai sul piano
+ *     del boss
  */
 public record FloorSpec(
         int width,
@@ -27,7 +29,8 @@ public record FloorSpec(
         int gateCount,
         int stairsCount,
         int lockedDoorCount,
-        int bossCount) {
+        int bossCount,
+        int shopChance) {
 
     public FloorSpec {
         if (width < 3 || height < 3) {
@@ -45,7 +48,9 @@ public record FloorSpec(
                 || lockedDoorCount < 0
                 || lockedDoorCount > doorCount
                 || bossCount < 0
-                || bossCount > 1) {
+                || bossCount > 1
+                || shopChance < 0
+                || shopChance > 100) {
             throw new IllegalArgumentException(
                     "Valori non validi: enemyCount="
                             + enemyCount
@@ -66,7 +71,9 @@ public record FloorSpec(
                             + ", lockedDoors="
                             + lockedDoorCount
                             + ", boss="
-                            + bossCount);
+                            + bossCount
+                            + ", shopChance="
+                            + shopChance);
         }
     }
 
@@ -78,7 +85,20 @@ public record FloorSpec(
             int itemCount,
             int minSpawnDistance,
             int maxAttempts) {
-        this(width, height, enemyCount, itemCount, minSpawnDistance, maxAttempts, 0, 0, 0, 0, 0, 0);
+        this(
+                width,
+                height,
+                enemyCount,
+                itemCount,
+                minSpawnDistance,
+                maxAttempts,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0);
     }
 
     /** Un piano senza porte chiuse a chiave. */
@@ -133,6 +153,37 @@ public record FloorSpec(
                 gateCount,
                 stairsCount,
                 lockedDoorCount,
+                0,
+                0);
+    }
+
+    /** Un piano senza negozio. */
+    public FloorSpec(
+            int width,
+            int height,
+            int enemyCount,
+            int itemCount,
+            int minSpawnDistance,
+            int maxAttempts,
+            int doorCount,
+            int chestCount,
+            int gateCount,
+            int stairsCount,
+            int lockedDoorCount,
+            int bossCount) {
+        this(
+                width,
+                height,
+                enemyCount,
+                itemCount,
+                minSpawnDistance,
+                maxAttempts,
+                doorCount,
+                chestCount,
+                gateCount,
+                stairsCount,
+                lockedDoorCount,
+                bossCount,
                 0);
     }
 }

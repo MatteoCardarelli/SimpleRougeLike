@@ -37,6 +37,9 @@ public final class StandardItemCatalog implements ItemCatalog {
     /** Apre la porta del boss. */
     public static final Kind BOSS_KEY = Kind.of("boss_key");
 
+    /** Un mucchio di 15 monete: finisce nel contatore del player. */
+    public static final Kind COINS = Kind.of("coins");
+
     private static final List<ItemDefinition> ITEMS =
             List.of(
                     new ItemDefinition(POTION, new HealEffect(25), true, 10),
@@ -53,7 +56,8 @@ public final class StandardItemCatalog implements ItemCatalog {
                             RING_OF_VIGOR, EquipmentSlot.RING, new Stats(20, 0), 1),
                     ItemDefinition.throwable(THROWING_KNIFE, new Throwing(8, 6), 5),
                     ItemDefinition.key(KEY, KeyType.COMMON),
-                    ItemDefinition.key(BOSS_KEY, KeyType.BOSS));
+                    ItemDefinition.key(BOSS_KEY, KeyType.BOSS),
+                    ItemDefinition.coins(COINS, 15, 8));
 
     @Override
     public List<ItemDefinition> all() {
