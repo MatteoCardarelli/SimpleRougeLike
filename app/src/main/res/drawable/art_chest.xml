@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "chest", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF8D6E63" android:pathData="M3,10h18v11h-18z" />
+    <path android:fillColor="#FFA1887F" android:pathData="M3,10L5,5L19,5L21,10z" />
+    <path android:fillColor="#FFFFB300" android:pathData="M3,9.5h18v1.4h-18z" />
+    <path android:fillColor="#FFFFB300" android:pathData="M10.5,9h3v4h-3z" />
+    <path android:fillColor="#FF111111" android:pathData="M11.3,12a0.7,0.7 0 1,0 1.4,0a0.7,0.7 0 1,0 -1.4,0z" />
+</vector>

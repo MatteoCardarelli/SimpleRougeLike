@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "leather_armor", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF8D6E63" android:pathData="M5,5L9,3L15,3L19,5L21,10L18,11L17,21L7,21L6,11L3,10z" />
+    <path android:strokeColor="#FF5D4037" android:strokeWidth="0.8" android:fillColor="#00000000" android:strokeLineCap="round" android:pathData="M12,5L12,20" />
+    <path android:fillColor="#FFD7CCC8" android:pathData="M9.3,9a0.7,0.7 0 1,0 1.4,0a0.7,0.7 0 1,0 -1.4,0z" />
+    <path android:fillColor="#FFD7CCC8" android:pathData="M13.3,9a0.7,0.7 0 1,0 1.4,0a0.7,0.7 0 1,0 -1.4,0z" />
+</vector>

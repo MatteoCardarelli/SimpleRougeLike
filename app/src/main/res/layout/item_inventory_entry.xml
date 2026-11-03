@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Una casella della griglia dell'inventario: forma colorata al posto dell'illustrazione, e nome -->
+<!-- Una casella della griglia dell'inventario: l'illustrazione e il nome -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -16,12 +16,11 @@
         android:layout_width="40dp"
         android:layout_height="40dp">
 
-        <View
+        <ImageView
             android:id="@+id/art"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_gravity="center"
-            android:background="@drawable/shape_item_art"
             android:importantForAccessibility="no" />
 
         <!-- Il segno di un oggetto equipaggiato, nell'angolo dell'illustrazione -->

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "goblin", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF7CB342" android:pathData="M3,6L8,10L5,12z" />
+    <path android:fillColor="#FF7CB342" android:pathData="M21,6L16,10L19,12z" />
+    <path android:fillColor="#FF8BC34A" android:pathData="M5,12a7,7 0 1,0 14,0a7,7 0 1,0 -14,0z" />
+    <path android:fillColor="#FFFFEB3B" android:pathData="M8.1,11a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0z" />
+    <path android:fillColor="#FFFFEB3B" android:pathData="M13.1,11a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0z" />
+    <path android:fillColor="#FF111111" android:pathData="M8.9,11a0.6,0.6 0 1,0 1.2,0a0.6,0.6 0 1,0 -1.2,0z" />
+    <path android:fillColor="#FF111111" android:pathData="M13.9,11a0.6,0.6 0 1,0 1.2,0a0.6,0.6 0 1,0 -1.2,0z" />
+    <path android:fillColor="#FF33691E" android:pathData="M9,15h6v1.2h-6z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M10,15L11,17L12,15z" />
+</vector>

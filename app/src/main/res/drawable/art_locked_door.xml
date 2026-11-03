@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "locked_door", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF6D4C41" android:pathData="M5,2h14v21h-14z" />
+    <path android:fillColor="#FF3E2723" android:pathData="M5,2h14v2h-14z" />
+    <path android:fillColor="#FFFFC107" android:pathData="M10,12a2,2 0 1,0 4,0a2,2 0 1,0 -4,0z" />
+    <path android:fillColor="#FFFFC107" android:pathData="M11,13L13,13L13.5,17L10.5,17z" />
+    <path android:fillColor="#FF111111" android:pathData="M11.2,12.5a0.8,0.8 0 1,0 1.6,0a0.8,0.8 0 1,0 -1.6,0z" />
+</vector>

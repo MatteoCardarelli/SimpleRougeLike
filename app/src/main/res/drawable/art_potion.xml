@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "potion", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF8D6E63" android:pathData="M10,3h4v2h-4z" />
+    <path android:fillColor="#FFB3E5FC" android:pathData="M10.5,5h3v4h-3z" />
+    <path android:fillColor="#FFB3E5FC" android:pathData="M5,15a7,7 0 1,0 14,0a7,7 0 1,0 -14,0z" />
+    <path android:fillColor="#FF00BCD4" android:pathData="M6.5,16a5.5,5.5 0 1,0 11,0a5.5,5.5 0 1,0 -11,0z" />
+    <path android:fillColor="#CCFFFFFF" android:pathData="M8.8,13.5a1.2,1.2 0 1,0 2.4,0a1.2,1.2 0 1,0 -2.4,0z" />
+</vector>

@@ -4,9 +4,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
+import androidx.appcompat.content.res.AppCompatResources;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
+import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.snapshot.CellView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.FixtureView;
@@ -16,15 +19,19 @@ import io.github.matteocardarelli.simpleroguelike.snapshot.Visibility;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Sprite;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Disegna la partita: le celle dallo snapshot, già filtrato dalla nebbia di guerra, gli oggetti a
- * terra visibili, e gli attori dalla scena, che durante un'animazione si discosta dallo snapshot.
- * La telecamera segue il player; durante un'animazione la vista si ridisegna a ogni fotogramma.
+ * terra visibili con le loro illustrazioni, e gli attori dalla scena, che durante un'animazione si
+ * discosta dallo snapshot. La telecamera segue il player; durante un'animazione la vista si
+ * ridisegna a ogni fotogramma.
  */
 public final class GameView extends View {
 
@@ -32,6 +39,7 @@ public final class GameView extends View {
     private static final int DANGER = 0x66FF1744;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Map<Kind, Drawable> arts = new LinkedHashMap<>();
     private @Nullable Camera camera;
     private @Nullable TilePalette palette;
     private @Nullable ContentPresentation content;
@@ -222,28 +230,55 @@ public final class GameView extends View {
 
     private void drawItems(
             Canvas canvas, ContentPresentation content, List<ItemView> items, float cell) {
-        float inset = cell * 0.25f;
+        float inset = cell * 0.15f;
         for (ItemView item : items) {
-            paint.setColor(getContext().getColor(content.colorRes(item.kind())));
             float x = item.position().x() * cell;
             float y = item.position().y() * cell;
-            canvas.drawRect(x + inset, y + inset, x + cell - inset, y + cell - inset, paint);
+            drawArt(canvas, content, item.kind(), x + inset, y + inset, cell - 2 * inset, 1f);
         }
     }
 
     private void drawSprites(
             Canvas canvas, ContentPresentation content, List<Sprite> sprites, float cell) {
         for (Sprite sprite : sprites) {
-            paint.setColor(getContext().getColor(content.colorRes(sprite.kind())));
-            paint.setAlpha(Math.round(sprite.alpha() * 255));
-            float half = sprite.size() * cell / 2;
-            canvas.drawCircle(
-                    sprite.x() * cell + half,
-                    sprite.y() * cell + half,
-                    sprite.size() * cell / 2.2f,
-                    paint);
+            drawArt(
+                    canvas,
+                    content,
+                    sprite.kind(),
+                    sprite.x() * cell,
+                    sprite.y() * cell,
+                    sprite.size() * cell,
+                    sprite.alpha());
         }
-        paint.setAlpha(255);
+    }
+
+    /** L'illustrazione di un {@code Kind} nel quadrato di lato {@code side} che parte da (x, y). */
+    private void drawArt(
+            Canvas canvas,
+            ContentPresentation content,
+            Kind kind,
+            float x,
+            float y,
+            float side,
+            float alpha) {
+        Drawable art = art(content, kind);
+        art.setBounds(Math.round(x), Math.round(y), Math.round(x + side), Math.round(y + side));
+        art.setAlpha(Math.round(alpha * 255));
+        art.draw(canvas);
+        art.setAlpha(255);
+    }
+
+    /** Le illustrazioni, caricate una volta per tipo. */
+    private Drawable art(ContentPresentation content, Kind kind) {
+        Drawable art = arts.get(kind);
+        if (art == null) {
+            Drawable loaded =
+                    Objects.requireNonNull(
+                            AppCompatResources.getDrawable(getContext(), content.artRes(kind)));
+            art = loaded.mutate();
+            arts.put(kind, art);
+        }
+        return art;
     }
 
     /** Le celle dove un nemico atterrerà al prossimo turno, in rosso. */
@@ -259,9 +294,15 @@ public final class GameView extends View {
     private void drawEffects(
             Canvas canvas, ContentPresentation content, List<Sprite> effects, float cell) {
         for (Sprite effect : effects) {
-            paint.setColor(getContext().getColor(content.colorRes(effect.kind())));
-            canvas.drawCircle(
-                    effect.x() * cell + cell / 2, effect.y() * cell + cell / 2, cell / 6f, paint);
+            float inset = cell * 0.25f;
+            drawArt(
+                    canvas,
+                    content,
+                    effect.kind(),
+                    effect.x() * cell + inset,
+                    effect.y() * cell + inset,
+                    cell - 2 * inset,
+                    1f);
         }
     }
 }

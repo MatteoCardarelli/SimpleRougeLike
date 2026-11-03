@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "wolf", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FF78909C" android:pathData="M4,4L9,9L5,11z" />
+    <path android:fillColor="#FF78909C" android:pathData="M20,4L15,9L19,11z" />
+    <path android:fillColor="#FF90A4AE" android:pathData="M4,10L20,10L16,18L12,22L8,18z" />
+    <path android:fillColor="#FFCFD8DC" android:pathData="M9,16L15,16L12,21z" />
+    <path android:fillColor="#FF111111" android:pathData="M10.8,20a1.2,1.2 0 1,0 2.4,0a1.2,1.2 0 1,0 -2.4,0z" />
+    <path android:fillColor="#FFFFC107" android:pathData="M7.9,12.5a1.1,1.1 0 1,0 2.2,0a1.1,1.1 0 1,0 -2.2,0z" />
+    <path android:fillColor="#FFFFC107" android:pathData="M13.9,12.5a1.1,1.1 0 1,0 2.2,0a1.1,1.1 0 1,0 -2.2,0z" />
+</vector>
