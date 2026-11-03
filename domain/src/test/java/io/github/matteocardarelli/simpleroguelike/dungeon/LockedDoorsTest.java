@@ -37,30 +37,26 @@ class LockedDoorsTest {
     void lockedDoor_withAKey_opens_andSpendsTheKey() {
         Floor floor = FloorFixtures.parse("@kK.");
         ACTIONS.step(floor, PLAYER, Direction.RIGHT, ALWAYS_HIT);
-        assertThat(floor.player().inventory().items()).hasSize(1);
+        assertThat(floor.player().keys(KeyType.COMMON)).isEqualTo(1);
 
         var result = ACTIONS.step(floor, PLAYER, Direction.RIGHT, ALWAYS_HIT);
 
         assertThat(result.events()).containsExactly(new DoorUnlocked(new Position(2, 0)));
         assertThat(floor.isWalkable(new Position(2, 0))).isTrue();
-        assertThat(floor.player().inventory().items()).isEmpty();
+        assertThat(floor.player().keys(KeyType.COMMON)).isZero();
     }
 
     @Test
-    void keys_stack_andDoNotOpenTheBossDoor() {
+    void keys_goToTheirCounter_withoutTakingInventorySpace() {
         Floor floor = FloorFixtures.parse("@kk");
         floor.move(PLAYER, Direction.RIGHT);
         floor.pickUp(PLAYER);
         floor.move(PLAYER, Direction.RIGHT);
         floor.pickUp(PLAYER);
 
-        assertThat(floor.player().inventory().items())
-                .singleElement()
-                .satisfies(
-                        keys -> {
-                            assertThat(keys.kind()).isEqualTo(StandardItemCatalog.KEY);
-                            assertThat(keys.count()).isEqualTo(2);
-                        });
+        assertThat(floor.player().keys(KeyType.COMMON)).isEqualTo(2);
+        assertThat(floor.player().keys(KeyType.BOSS)).isZero();
+        assertThat(floor.player().inventory().items()).isEmpty();
     }
 
     @Test

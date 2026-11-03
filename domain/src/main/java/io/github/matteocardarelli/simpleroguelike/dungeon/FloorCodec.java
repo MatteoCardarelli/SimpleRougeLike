@@ -63,7 +63,9 @@ public final class FloorCodec {
                         player.experience(),
                         player.experienceToNextLevel(),
                         player.coins(),
-                        player.inventory().capacity()));
+                        player.inventory().capacity(),
+                        player.keys(KeyType.COMMON),
+                        player.keys(KeyType.BOSS)));
         for (Item item : player.inventory().items()) {
             lines.add(
                     join(
@@ -184,6 +186,12 @@ public final class FloorCodec {
         while (in.peek("inv")) {
             String[] i = in.next("inv");
             Item item = item(integer(i[1]), i[2], integer(i[3]));
+            Optional<KeyType> key = item.definition().key();
+            if (key.isPresent()) {
+                // Prima che diventassero un contatore, le chiavi stavano nell'inventario.
+                player.addKeys(key.get(), item.count());
+                continue;
+            }
             if (!player.inventory().add(item)) {
                 throw new IllegalArgumentException("Inventario salvato troppo pieno");
             }
@@ -195,6 +203,11 @@ public final class FloorCodec {
             player.equip(item);
         }
         player.restoreSavedHealth(integer(p[9]));
+        // Le chiavi in fondo alla riga sono arrivate dopo il formato 1.
+        if (p.length > 16) {
+            player.addKeys(KeyType.COMMON, integer(p[15]));
+            player.addKeys(KeyType.BOSS, integer(p[16]));
+        }
         FloorBuilder builder =
                 new FloorBuilder()
                         .terrain(terrain)

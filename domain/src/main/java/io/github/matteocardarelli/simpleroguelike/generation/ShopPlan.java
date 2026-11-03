@@ -15,8 +15,9 @@ import java.util.Set;
 
 /**
  * Dove sta un negozio: una stanza di {@value #WIDTH}×{@value #HEIGHT} celle libere, con il mercante
- * sul lato sinistro e quattro merci a terra. La zona è la stanza più il suo bordo: finché il player
- * resta lì può tenere la merce senza pagarla.
+ * al centro e quattro merci intorno, una cella più in là in diagonale. La zona è la stanza più il
+ * suo bordo: finché il player resta lì può tenere la merce senza pagarla, e l'interfaccia ci
+ * disegna un tappeto.
  *
  * @param room le celle del negozio, dove non nasce niente altro
  * @param zone la stanza e il suo bordo
@@ -72,13 +73,13 @@ record ShopPlan(Set<Position> room, Set<Position> zone, Position merchant, List<
                 }
             }
         }
-        Position merchant = new Position(corner.x(), corner.y() + 1);
+        Position merchant = new Position(corner.x() + 2, corner.y() + 1);
         List<Position> wares =
                 List.of(
-                        new Position(corner.x() + 2, corner.y()),
-                        new Position(corner.x() + 4, corner.y()),
-                        new Position(corner.x() + 2, corner.y() + 2),
-                        new Position(corner.x() + 4, corner.y() + 2));
+                        new Position(corner.x() + 1, corner.y()),
+                        new Position(corner.x() + 3, corner.y()),
+                        new Position(corner.x() + 1, corner.y() + 2),
+                        new Position(corner.x() + 3, corner.y() + 2));
         return Optional.of(new ShopPlan(room, zone, merchant, wares));
     }
 

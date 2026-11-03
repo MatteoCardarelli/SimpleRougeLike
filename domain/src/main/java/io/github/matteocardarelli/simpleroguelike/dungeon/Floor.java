@@ -371,6 +371,13 @@ public final class Floor implements FloorView {
             // La merce non si raccoglie da sola: il player sceglie se prenderla.
             return Optional.empty();
         }
+        Optional<KeyType> key = item.definition().key();
+        if (key.isPresent()) {
+            // Le chiavi non occupano posto: vanno nel loro contatore, come le monete.
+            groundItems.remove(at);
+            player.addKeys(key.get(), item.count());
+            return Optional.of(new ItemPickedUp(item.id(), item.kind(), at));
+        }
         if (!player.inventory().add(item)) {
             return Optional.of(new InventoryFull(item.id(), item.kind(), at));
         }
@@ -504,11 +511,9 @@ public final class Floor implements FloorView {
             case LOCKED_DOOR, BOSS_DOOR -> {
                 KeyType needed =
                         fixture.type() == FixtureType.BOSS_DOOR ? KeyType.BOSS : KeyType.COMMON;
-                Optional<Item> key = keyOf(needed);
-                if (!key.isPresent()) {
+                if (!player.useKey(needed)) {
                     yield List.of(new DoorLocked(at));
                 }
-                player.inventory().removeOne(key.get().id());
                 fixture.open();
                 changed();
                 yield List.of(new DoorUnlocked(at));
@@ -532,16 +537,6 @@ public final class Floor implements FloorView {
             }
             case GATE, STAIRS -> List.of();
         };
-    }
-
-    /** Una chiave del tipo {@code type} nell'inventario del player, se c'è. */
-    private Optional<Item> keyOf(KeyType type) {
-        for (Item item : player.inventory().items()) {
-            if (item.definition().key().equals(Optional.of(type))) {
-                return Optional.of(item);
-            }
-        }
-        return Optional.empty();
     }
 
     /**

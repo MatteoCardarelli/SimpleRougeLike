@@ -150,6 +150,38 @@ class FloorCodecTest {
     }
 
     @Test
+    void read_restoresTheKeys() {
+        Floor floor = played();
+        floor.player().addKeys(KeyType.COMMON, 2);
+        floor.player().addKeys(KeyType.BOSS, 1);
+
+        Player player = CODEC.read(CODEC.write(floor)).player();
+
+        assertThat(player.keys(KeyType.COMMON)).isEqualTo(2);
+        assertThat(player.keys(KeyType.BOSS)).isEqualTo(1);
+    }
+
+    /** Prima del contatore le chiavi stavano nell'inventario: si rileggono nel contatore. */
+    @Test
+    void read_ofAKeyInTheInventory_putsItInTheCounter() {
+        List<String> lines = new ArrayList<>();
+        for (String line : CODEC.write(played())) {
+            if (line.startsWith("player ")) {
+                String[] parts = line.split(" ");
+                lines.add(String.join(" ", java.util.Arrays.copyOf(parts, 15)));
+                lines.add("inv 90 key 2 0");
+            } else {
+                lines.add(line);
+            }
+        }
+
+        Player player = CODEC.read(lines).player();
+
+        assertThat(player.keys(KeyType.COMMON)).isEqualTo(2);
+        assertThat(player.inventory().items()).noneMatch(item -> item.kind().value().equals("key"));
+    }
+
+    @Test
     void read_withoutTheEndLine_throwsIllegalArgument() {
         List<String> lines = new ArrayList<>(CODEC.write(played()));
         lines.remove(lines.size() - 1);

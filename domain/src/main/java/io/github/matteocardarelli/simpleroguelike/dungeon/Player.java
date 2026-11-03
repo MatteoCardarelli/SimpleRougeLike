@@ -23,6 +23,7 @@ public final class Player extends Actor {
 
     private final Inventory inventory;
     private final Map<EquipmentSlot, Item> equipped = new EnumMap<>(EquipmentSlot.class);
+    private final Map<KeyType, Integer> keys = new EnumMap<>(KeyType.class);
     private int level = 1;
     private int experience;
     private int experienceToNextLevel;
@@ -85,6 +86,28 @@ public final class Player extends Actor {
         this.experience = experience;
         this.experienceToNextLevel = experienceToNextLevel;
         this.coins = coins;
+    }
+
+    /** Quante chiavi del tipo {@code type} ha il player: sono un contatore, come le monete. */
+    public int keys(KeyType type) {
+        return keys.getOrDefault(type, 0);
+    }
+
+    void addKeys(KeyType type, int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Chiavi negative: " + amount);
+        }
+        keys.put(type, Math.addExact(keys(type), amount));
+    }
+
+    /** Usa una chiave del tipo {@code type}, se c'è. */
+    boolean useKey(KeyType type) {
+        int left = keys(type);
+        if (left == 0) {
+            return false;
+        }
+        keys.put(type, left - 1);
+        return true;
     }
 
     void addCoins(int amount) {
