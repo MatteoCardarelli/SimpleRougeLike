@@ -22,11 +22,15 @@ public final class Run {
     private Floor floor;
     private int depth = 1;
     private final EntityIdSequence ids;
-    private final RandomSource generation;
-    private final RandomSource gameplay;
+    private final SeededRandomSource generation;
+    private final SeededRandomSource gameplay;
     private int turn = 1;
 
-    private Run(Floor floor, EntityIdSequence ids, RandomSource generation, RandomSource gameplay) {
+    private Run(
+            Floor floor,
+            EntityIdSequence ids,
+            SeededRandomSource generation,
+            SeededRandomSource gameplay) {
         this.floor = floor;
         this.ids = ids;
         this.generation = generation;
@@ -36,8 +40,8 @@ public final class Run {
     /** Inizia una partita: dallo stesso seed esce sempre la stessa. */
     public static Run start(long seed, FloorSpec spec, FloorSource floors) {
         SeededRandomSource root = new SeededRandomSource(seed);
-        RandomSource generation = root.split();
-        RandomSource gameplay = root.split();
+        SeededRandomSource generation = root.split();
+        SeededRandomSource gameplay = root.split();
         EntityIdSequence ids = new EntityIdSequence();
         Floor floor = floors.create(spec, generation, ids);
         return new Run(floor, ids, generation, gameplay);
@@ -79,6 +83,41 @@ public final class Run {
     public void descend(FloorSource floors, FloorSpec spec) {
         floor = floors.createNext(spec, generation, ids, floor.player());
         depth++;
+    }
+
+    /**
+     * Riprende una partita salvata, con lo stato dei due flussi casuali: da qui continua identica a
+     * come sarebbe continuata.
+     */
+    public static Run restore(
+            Floor floor,
+            EntityIdSequence ids,
+            SeededRandomSource.State generation,
+            SeededRandomSource.State gameplay,
+            int depth,
+            int turn) {
+        if (depth < 1 || turn < 1) {
+            throw new IllegalArgumentException("Piano o turno salvati non validi");
+        }
+        Run run =
+                new Run(
+                        floor,
+                        ids,
+                        SeededRandomSource.restore(generation),
+                        SeededRandomSource.restore(gameplay));
+        run.depth = depth;
+        run.turn = turn;
+        return run;
+    }
+
+    /** Lo stato del flusso di generazione, da salvare. */
+    public SeededRandomSource.State generationState() {
+        return generation.state();
+    }
+
+    /** Lo stato del flusso di gameplay, da salvare. */
+    public SeededRandomSource.State gameplayState() {
+        return gameplay.state();
     }
 
     /** Il turno in corso, da 1. */

@@ -797,6 +797,25 @@ public final class Floor implements FloorView {
     }
 
     /**
+     * Rimette le celle visibili ed esplorate e il boss sconfitto salvati; solo per riprendere una
+     * partita, senza ricalcolare il campo visivo.
+     */
+    void restoreMemory(CellSet visible, CellSet explored, Optional<EntityId> defeatedBoss) {
+        if (visible.width() != terrain.width() || visible.height() != terrain.height()) {
+            throw new IllegalArgumentException(
+                    "Le celle visibili devono avere le dimensioni del piano");
+        }
+        this.visible = visible;
+        this.explored = explored.union(visible);
+        this.defeatedBoss = defeatedBoss.orElse(null);
+    }
+
+    /** Il boss già sconfitto e tolto dal piano, se c'è: per il salvataggio. */
+    Optional<EntityId> defeatedBoss() {
+        return Optional.ofNullable(defeatedBoss);
+    }
+
+    /**
      * Sostituisce le celle visibili e le aggiunge a quelle esplorate.
      *
      * @throws IllegalArgumentException se l'insieme non ha le dimensioni del piano

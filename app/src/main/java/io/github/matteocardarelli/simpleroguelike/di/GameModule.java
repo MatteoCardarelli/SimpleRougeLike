@@ -40,6 +40,7 @@ import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.LootHook;
+import io.github.matteocardarelli.simpleroguelike.session.SaveCodec;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidFieldOfView;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidTerrainGenerator;
@@ -190,6 +191,12 @@ public abstract class GameModule {
     @Provides
     static CommandDispatcher commandDispatcher(Set<CommandHandler<?>> handlers) {
         return new CommandDispatcher(handlers);
+    }
+
+    /** Il formato del salvataggio, che ritrova oggetti e nemici nei cataloghi. */
+    @Provides
+    static SaveCodec saveCodec(ItemCatalog items, EnemyCatalog enemies) {
+        return new SaveCodec(items, enemies);
     }
 
     @Provides

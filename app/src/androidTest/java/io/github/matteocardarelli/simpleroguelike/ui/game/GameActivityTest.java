@@ -32,11 +32,14 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.save.FileGameStore;
 import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventorySheet;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsDialog;
+import java.io.File;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
@@ -52,15 +55,28 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class GameActivityTest {
 
-    /** Le impostazioni restano tra un avvio e l'altro: ogni test parte da quelle iniziali. */
+    /**
+     * Impostazioni e partita salvata restano tra un avvio e l'altro: ogni test parte da quelle
+     * iniziali, con una partita nuova.
+     */
     @Before
     @After
-    public void clearTheSettings() {
+    public void clearTheSettingsAndTheSave() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         context.getSharedPreferences(PreferencesSettingsStore.FILE, Context.MODE_PRIVATE)
                 .edit()
                 .clear()
                 .commit();
+        // Dalla stessa coda delle scritture dell'app: dopo, nessuna scrittura in sospeso del test
+        // di prima può rimettere il file. La lettura aspetta che la cancellazione sia fatta.
+        FileGameStore save = store();
+        save.clear();
+        assertFalse(save.load().isPresent());
+    }
+
+    private static FileGameStore store() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        return new FileGameStore(new File(context.getFilesDir(), FileGameStore.FILE));
     }
 
     private static GameViewModel viewModel(GameActivity activity) {
@@ -74,6 +90,38 @@ public class GameActivityTest {
                 ActivityScenario.launch(GameActivity.class)) {
             onView(withId(R.id.game_view)).check(matches(isDisplayed()));
             onView(withId(R.id.health_bar)).check(matches(isDisplayed()));
+        }
+    }
+
+    /** Passo 7m: chiusa e riaperta, l'app ritrova la partita dove era rimasta. */
+    @Test
+    public void closingAndReopening_resumesTheSameGame() {
+        AtomicReference<@Nullable GameSnapshot> before = new AtomicReference<>();
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            scenario.onActivity(
+                    activity -> {
+                        GameViewModel viewModel = viewModel(activity);
+                        viewModel.submit(new MoveCommand(Direction.UP));
+                        viewModel.submit(new MoveCommand(Direction.LEFT));
+                        before.set(viewModel.state().result().snapshot());
+                    });
+        }
+        GameSnapshot saved = Objects.requireNonNull(before.get());
+        // La lettura aspetta le scritture in coda: è l'ultimo turno giocato.
+        assertTrue(store().load().isPresent());
+
+        try (ActivityScenario<GameActivity> scenario =
+                ActivityScenario.launch(GameActivity.class)) {
+            scenario.onActivity(
+                    activity -> {
+                        GameUiState state = viewModel(activity).state();
+                        GameSnapshot snapshot = state.result().snapshot();
+                        assertEquals(saved.seed(), snapshot.seed());
+                        assertEquals(saved.turn(), snapshot.turn());
+                        assertEquals(saved.player(), snapshot.player());
+                        assertFalse(state.previousGameLost());
+                    });
         }
     }
 

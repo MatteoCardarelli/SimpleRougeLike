@@ -137,6 +137,7 @@ class AppArchitectureTest {
                                             BASE + ".snapshot..",
                                             BASE + ".feedback..",
                                             BASE + ".settings..",
+                                            BASE + ".save..",
                                             BASE + ".databinding..",
                                             BASE + ".model..",
                                             BASE + ".event..")
@@ -214,6 +215,18 @@ class AppArchitectureTest {
                     .because(
                             "le impostazioni sono dati del giocatore: niente partita né interfaccia,"
                                     + " e di Android solo SharedPreferences, nel suo adapter");
+
+    @ArchTest
+    static final ArchRule saveUsesOnlyJava =
+            classes()
+                    .that()
+                    .resideInAPackage(BASE + ".save..")
+                    .should()
+                    .onlyDependOnClassesThat()
+                    .resideInAnyPackage("java..", "org.jspecify.annotations..", BASE + ".save..")
+                    .because(
+                            "il salvataggio tiene righe di testo su file: le scrive e le rilegge la"
+                                    + " sessione, e i test lo provano sulla JVM senza Android");
 
     @ArchTest
     static final ArchRule uiLogUsesOnlyContent =

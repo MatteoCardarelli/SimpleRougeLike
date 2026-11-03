@@ -79,6 +79,13 @@ public final class Enemy extends Actor {
         return tired;
     }
 
+    /** Rimette lo stato salvato; solo per riprendere una partita. */
+    void restoreState(Optional<Position> pendingJump, boolean tired, boolean angry) {
+        this.pendingJump = pendingJump;
+        this.tired = tired;
+        this.angry = angry;
+    }
+
     void announceJump(Position anchor) {
         pendingJump = Optional.of(anchor);
     }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * La partita del test golden: seed e comandi fissi, con gli adapter, le regole e i contenuti veri.
@@ -46,6 +47,15 @@ public final class GoldenGame {
      * da un flusso casuale con un seed fisso.
      */
     public static List<String> play() {
+        return play(session -> session);
+    }
+
+    /**
+     * Gioca la stessa partita, passando la sessione da {@code between} dopo ogni comando: per
+     * esempio per salvarla e riprenderla in una sessione nuova. Se {@code between} non cambia
+     * niente, il registro è quello di {@link #play()}.
+     */
+    public static List<String> play(UnaryOperator<GameSession> between) {
         GameSession session = TestGraph.session(GameConfig.standard());
         EventLogWriter writer = new EventLogWriter();
         RandomSource wandering = new SeededRandomSource(SEED);
@@ -62,6 +72,10 @@ public final class GoldenGame {
             log.add("t" + before.turn() + " > " + choice.description());
             result = session.handle(choice.command());
             log.addAll(writer.lines(before.turn(), result.events()));
+            if (result.snapshot().phase() == Phase.PLAYING) {
+                session = between.apply(session);
+                result = session.current();
+            }
             // Un passo contro un muro lascia il player fermo, anche se il turno passa: si cambia
             // direzione.
             stuck = choice.intoWallOf(before);

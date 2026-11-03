@@ -76,6 +76,14 @@ public abstract class Actor {
         return restored;
     }
 
+    /** Rimette la salute salvata; solo per riprendere una partita. */
+    final void restoreSavedHealth(int value) {
+        if (value < 0 || value > stats().maxHealth()) {
+            throw new IllegalArgumentException("Salute salvata non valida: " + value);
+        }
+        health = value;
+    }
+
     /** Riporta la salute entro la salute massima, se un bonus tolto l'ha abbassata. */
     final void clampHealth() {
         health = Math.min(health, stats().maxHealth());

@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: `v1.12.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, ognuna con la sua release, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
+> **Stato: `v1.13.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, ognuna con la sua release, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -75,7 +75,7 @@ La CI, su ogni push e pull request, controlla formattazione, Lint (senza eccezio
 - [x] **5. Nuova app Android:** la stessa app di prima sul nuovo motore, le correzioni del primo collaudo e le note di collaudo, Hilt e MVVM, il nuovo rendering con l'inventario a griglia, le funzionalità nuove (pozione grande, registro dei messaggi, fine partita, barre con i valori, impostazioni), i test sul dispositivo in CI e il workflow di release.
 - [x] **6. Pulizia:** rimozione del codice vecchio e release `v1.0.0`.
 
-- [ ] **7. Dopo la v1:** una funzionalità alla volta, ognuna con la sua issue `enhancement` e la sua release.
+- [x] **7. Dopo la v1:** una funzionalità alla volta, ognuna con la sua issue `enhancement` e la sua release.
   - [x] Barre più pulite e impostazioni a tutto schermo, con il seed da copiare e la nuova partita (`v1.1.0`).
   - [x] Statistiche: attacco, difesa, precisione e schivata, con colpi che possono mancare (`v1.2.0`).
   - [x] Equipaggiamento: arma, armatura e anello, che si cambiano senza perdere il turno (`v1.3.0`).
@@ -88,7 +88,7 @@ La CI, su ogni push e pull request, controlla formattazione, Lint (senza eccezio
   - [x] Il boss: uno slime gigante che salta e schiaccia, nella sua arena sul quinto piano (`v1.10.0`).
   - [x] Monete e mercanti: la merce si prende, si paga urtando il mercante, e chi scappa senza pagare se ne pente (`v1.11.0`).
   - [x] Illustrazioni vettoriali di personaggi, oggetti e oggetti fissi (`v1.12.0`).
-  - [ ] Salvataggio della partita.
+  - [x] Salvataggio della partita: si chiude l'app e la si ritrova dove era, e la morte la cancella (`v1.13.0`).
 
 ## Compilare ed eseguire
 
