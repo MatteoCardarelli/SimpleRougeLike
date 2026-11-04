@@ -10,7 +10,6 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Shop;
 import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
-import io.github.matteocardarelli.simpleroguelike.model.EquipmentSlot;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
@@ -170,13 +169,16 @@ public final class SnapshotMapper {
 
     private static int category(InventoryEntry entry) {
         if (entry.slot().isPresent()) {
-            return entry.slot().get().ordinal();
+            return switch (entry.slot().get()) {
+                case WEAPON -> 0;
+                case ARMOR -> 1;
+                case RING -> 2;
+            };
         }
-        int slots = EquipmentSlot.values().length;
         if (entry.usable()) {
-            return slots;
+            return 3;
         }
-        return entry.throwable() ? slots + 1 : slots + 2;
+        return entry.throwable() ? 4 : 5;
     }
 
     private static Optional<WareView> ware(FloorView floor, Position at) {

@@ -26,7 +26,7 @@ t6 Attacked attacker=1 target=12 from=44,47 at=45,47
 t6 Damaged target=12 at=45,47 amount=3 hp=0
 t6 Died actor=12 kind=goblin at=45,47
 t6 ExperienceGained at=44,47 amount=25
-t6 ItemDropped item=31 kind=throwing_knife at=45,47
+t6 ItemDropped item=31 kind=greater_potion at=45,47
 t7 > move left
 t7 Moved actor=1 kind=player from=44,47 to=43,47
 t8 > move left
@@ -70,7 +70,7 @@ t27 > move right
 t27 Moved actor=1 kind=player from=43,47 to=44,47
 t28 > move right
 t28 Moved actor=1 kind=player from=44,47 to=45,47
-t28 ItemPickedUp item=31 kind=throwing_knife at=45,47
+t28 ItemPickedUp item=31 kind=greater_potion at=45,47
 t29 > move right
 t29 Moved actor=1 kind=player from=45,47 to=46,47
 t30 > move right

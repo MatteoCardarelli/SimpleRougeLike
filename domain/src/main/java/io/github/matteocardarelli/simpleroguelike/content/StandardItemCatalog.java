@@ -42,8 +42,8 @@ public final class StandardItemCatalog implements ItemCatalog {
 
     private static final List<ItemDefinition> ITEMS =
             List.of(
-                    new ItemDefinition(POTION, new HealEffect(25), true, 10),
-                    new ItemDefinition(GREATER_POTION, new HealEffect(60), true, 3),
+                    new ItemDefinition(POTION, new HealEffect(25), true, 6),
+                    new ItemDefinition(GREATER_POTION, new HealEffect(60), true, 2),
                     ItemDefinition.equipment(SWORD, EquipmentSlot.WEAPON, new Stats(0, 4), 2),
                     ItemDefinition.equipment(AXE, EquipmentSlot.WEAPON, new Stats(0, 7), 1),
                     ItemDefinition.equipment(

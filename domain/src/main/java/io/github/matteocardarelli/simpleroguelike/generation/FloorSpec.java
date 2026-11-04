@@ -16,6 +16,7 @@ package io.github.matteocardarelli.simpleroguelike.generation;
  * @param bossCount 1 per il piano del boss: un'arena con il boss, la sua porta e la sua chiave
  * @param shopChance la probabilità, in percentuale, che il piano abbia un negozio; mai sul piano
  *     del boss
+ * @param enemyLevel il livello dei nemici normali, da 1: di solito la profondità del piano
  */
 public record FloorSpec(
         int width,
@@ -30,7 +31,8 @@ public record FloorSpec(
         int stairsCount,
         int lockedDoorCount,
         int bossCount,
-        int shopChance) {
+        int shopChance,
+        int enemyLevel) {
 
     public FloorSpec {
         if (width < 3 || height < 3) {
@@ -50,7 +52,8 @@ public record FloorSpec(
                 || bossCount < 0
                 || bossCount > 1
                 || shopChance < 0
-                || shopChance > 100) {
+                || shopChance > 100
+                || enemyLevel < 1) {
             throw new IllegalArgumentException(
                     "Valori non validi: enemyCount="
                             + enemyCount
@@ -73,8 +76,42 @@ public record FloorSpec(
                             + ", boss="
                             + bossCount
                             + ", shopChance="
-                            + shopChance);
+                            + shopChance
+                            + ", enemyLevel="
+                            + enemyLevel);
         }
+    }
+
+    /** Un piano con i nemici di livello 1. */
+    public FloorSpec(
+            int width,
+            int height,
+            int enemyCount,
+            int itemCount,
+            int minSpawnDistance,
+            int maxAttempts,
+            int doorCount,
+            int chestCount,
+            int gateCount,
+            int stairsCount,
+            int lockedDoorCount,
+            int bossCount,
+            int shopChance) {
+        this(
+                width,
+                height,
+                enemyCount,
+                itemCount,
+                minSpawnDistance,
+                maxAttempts,
+                doorCount,
+                chestCount,
+                gateCount,
+                stairsCount,
+                lockedDoorCount,
+                bossCount,
+                shopChance,
+                1);
     }
 
     /** Un piano senza oggetti fissi. */

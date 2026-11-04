@@ -15,10 +15,9 @@ class StandardCatalogsTest {
     void items_containThePotionAndTheGreaterPotion() {
         assertThat(new StandardItemCatalog().all())
                 .startsWith(
+                        new ItemDefinition(StandardItemCatalog.POTION, new HealEffect(25), true, 6),
                         new ItemDefinition(
-                                StandardItemCatalog.POTION, new HealEffect(25), true, 10),
-                        new ItemDefinition(
-                                StandardItemCatalog.GREATER_POTION, new HealEffect(60), true, 3));
+                                StandardItemCatalog.GREATER_POTION, new HealEffect(60), true, 2));
     }
 
     @Test
