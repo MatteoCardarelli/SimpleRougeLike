@@ -178,6 +178,55 @@ class FloorPopulatorTest {
         }
     }
 
+    /** Dietro una porta chiusa a chiave, una volta su quattro, c'è un oggetto raro. */
+    @Test
+    void populate_behindALockedDoor_sometimesARareItem_onTheOtherSide() {
+        Grid<TileType> twoRooms =
+                FloorFixtures.terrain(
+                        "##############",
+                        "#......###...#",
+                        "#............#",
+                        "#......###...#",
+                        "#......#######",
+                        "##############");
+        FloorSpec spec = new FloorSpec(14, 6, 0, 0, 0, 1, 1, 0, 0, 0, 1);
+
+        int rewarded = 0;
+        int floors = 200;
+        for (long seed = 1; seed <= floors; seed++) {
+            Floor floor =
+                    POPULATOR.populate(
+                            twoRooms, spec, new SeededRandomSource(seed), new EntityIdSequence());
+            Position door =
+                    floor.fixtures().entrySet().stream()
+                            .filter(e -> e.getValue().type() == FixtureType.LOCKED_DOOR)
+                            .map(java.util.Map.Entry::getKey)
+                            .findFirst()
+                            .orElseThrow();
+            Position player = floor.positionOf(floor.playerId());
+            for (var entry : floor.itemsOnGround().entrySet()) {
+                if (entry.getValue().definition().key().isPresent()) {
+                    continue;
+                }
+                rewarded++;
+                assertThat(entry.getValue().definition().spawnWeight())
+                        .isBetween(1, FloorPopulator.RARE_WEIGHT);
+                assertThat(Integer.signum(entry.getKey().x() - door.x()))
+                        .isEqualTo(-Integer.signum(player.x() - door.x()));
+            }
+        }
+        assertThat(rewarded).isBetween(floors / 8, floors * 3 / 8);
+    }
+
+    @Test
+    void populate_enemiesHaveTheLevelOfTheSpec() {
+        FloorSpec spec = new FloorSpec(10, 7, 3, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 4);
+
+        Floor floor = populate(spec, 1);
+
+        assertThat(floor.enemies()).isNotEmpty().allMatch(enemy -> enemy.level() == 4);
+    }
+
     @Test
     void populate_theBossFloor_hasTheArenaTheBossItsDoorAndItsKey() {
         StringBuilder wall = new StringBuilder();

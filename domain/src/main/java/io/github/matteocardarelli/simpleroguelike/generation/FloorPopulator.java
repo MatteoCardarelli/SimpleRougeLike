@@ -15,10 +15,12 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.PlayerDefinition;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Shop;
 import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
+import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.random.RandomSource;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -43,6 +45,12 @@ public final class FloorPopulator {
 
     /** Quanto lontano dal primo nascono i compagni di un branco. */
     static final int PACK_RADIUS = 3;
+
+    /** La probabilità, in percentuale, di un oggetto raro dietro una porta chiusa a chiave. */
+    static final int LOCKED_REWARD_CHANCE = 25;
+
+    /** Il peso di comparsa massimo di un oggetto raro. */
+    static final int RARE_WEIGHT = 3;
 
     private final ItemCatalog items;
     private final EnemyCatalog enemies;
@@ -218,6 +226,13 @@ public final class FloorPopulator {
         List<Position> keyCells =
                 keyCells(terrain, layout, arena.map(Arena::door), playerAt, free, random);
 
+        List<Position> rewardCells =
+                rewardCells(terrain, layout, arena.map(Arena::door), playerAt, free, random);
+        List<ItemDefinition> rewardTypes = new ArrayList<>();
+        for (int i = 0; i < rewardCells.size(); i++) {
+            rewardTypes.add(WeightedPicker.pick(rare(), ItemDefinition::spawnWeight, random));
+        }
+
         List<ItemDefinition> chestTypes = new ArrayList<>();
         for (int i = 0; i < layout.chests().size(); i++) {
             chestTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
@@ -227,10 +242,14 @@ public final class FloorPopulator {
                         .terrain(terrain)
                         .player(existing.orElseGet(() -> new Player(ids.next(), player)), playerAt);
         for (int i = 0; i < enemyCells.size(); i++) {
-            builder.enemy(new Enemy(ids.next(), enemyTypes.get(i)), enemyCells.get(i));
+            builder.enemy(
+                    new Enemy(ids.next(), enemyTypes.get(i), spec.enemyLevel()), enemyCells.get(i));
         }
         for (int i = 0; i < itemCells.size(); i++) {
             builder.item(new Item(ids.next(), itemTypes.get(i)), itemCells.get(i));
+        }
+        for (int i = 0; i < rewardCells.size(); i++) {
+            builder.item(new Item(ids.next(), rewardTypes.get(i)), rewardCells.get(i));
         }
         for (int i = 0; i < layout.chests().size(); i++) {
             builder.fixture(
@@ -313,20 +332,91 @@ public final class FloorPopulator {
         if (count == 0) {
             return List.of();
         }
+        Set<Position> seen = reachable(terrain, playerAt, barriers(layout, bossDoor));
+        List<Position> reachable = new ArrayList<>();
+        for (Position cell : free) {
+            if (seen.contains(cell)) {
+                reachable.add(cell);
+            }
+        }
+        List<Position> keys = take(reachable, count, random, "chiavi");
+        free.removeAll(keys);
+        return keys;
+    }
+
+    /**
+     * Per ogni porta chiusa a chiave, una volta su {@code 100 / }{@value #LOCKED_REWARD_CHANCE}, la
+     * cella libera più vicina alla porta dalla parte che il player non raggiunge senza aprirla: lì
+     * c'è un oggetto raro. Una porta che non separa niente non ne ha.
+     */
+    private static List<Position> rewardCells(
+            Grid<TileType> terrain,
+            FixtureLayout layout,
+            Optional<Position> bossDoor,
+            Position playerAt,
+            List<Position> free,
+            RandomSource random) {
+        List<Position> rewards = new ArrayList<>();
+        if (layout.lockedDoors().isEmpty()) {
+            return rewards;
+        }
+        List<Position> barriers = barriers(layout, bossDoor);
+        Set<Position> before = reachable(terrain, playerAt, barriers);
+        for (Position door : layout.lockedDoors()) {
+            if (random.nextInt(100) >= LOCKED_REWARD_CHANCE) {
+                continue;
+            }
+            for (Direction direction : Direction.values()) {
+                Position behind = door.translate(direction);
+                if (!terrain.isInside(behind)
+                        || !terrain.get(behind).isWalkable()
+                        || before.contains(behind)) {
+                    continue;
+                }
+                Set<Position> side = reachable(terrain, behind, barriers);
+                Position best = null;
+                for (Position cell : free) {
+                    if (side.contains(cell)
+                            && (best == null || cell.distanceTo(door) < best.distanceTo(door))) {
+                        best = cell;
+                    }
+                }
+                if (best != null) {
+                    free.remove(best);
+                    rewards.add(best);
+                }
+                break;
+            }
+        }
+        return rewards;
+    }
+
+    /**
+     * Le celle che si attraversano solo aprendole: porte chiuse a chiave, cancelli, la porta del
+     * boss.
+     */
+    private static List<Position> barriers(FixtureLayout layout, Optional<Position> bossDoor) {
         List<Position> barriers = new ArrayList<>(layout.lockedDoors());
         bossDoor.ifPresent(barriers::add);
         for (FixtureLayout.Gate gate : layout.gates()) {
             barriers.add(gate.at());
         }
-        List<Position> reachable = new ArrayList<>();
-        java.util.Set<Position> seen = new java.util.LinkedHashSet<>();
-        java.util.ArrayDeque<Position> queue = new java.util.ArrayDeque<>();
-        seen.add(playerAt);
-        queue.add(playerAt);
+        return barriers;
+    }
+
+    /**
+     * Le celle attraversabili che si raggiungono da {@code start} senza passare da {@code
+     * barriers}.
+     */
+    private static Set<Position> reachable(
+            Grid<TileType> terrain, Position start, List<Position> barriers) {
+        Set<Position> seen = new LinkedHashSet<>();
+        ArrayDeque<Position> queue = new ArrayDeque<>();
+        seen.add(start);
+        queue.add(start);
         while (!queue.isEmpty()) {
             Position cell = queue.poll();
-            for (io.github.matteocardarelli.simpleroguelike.model.Direction direction :
-                    io.github.matteocardarelli.simpleroguelike.model.Direction.values()) {
+            for (Direction direction : Direction.values()) {
                 Position next = cell.translate(direction);
                 if (terrain.isInside(next)
                         && terrain.get(next).isWalkable()
@@ -336,14 +426,24 @@ public final class FloorPopulator {
                 }
             }
         }
-        for (Position cell : free) {
-            if (seen.contains(cell)) {
-                reachable.add(cell);
+        return seen;
+    }
+
+    /** Gli oggetti rari, quelli che compaiono poco: il premio dietro una porta chiusa. */
+    private List<ItemDefinition> rare() {
+        List<ItemDefinition> rare = new ArrayList<>();
+        for (ItemDefinition definition : items.all()) {
+            if (definition.spawnWeight() > 0
+                    && definition.spawnWeight() <= RARE_WEIGHT
+                    && definition.coinValue() == 0
+                    && !definition.key().isPresent()) {
+                rare.add(definition);
             }
         }
-        List<Position> keys = take(reachable, count, random, "chiavi");
-        free.removeAll(keys);
-        return keys;
+        if (rare.isEmpty()) {
+            throw new FloorGenerationException("Il catalogo non ha oggetti rari");
+        }
+        return rare;
     }
 
     private ItemDefinition key(KeyType type) {

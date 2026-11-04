@@ -52,7 +52,8 @@ public record GameConfig(List<FloorSpec> floorSpecs, int visionRadius, OptionalL
                             depth < FLOORS ? 1 : 0,
                             2,
                             depth == FLOORS ? 1 : 0,
-                            depth < FLOORS ? SHOP_CHANCE : 0));
+                            depth < FLOORS ? SHOP_CHANCE : 0,
+                            depth));
         }
         return new GameConfig(floors, 8, OptionalLong.empty());
     }

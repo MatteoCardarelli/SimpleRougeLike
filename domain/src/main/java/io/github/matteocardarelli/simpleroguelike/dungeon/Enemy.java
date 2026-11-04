@@ -5,9 +5,14 @@ import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Faction;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
+import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import java.util.Optional;
 
-/** Un nemico. I suoi valori vengono dalla definizione del suo tipo. */
+/**
+ * Un nemico. I suoi valori vengono dalla definizione del suo tipo e dal suo livello, che è quello
+ * del piano dove nasce: più si scende, più è forte e più esperienza dà. Boss e mercante hanno
+ * sempre i valori della definizione.
+ */
 public final class Enemy extends Actor {
 
     private final EnemyDefinition definition;
@@ -15,10 +20,47 @@ public final class Enemy extends Actor {
     private boolean tired;
     private boolean angry;
     private boolean retreated;
+    private final int level;
 
     public Enemy(EntityId id, EnemyDefinition definition) {
-        super(id, definition.stats());
+        this(id, definition, 1);
+    }
+
+    /**
+     * @param level il livello, da 1: ogni livello oltre il primo dà un quarto di salute ed
+     *     esperienza in più, 2 di attacco, 3 di precisione, 1 di schivata e mezzo punto di difesa
+     * @throws IllegalArgumentException se il livello è minore di 1
+     */
+    public Enemy(EntityId id, EnemyDefinition definition, int level) {
+        super(id, statsAt(definition, level));
         this.definition = definition;
+        this.level = scales(definition) ? level : 1;
+    }
+
+    private static boolean scales(EnemyDefinition definition) {
+        return !definition.boss() && !definition.merchant();
+    }
+
+    private static Stats statsAt(EnemyDefinition definition, int level) {
+        if (level < 1) {
+            throw new IllegalArgumentException("Livello non valido: " + level);
+        }
+        Stats base = definition.stats();
+        if (!scales(definition) || level == 1) {
+            return base;
+        }
+        int extra = level - 1;
+        return new Stats(
+                base.maxHealth() * (4 + extra) / 4,
+                base.attack() + 2 * extra,
+                base.defense() + extra / 2,
+                base.accuracy() + 3 * extra,
+                base.evasion() + extra);
+    }
+
+    /** Il livello del nemico, da 1. */
+    public int level() {
+        return level;
     }
 
     @Override
@@ -45,7 +87,7 @@ public final class Enemy extends Actor {
     }
 
     public int experienceReward() {
-        return definition.experienceReward();
+        return definition.experienceReward() * (3 + level) / 4;
     }
 
     public int aggroRange() {

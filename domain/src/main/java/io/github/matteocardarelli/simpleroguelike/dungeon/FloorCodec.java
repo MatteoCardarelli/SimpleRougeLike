@@ -89,7 +89,8 @@ public final class FloorCodec {
                             jump,
                             enemy.isTired() ? 1 : 0,
                             enemy.isAngry() ? 1 : 0,
-                            enemy.hasJustRetreated() ? 1 : 0));
+                            enemy.hasJustRetreated() ? 1 : 0,
+                            enemy.level()));
         }
         for (Map.Entry<Position, Item> entry : floor.itemsOnGround().entrySet()) {
             Item item = entry.getValue();
@@ -214,7 +215,10 @@ public final class FloorCodec {
                         .player(player, new Position(integer(p[2]), integer(p[3])));
         while (in.peek("enemy")) {
             String[] e = in.next("enemy");
-            Enemy enemy = new Enemy(new EntityId(integer(e[1])), enemy(e[2]));
+            // Il livello è arrivato dopo il formato 1: un salvataggio di prima ha nemici di livello
+            // 1.
+            int level = e.length > 11 ? integer(e[11]) : 1;
+            Enemy enemy = new Enemy(new EntityId(integer(e[1])), enemy(e[2]), level);
             enemy.restoreSavedHealth(integer(e[5]));
             Optional<Position> jump =
                     e[6].equals("-")

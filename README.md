@@ -6,7 +6,7 @@ Un roguelike a turni per Android, scritto in Java.
 
 Il gioco è volutamente piccolo: un piano, qualche nemico, delle pozioni. Il progetto invece è un esercizio di ingegneria del software: architettura esplicita, regole verificate automaticamente, test e integrazione continua, come in un prodotto vero.
 
-> **Stato: `v1.14.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, ognuna con la sua release, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
+> **Stato: `v1.15.0`.** Il refactoring è finito: l'app gioca sul nuovo motore (`:domain`, `:application`, `:infrastructure`), con Hilt e MVVM, e il codice di prima è stato rimosso. Le funzionalità nuove arrivano una alla volta, ognuna con la sua release, a partire dalle fondamenta (vedi [Roadmap](#roadmap)).
 
 ## Il gioco
 
@@ -89,10 +89,10 @@ La CI, su ogni push e pull request, controlla formattazione, Lint (senza eccezio
   - [x] Monete e mercanti: la merce si prende, si paga urtando il mercante, e chi scappa senza pagare se ne pente (`v1.11.0`).
   - [x] Illustrazioni vettoriali di personaggi, oggetti e oggetti fissi (`v1.12.0`).
   - [x] Salvataggio della partita: si chiude l'app e la si ritrova dove era, e la morte la cancella (`v1.13.0`).
-- [ ] **Dopo il collaudo:** le correzioni chieste giocando.
+- [x] **Dopo il collaudo:** le correzioni chieste giocando.
   - [x] Arcieri che si possono raggiungere (`v1.13.1`).
   - [x] Tappeto sulla zona del negozio, chiavi come contatore e inventario ordinato (`v1.14.0`).
-  - [ ] Nemici più forti a ogni piano, meno pozioni e qualcosa dietro le porte chiuse.
+  - [x] Nemici più forti a ogni piano, meno pozioni e, ogni tanto, un oggetto raro dietro le porte chiuse (`v1.15.0`).
 
 ## Compilare ed eseguire
 

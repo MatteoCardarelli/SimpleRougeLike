@@ -136,17 +136,23 @@ class FloorCodecTest {
         assertThat(read.explored().positions()).hasSize(5);
     }
 
-    /** Un salvataggio scritto prima della fuga con pausa non ha l'ultimo campo dei nemici. */
+    /** Un salvataggio del formato 1 non ha gli ultimi campi dei nemici: fuga e livello. */
     @Test
-    void read_ofAnEnemyLineWithoutTheRetreat_readsIt() {
+    void read_ofAnEnemyLineWithoutTheNewerFields_readsIt() {
         List<String> lines = new ArrayList<>();
         for (String line : CODEC.write(played())) {
-            lines.add(line.startsWith("enemy ") ? line.substring(0, line.lastIndexOf(' ')) : line);
+            if (line.startsWith("enemy ")) {
+                String[] parts = line.split(" ");
+                lines.add(String.join(" ", java.util.Arrays.copyOf(parts, 10)));
+            } else {
+                lines.add(line);
+            }
         }
 
         Floor read = CODEC.read(lines);
 
         assertThat(read.enemies().get(0).hasJustRetreated()).isFalse();
+        assertThat(read.enemies().get(0).level()).isEqualTo(1);
     }
 
     @Test
