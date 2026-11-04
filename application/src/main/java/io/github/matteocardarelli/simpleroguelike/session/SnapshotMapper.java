@@ -5,9 +5,12 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.Equipment;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Fixture;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorView;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
+import io.github.matteocardarelli.simpleroguelike.dungeon.KeyType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Shop;
 import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
+import io.github.matteocardarelli.simpleroguelike.model.EquipmentSlot;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
@@ -21,6 +24,7 @@ import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Visibility;
 import io.github.matteocardarelli.simpleroguelike.snapshot.WareView;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -94,6 +98,7 @@ public final class SnapshotMapper {
                             item.count(),
                             item.definition().usable()));
         }
+        inventory.sort(BY_CATEGORY);
         PlayerView playerView =
                 new PlayerView(
                         player.id(),
@@ -107,7 +112,9 @@ public final class SnapshotMapper {
                         player.stats().defense(),
                         player.stats().accuracy(),
                         player.stats().evasion(),
-                        player.coins());
+                        player.coins(),
+                        player.keys(KeyType.COMMON),
+                        player.keys(KeyType.BOSS));
 
         List<FixtureView> fixtures = new ArrayList<>();
         for (Map.Entry<Position, Fixture> entry : floor.fixtures().entrySet()) {
@@ -130,7 +137,46 @@ public final class SnapshotMapper {
                 depth,
                 floors,
                 danger,
-                ware(floor, playerView.position()));
+                ware(floor, playerView.position()),
+                shop(floor, explored));
+    }
+
+    /** Le celle della zona del negozio già esplorate e attraversabili: dove sta il tappeto. */
+    private static List<Position> shop(FloorView floor, CellSet explored) {
+        List<Position> rug = new ArrayList<>();
+        Optional<Shop> shop = floor.shop();
+        if (shop.isPresent()) {
+            Grid<TileType> terrain = floor.terrain();
+            for (Position cell : shop.get().zone()) {
+                if (terrain.isInside(cell)
+                        && terrain.get(cell).isWalkable()
+                        && explored.contains(cell)) {
+                    rug.add(cell);
+                }
+            }
+        }
+        return rug;
+    }
+
+    /**
+     * L'ordine dell'inventario: prima l'equipaggiamento nell'ordine degli spazi, poi quello che si
+     * usa, poi quello che si lancia; dentro ogni gruppo gli oggetti dello stesso tipo stanno
+     * vicini.
+     */
+    private static final Comparator<InventoryEntry> BY_CATEGORY =
+            Comparator.comparingInt(SnapshotMapper::category)
+                    .thenComparing(entry -> entry.kind().value())
+                    .thenComparingInt(entry -> entry.id().value());
+
+    private static int category(InventoryEntry entry) {
+        if (entry.slot().isPresent()) {
+            return entry.slot().get().ordinal();
+        }
+        int slots = EquipmentSlot.values().length;
+        if (entry.usable()) {
+            return slots;
+        }
+        return entry.throwable() ? slots + 1 : slots + 2;
     }
 
     private static Optional<WareView> ware(FloorView floor, Position at) {

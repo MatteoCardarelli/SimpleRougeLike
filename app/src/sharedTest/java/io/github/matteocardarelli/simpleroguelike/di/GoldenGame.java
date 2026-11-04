@@ -13,6 +13,7 @@ import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
+import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import java.util.ArrayList;
@@ -104,8 +105,10 @@ public final class GoldenGame {
 
     private static Choice next(GameSnapshot snapshot, Direction heading, boolean stuck) {
         PlayerView player = snapshot.player();
-        if (player.health() * 2 < player.maxHealth() && !snapshot.inventory().isEmpty()) {
-            UseItemCommand use = new UseItemCommand(snapshot.inventory().get(0).id());
+        Optional<InventoryEntry> potion =
+                snapshot.inventory().stream().filter(InventoryEntry::usable).findFirst();
+        if (player.health() * 2 < player.maxHealth() && potion.isPresent()) {
+            UseItemCommand use = new UseItemCommand(potion.get().id());
             return new Choice(use, FORMAT.line(use), Optional.empty());
         }
         Optional<ActorView> target =

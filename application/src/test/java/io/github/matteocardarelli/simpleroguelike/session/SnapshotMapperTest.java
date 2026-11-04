@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorFixtures;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Shop;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -20,7 +21,10 @@ import io.github.matteocardarelli.simpleroguelike.snapshot.Phase;
 import io.github.matteocardarelli.simpleroguelike.snapshot.PlayerView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.Visibility;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class SnapshotMapperTest {
@@ -133,6 +137,50 @@ class SnapshotMapperTest {
 
         assertThatThrownBy(() -> result.events().clear())
                 .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void from_inventory_byCategory_equipmentFirst_thenUsable_thenThrowable() {
+        Floor floor = FloorFixtures.parse("@-![/");
+        for (int i = 0; i < 4; i++) {
+            floor.move(new EntityId(1), Direction.RIGHT);
+            floor.pickUp(new EntityId(1));
+        }
+
+        GameSnapshot snapshot = MAPPER.from(floor, Phase.PLAYING, 1, 1);
+
+        assertThat(snapshot.inventory())
+                .extracting(entry -> entry.kind().value())
+                .containsExactly("sword", "leather_armor", "potion", "throwing_knife");
+    }
+
+    @Test
+    void from_keys_areACounter_notInTheInventory() {
+        Floor floor = FloorFixtures.parse("@k");
+        floor.move(new EntityId(1), Direction.RIGHT);
+        floor.pickUp(new EntityId(1));
+
+        GameSnapshot snapshot = MAPPER.from(floor, Phase.PLAYING, 1, 1);
+
+        assertThat(snapshot.player().keys()).isEqualTo(1);
+        assertThat(snapshot.player().bossKeys()).isZero();
+        assertThat(snapshot.inventory()).isEmpty();
+    }
+
+    /** Il tappeto copre le celle della zona del negozio già esplorate, senza i muri. */
+    @Test
+    void from_shopRug_isTheExploredWalkableZone() {
+        Floor floor = FloorFixtures.parse("#@M..");
+        Set<Position> zone = new LinkedHashSet<>();
+        for (int x = 0; x < 4; x++) {
+            zone.add(new Position(x, 0));
+        }
+        floor.openShop(new Shop(floor.enemies().get(0).id(), zone, Map.of()));
+        floor.updateVisibility(visible(floor, 0, 1, 2));
+
+        GameSnapshot snapshot = MAPPER.from(floor, Phase.PLAYING, 1, 1);
+
+        assertThat(snapshot.shop()).containsExactly(new Position(1, 0), new Position(2, 0));
     }
 
     private static CellSet visible(Floor floor, int... xs) {

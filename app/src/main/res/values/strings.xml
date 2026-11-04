@@ -112,8 +112,9 @@
 
     <string name="hud_health_value">%1$d/%2$d</string>
     <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
-    <string name="hud_level">liv. %1$d · piano %2$d/%3$d · monete %4$d</string>
-    <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d · Monete %5$d</string>
+    <string name="hud_level">liv. %1$d · piano %2$d/%3$d · monete %4$d · chiavi %5$d</string>
+    <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d · Monete %5$d · Chiavi %6$d</string>
+    <string name="hud_boss_key">%1$s · chiave del boss</string>
 
     <string name="debug_turn">turno %1$d</string>
 

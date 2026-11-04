@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 import androidx.appcompat.content.res.AppCompatResources;
+import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
@@ -20,11 +21,13 @@ import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Sprite;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -37,6 +40,9 @@ public final class GameView extends View {
 
     /** Il rosso semitrasparente delle celle dove sta per atterrare un nemico. */
     private static final int DANGER = 0x66FF1744;
+
+    private static final int RUG = 0xFF8E2430;
+    private static final int RUG_BORDER = 0xFFE5B23C;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Map<Kind, Drawable> arts = new LinkedHashMap<>();
@@ -108,6 +114,7 @@ public final class GameView extends View {
         canvas.save();
         canvas.translate(-viewport.offsetX(), -viewport.offsetY());
         drawCells(canvas, palette, cells, viewport, cell);
+        drawRug(canvas, cells, snapshot.shop(), cell);
         drawFixtures(canvas, content, cells, snapshot.fixtures(), cell);
         drawItems(canvas, content, snapshot.visibleItems(), cell);
         drawDanger(canvas, snapshot.danger(), cell);
@@ -279,6 +286,42 @@ public final class GameView extends View {
             arts.put(kind, art);
         }
         return art;
+    }
+
+    /**
+     * Il tappeto del negozio sulle celle della sua zona, con un bordo dorato dove finisce: uscendo
+     * dal tappeto con merce non pagata si ruba. Più scuro sulle celle che il player non vede
+     * adesso.
+     */
+    private void drawRug(Canvas canvas, Grid<CellView> cells, List<Position> rug, float cell) {
+        if (rug.isEmpty()) {
+            return;
+        }
+        Set<Position> inside = new LinkedHashSet<>(rug);
+        float edge = cell * 0.12f;
+        for (Position at : rug) {
+            int alpha = cells.get(at).visibility() == Visibility.VISIBLE ? 255 : 120;
+            float left = at.x() * cell;
+            float top = at.y() * cell;
+            paint.setColor(RUG);
+            paint.setAlpha(alpha);
+            canvas.drawRect(left, top, left + cell, top + cell, paint);
+            paint.setColor(RUG_BORDER);
+            paint.setAlpha(alpha);
+            if (!inside.contains(at.translate(Direction.UP))) {
+                canvas.drawRect(left, top, left + cell, top + edge, paint);
+            }
+            if (!inside.contains(at.translate(Direction.DOWN))) {
+                canvas.drawRect(left, top + cell - edge, left + cell, top + cell, paint);
+            }
+            if (!inside.contains(at.translate(Direction.LEFT))) {
+                canvas.drawRect(left, top, left + edge, top + cell, paint);
+            }
+            if (!inside.contains(at.translate(Direction.RIGHT))) {
+                canvas.drawRect(left + cell - edge, top, left + cell, top + cell, paint);
+            }
+        }
+        paint.setAlpha(255);
     }
 
     /** Le celle dove un nemico atterrerà al prossimo turno, in rosso. */

@@ -316,7 +316,8 @@ public class GameActivityTest {
                                         player.level(),
                                         snapshot.depth(),
                                         snapshot.floors(),
-                                        player.coins()));
+                                        player.coins(),
+                                        player.keys()));
                         View healthBar = activity.findViewById(R.id.health_bar);
                         assertEquals(
                                 activity.getString(

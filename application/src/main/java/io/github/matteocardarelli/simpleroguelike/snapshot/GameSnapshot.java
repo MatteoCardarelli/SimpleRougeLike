@@ -35,7 +35,8 @@ public record GameSnapshot(
         int depth,
         int floors,
         List<Position> danger,
-        Optional<WareView> ware) {
+        Optional<WareView> ware,
+        List<Position> shop) {
 
     public GameSnapshot {
         visibleEnemies = List.copyOf(visibleEnemies);
@@ -43,5 +44,6 @@ public record GameSnapshot(
         inventory = List.copyOf(inventory);
         fixtures = List.copyOf(fixtures);
         danger = List.copyOf(danger);
+        shop = List.copyOf(shop);
     }
 }

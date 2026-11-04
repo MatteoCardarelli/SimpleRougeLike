@@ -24,8 +24,16 @@ public final class PlayerBars {
         bars.healthValue.setVisibility(View.GONE);
         bars.statsValue.setVisibility(View.GONE);
         bars.xpValue.setText(
-                context.getString(
-                        R.string.hud_level, player.level(), depth, floors, player.coins()));
+                withBossKey(
+                        context,
+                        player,
+                        context.getString(
+                                R.string.hud_level,
+                                player.level(),
+                                depth,
+                                floors,
+                                player.coins(),
+                                player.keys())));
     }
 
     /**
@@ -46,13 +54,22 @@ public final class PlayerBars {
                         player.level()));
         bars.statsValue.setVisibility(View.VISIBLE);
         bars.statsValue.setText(
-                context.getString(
-                        R.string.hud_stats,
-                        player.attack(),
-                        player.defense(),
-                        player.accuracy(),
-                        player.evasion(),
-                        player.coins()));
+                withBossKey(
+                        context,
+                        player,
+                        context.getString(
+                                R.string.hud_stats,
+                                player.attack(),
+                                player.defense(),
+                                player.accuracy(),
+                                player.evasion(),
+                                player.coins(),
+                                player.keys())));
+    }
+
+    /** Il testo, con la chiave del boss in fondo se il player ce l'ha. */
+    private static String withBossKey(Context context, PlayerView player, String text) {
+        return player.bossKeys() > 0 ? context.getString(R.string.hud_boss_key, text) : text;
     }
 
     /** Le barre e le loro descrizioni per TalkBack, uguali nei due posti. */
