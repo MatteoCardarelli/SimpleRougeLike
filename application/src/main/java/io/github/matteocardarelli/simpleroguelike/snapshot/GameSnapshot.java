@@ -13,8 +13,8 @@ import java.util.Optional;
  * @param turn il turno in corso, da 1
  * @param depth il piano in cui si gioca, da 1
  * @param floors quanti piani ha la partita
- * @param danger le celle dove un nemico visibile atterrerà al prossimo turno: chi ci resta viene
- *     schiacciato
+ * @param danger l'ombra di un nemico visibile in aria, dove atterrerà al prossimo turno: chi ci
+ *     resta viene schiacciato
  * @param ware la merce del negozio su cui sta il player, se c'è
  * @param visibleEnemies i nemici vivi nelle celle visibili, in ordine di id
  * @param visibleItems gli oggetti a terra nelle celle visibili

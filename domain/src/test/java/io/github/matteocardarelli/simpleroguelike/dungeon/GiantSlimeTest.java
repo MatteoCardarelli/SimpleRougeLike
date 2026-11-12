@@ -3,6 +3,8 @@ package io.github.matteocardarelli.simpleroguelike.dungeon;
 import static io.github.matteocardarelli.simpleroguelike.random.FixedRandomSource.ALWAYS_HIT;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.matteocardarelli.simpleroguelike.ai.ChargeIntent;
+import io.github.matteocardarelli.simpleroguelike.ai.EnemyIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.JumpIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.LandIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.RestIntent;
@@ -10,6 +12,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.SlimeBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WaitIntent;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
+import io.github.matteocardarelli.simpleroguelike.event.JumpCharged;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
@@ -75,18 +78,24 @@ class GiantSlimeTest {
     }
 
     @Test
-    void behavior_announcesAJumpOnThePlayer_landsNextTurn_thenRests() {
+    void behavior_restsChargesJumpsOnThePlayerAndLands_thenStartsAgain() {
         Floor floor = arena();
         Enemy slime = floor.enemy(SLIME).orElseThrow();
 
-        var intent = SLIME_AI.decide(slime, floor, new FixedRandomSource(1));
+        assertThat(decide(floor)).isEqualTo(new RestIntent());
+        floor.rest(SLIME);
+        assertThat(decide(floor)).isEqualTo(new ChargeIntent());
+        assertThat(floor.chargeJump(SLIME)).isInstanceOf(JumpCharged.class);
+        assertThat(slime.jumpPhase()).isEqualTo(JumpPhase.CHARGING);
+        var intent = decide(floor);
 
         assertThat(intent).isInstanceOf(JumpIntent.class);
         Position anchor = ((JumpIntent) intent).anchor();
         assertThat(slime.footprint().at(anchor)).contains(new Position(1, 1));
         assertThat(floor.announceJump(SLIME, anchor)).isInstanceOf(JumpAnnounced.class);
-        assertThat(SLIME_AI.decide(slime, floor, new FixedRandomSource(1)))
-                .isEqualTo(new LandIntent());
+        assertThat(slime.isAirborne()).isTrue();
+        assertThat(floor.positionOf(SLIME)).isEqualTo(anchor);
+        assertThat(decide(floor)).isEqualTo(new LandIntent());
 
         var landing = JUMPS.land(floor, SLIME);
 
@@ -94,23 +103,32 @@ class GiantSlimeTest {
         assertThat(landing).anyMatch(Moved.class::isInstance);
         assertThat(landing).anyMatch(e -> e instanceof Damaged d && d.target().equals(PLAYER));
         assertThat(floor.cellsOf(SLIME)).doesNotContain(floor.positionOf(PLAYER));
-        assertThat(SLIME_AI.decide(slime, floor, new FixedRandomSource(1)))
-                .isEqualTo(new RestIntent());
-        floor.rest(SLIME);
-        assertThat(SLIME_AI.decide(slime, floor, new FixedRandomSource(1)))
-                .isNotEqualTo(new RestIntent());
+        assertThat(slime.jumpPhase()).isEqualTo(JumpPhase.RESTING);
+        assertThat(decide(floor)).isEqualTo(new RestIntent());
+    }
+
+    @Test
+    void inTheAir_theSlimeLeavesItsCells_andCannotBeHit() {
+        Floor floor = arena();
+        floor.chargeJump(SLIME);
+
+        floor.announceJump(SLIME, new Position(1, 2));
+
+        assertThat(floor.actorAt(new Position(8, 1))).isEmpty();
+        assertThat(floor.actorAt(new Position(2, 3))).isEmpty();
+        // Sotto l'ombra si cammina: lo slime in aria non si colpisce.
+        ACTIONS.step(floor, PLAYER, Direction.RIGHT, ALWAYS_HIT);
+        var step = ACTIONS.step(floor, PLAYER, Direction.DOWN, ALWAYS_HIT);
+        assertThat(step.events()).noneMatch(Damaged.class::isInstance);
+        assertThat(floor.positionOf(PLAYER)).isEqualTo(new Position(2, 2));
+        assertThat(floor.cellsOf(SLIME)).contains(new Position(2, 2));
     }
 
     @Test
     void land_whenThePlayerHasMoved_doesNoHarm() {
         Floor floor = arena();
-        Position anchor =
-                ((JumpIntent)
-                                SLIME_AI.decide(
-                                        floor.enemy(SLIME).orElseThrow(),
-                                        floor,
-                                        new FixedRandomSource(1)))
-                        .anchor();
+        floor.chargeJump(SLIME);
+        Position anchor = ((JumpIntent) decide(floor)).anchor();
         floor.announceJump(SLIME, anchor);
         for (int i = 0; i < 5; i++) {
             floor.move(PLAYER, Direction.DOWN);
@@ -120,6 +138,11 @@ class GiantSlimeTest {
 
         assertThat(landing).singleElement().isInstanceOf(Landed.class);
         assertThat(floor.player().health()).isEqualTo(floor.player().stats().maxHealth());
+        assertThat(floor.actorAt(anchor.translate(Direction.RIGHT))).map(Actor::id).contains(SLIME);
+    }
+
+    private static EnemyIntent decide(Floor floor) {
+        return SLIME_AI.decide(floor.enemy(SLIME).orElseThrow(), floor, new FixedRandomSource(1));
     }
 
     @Test

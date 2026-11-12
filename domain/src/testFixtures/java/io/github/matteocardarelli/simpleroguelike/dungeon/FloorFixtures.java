@@ -51,11 +51,25 @@ public final class FloorFixtures {
         return parse(ids, inventoryCapacity, Optional.empty(), rows);
     }
 
+    /** Come {@link #parse(String...)}, e tutte le celle attraversabili sono la stanza del boss. */
+    public static Floor parseBossRoom(String... rows) {
+        return parse(new EntityIdSequence(), INVENTORY_CAPACITY, Optional.empty(), true, rows);
+    }
+
     /** Come gli altri, ma con un player che esiste già al posto di {@code @}. */
     public static Floor parse(
             EntityIdSequence ids,
             int inventoryCapacity,
             Optional<Player> existing,
+            String... rows) {
+        return parse(ids, inventoryCapacity, existing, false, rows);
+    }
+
+    private static Floor parse(
+            EntityIdSequence ids,
+            int inventoryCapacity,
+            Optional<Player> existing,
+            boolean bossRoom,
             String... rows) {
         if (rows.length == 0) {
             throw new IllegalArgumentException("Serve almeno una riga");
@@ -66,6 +80,7 @@ public final class FloorFixtures {
         FloorBuilder builder = new FloorBuilder();
         List<Position> gates = new ArrayList<>();
         List<Position> levers = new ArrayList<>();
+        List<Position> room = new ArrayList<>();
         for (int y = 0; y < height; y++) {
             if (rows[y].length() != width) {
                 throw new IllegalArgumentException("Le righe devono avere la stessa lunghezza");
@@ -74,6 +89,9 @@ public final class FloorFixtures {
                 char cell = rows[y].charAt(x);
                 Position at = new Position(x, y);
                 tiles.add(cell == '#' || cell == 'L' ? TileType.WALL : TileType.FLOOR);
+                if (bossRoom && cell != '#' && cell != 'L') {
+                    room.add(at);
+                }
                 switch (cell) {
                     case '#', '.' -> {}
                     case '+' -> builder.fixture(Fixture.door(), at);
@@ -130,7 +148,7 @@ public final class FloorFixtures {
         for (Position lever : levers) {
             builder.fixture(Fixture.lever(gates), lever);
         }
-        return builder.terrain(new Grid<>(width, height, tiles)).build();
+        return builder.terrain(new Grid<>(width, height, tiles)).bossRoom(room).build();
     }
 
     /** Solo il terreno di un disegno: {@code #} è muro, ogni altro carattere è pavimento. */

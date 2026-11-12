@@ -15,6 +15,7 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
+import io.github.matteocardarelli.simpleroguelike.event.JumpCharged;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
 import io.github.matteocardarelli.simpleroguelike.event.MerchantAngered;
@@ -47,7 +48,8 @@ import org.jspecify.annotations.Nullable;
  * <ul>
  *   <li>Mai due attori vivi nella stessa cella, mai un attore su una cella che non si può
  *       attraversare. Un attore grande occupa tutte le celle della sua impronta, a partire dalla
- *       cella di riferimento che il piano tiene come sua posizione.
+ *       cella di riferimento che il piano tiene come sua posizione. Un nemico in aria non occupa
+ *       celle: la sua posizione è la cella di riferimento della sua ombra.
  *   <li>Al massimo un oggetto a terra per cella.
  *   <li>La morte è definitiva: un attore morto non si cura e non si muove.
  *   <li>Le celle esplorate contengono sempre quelle visibili.
@@ -67,6 +69,7 @@ public final class Floor implements FloorView {
     private @Nullable Grid<TileType> sightGrid;
     private @Nullable EntityId defeatedBoss;
     private @Nullable Shop shop;
+    private final CellSet bossRoom;
     private CellSet visible;
     private CellSet explored;
 
@@ -77,8 +80,10 @@ public final class Floor implements FloorView {
             Map<EntityId, Enemy> enemies,
             Map<EntityId, Position> positions,
             Map<Position, Item> groundItems,
-            Map<Position, Fixture> fixtures) {
+            Map<Position, Fixture> fixtures,
+            CellSet bossRoom) {
         this.terrain = terrain;
+        this.bossRoom = bossRoom;
         this.player = player;
         this.enemies = new TreeMap<>(enemies);
         this.positions = new TreeMap<>(positions);
@@ -140,11 +145,23 @@ public final class Floor implements FloorView {
     public Optional<Actor> actorAt(Position position) {
         for (Map.Entry<EntityId, Position> entry : positions.entrySet()) {
             Actor actor = requireActor(entry.getKey());
-            if (actor.isAlive() && actor.footprint().at(entry.getValue()).contains(position)) {
+            if (actor.isAlive()
+                    && !isAirborne(entry.getKey())
+                    && actor.footprint().at(entry.getValue()).contains(position)) {
                 return Optional.of(actor);
             }
         }
         return Optional.empty();
+    }
+
+    private boolean isAirborne(EntityId id) {
+        Enemy enemy = enemies.get(id);
+        return enemy != null && enemy.isAirborne();
+    }
+
+    @Override
+    public CellSet bossRoom() {
+        return bossRoom;
     }
 
     @Override
@@ -681,35 +698,61 @@ public final class Floor implements FloorView {
     }
 
     /**
-     * Un nemico grande annuncia un salto: al prossimo turno atterrerà con la cella di riferimento
-     * in {@code anchor}.
+     * Il nemico che salta resta fermo un turno: dopo, sarà pronto a caricarsi.
      *
-     * @throws IllegalStateException se il nemico è morto o non può atterrare lì
+     * @throws IllegalStateException se il nemico è morto
+     */
+    public void rest(EntityId jumper) {
+        requireLivingEnemy(jumper).rested();
+    }
+
+    /**
+     * Il nemico si carica per saltare, restando a terra.
+     *
+     * @throws IllegalStateException se il nemico è morto o in aria
+     */
+    public JumpCharged chargeJump(EntityId jumper) {
+        Enemy enemy = requireLivingEnemy(jumper);
+        if (enemy.isAirborne()) {
+            throw new IllegalStateException(jumper + " è in aria");
+        }
+        enemy.charged();
+        return new JumpCharged(jumper, enemy.kind(), cellsOf(jumper));
+    }
+
+    /**
+     * Il nemico si alza in aria sopra la sua ombra, con la cella di riferimento in {@code anchor}:
+     * lascia le sue celle, non si può colpire, e al prossimo turno atterrerà lì.
+     *
+     * @throws IllegalStateException se il nemico è morto, già in aria, o non può atterrare lì
      */
     public JumpAnnounced announceJump(EntityId jumper, Position anchor) {
         Enemy enemy = requireLivingEnemy(jumper);
+        if (enemy.isAirborne()) {
+            throw new IllegalStateException(jumper + " è già in aria");
+        }
         if (!canLand(jumper, anchor)) {
             throw new IllegalStateException(jumper + " non può atterrare in " + anchor);
         }
-        enemy.announceJump(anchor);
+        enemy.liftedOff(anchor);
+        positions.put(jumper, anchor);
         return new JumpAnnounced(jumper, enemy.footprint().at(anchor));
     }
 
     /**
-     * Il nemico atterra dove aveva annunciato: chi era sotto viene spinto nella cella libera più
-     * vicina fuori dall'impronta. Dopo l'atterraggio il nemico riposa un turno.
+     * Il nemico in aria atterra sulla sua ombra: chi era sotto viene spinto nella cella libera più
+     * vicina fuori dall'impronta. Se un altro nemico occupa l'ombra, o non c'è una cella dove
+     * spingere il player, resta in aria e ci riprova al turno dopo.
      *
      * @return {@code Landed} seguito da un {@code Moved} per ogni attore spinto via; vuoto se non
-     *     c'era un salto annunciato o la cella non è più buona
+     *     era in aria o non è potuto atterrare
      */
     public List<GameEvent> land(EntityId jumper) {
         Enemy enemy = requireLivingEnemy(jumper);
         Optional<Position> target = enemy.pendingJump();
         if (!target.isPresent() || !canLand(jumper, target.get())) {
-            enemy.landed();
             return List.of();
         }
-        Position from = positionOf(jumper);
         List<Position> cells = enemy.footprint().at(target.get());
         Position playerAt = positionOf(player.id());
         boolean crushed = player.isAlive() && cells.contains(playerAt);
@@ -717,15 +760,12 @@ public final class Floor implements FloorView {
         if (crushed) {
             out = nearestFreeOutside(playerAt, cells);
             if (!out.isPresent()) {
-                // Nessuna cella dove spingere il player: il salto va a vuoto.
-                enemy.landed();
                 return List.of();
             }
         }
         List<GameEvent> events = new ArrayList<>();
-        positions.put(jumper, target.get());
         enemy.landed();
-        events.add(new Landed(jumper, enemy.kind(), from, target.get()));
+        events.add(new Landed(jumper, enemy.kind(), target.get(), target.get()));
         if (out.isPresent()) {
             positions.put(player.id(), out.get());
             events.add(new Moved(player.id(), player.kind(), playerAt, out.get()));
@@ -736,11 +776,6 @@ public final class Floor implements FloorView {
     /** Ricorda se l'ultima azione del nemico è stata allontanarsi dal player. */
     public void recordRetreat(EntityId enemy, boolean retreated) {
         requireLivingEnemy(enemy).retreated(retreated);
-    }
-
-    /** Il nemico ha riposato dopo un atterraggio. */
-    public void rest(EntityId jumper) {
-        requireLivingEnemy(jumper).rested();
     }
 
     /** La cella libera più vicina a {@code from}, fuori da {@code forbidden}. */

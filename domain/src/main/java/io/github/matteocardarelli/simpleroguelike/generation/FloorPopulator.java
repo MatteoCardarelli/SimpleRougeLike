@@ -88,7 +88,7 @@ public final class FloorPopulator {
             return populateOn(terrain, spec, random, ids, existing, Optional.empty());
         }
         EnemyDefinition boss = bossDefinition();
-        Arena arena = Arena.carve(terrain, boss.footprint().size(), random);
+        Arena arena = Arena.build(terrain, boss.arena(), boss.footprint().size(), random);
         return populateOn(arena.terrain(), spec, random, ids, existing, Optional.of(arena));
     }
 
@@ -132,6 +132,7 @@ public final class FloorPopulator {
         if (arena.isPresent()) {
             reserved.addAll(arena.get().interior());
             reserved.add(arena.get().door());
+            reserved.addAll(arena.get().corridor());
         }
         List<Position> free = new ArrayList<>();
         for (Position cell : terrain.positions()) {
@@ -148,7 +149,7 @@ public final class FloorPopulator {
         List<Position> playerCells = new ArrayList<>(free);
         playerCells.removeAll(layout.closed());
         if (arena.isPresent()) {
-            // Il player nasce dove arriva il corridoio dell'arena.
+            // Il player nasce nel resto del piano, dove arriva il corridoio della stanza del boss.
             playerCells.retainAll(arena.get().outside());
         }
         if (playerCells.isEmpty()) {
@@ -273,6 +274,7 @@ public final class FloorPopulator {
         if (arena.isPresent()) {
             builder.fixture(Fixture.bossDoor(), arena.get().door());
             builder.enemy(new Enemy(ids.next(), bossDefinition()), arena.get().bossAnchor());
+            builder.bossRoom(arena.get().interior());
         }
         layout.stairs().ifPresent(stairs -> builder.fixture(Fixture.stairs(), stairs));
         Optional<Shop> shop = Optional.empty();

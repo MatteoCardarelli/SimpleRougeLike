@@ -21,6 +21,9 @@ public record GameConfig(List<FloorSpec> floorSpecs, int visionRadius, OptionalL
     /** La probabilità, in percentuale, di un negozio su un piano: circa uno ogni tre o quattro. */
     public static final int SHOP_CHANCE = 30;
 
+    /** Ogni quanti piani c'è il piano del boss: con cinque piani, è l'ultimo. */
+    public static final int BOSS_EVERY = 5;
+
     public GameConfig {
         floorSpecs = List.copyOf(floorSpecs);
         if (floorSpecs.isEmpty()) {
@@ -31,9 +34,9 @@ public record GameConfig(List<FloorSpec> floorSpecs, int visionRadius, OptionalL
     /**
      * Cinque piani 50×50, campo visivo di 8 celle. Ogni piano ha 10 oggetti, 6 porte di cui 2
      * chiuse a chiave, 3 scrigni e un cancello con la sua leva; i nemici partono da 14 e crescono
-     * di 3 a ogni piano. Tutti tranne l'ultimo hanno le scale; l'ultimo ha l'arena del boss, con la
-     * sua porta e la sua chiave. I nemici possono nascere in qualunque cella diversa da quella del
-     * player, come nel gioco di prima.
+     * di 3 a ogni piano. Tutti tranne l'ultimo hanno le scale; ogni quinto piano ha la stanza del
+     * boss, con la sua porta e la sua chiave, e niente negozio. I nemici possono nascere in
+     * qualunque cella diversa da quella del player, come nel gioco di prima.
      */
     public static GameConfig standard() {
         List<FloorSpec> floors = new ArrayList<>();
@@ -51,8 +54,8 @@ public record GameConfig(List<FloorSpec> floorSpecs, int visionRadius, OptionalL
                             1,
                             depth < FLOORS ? 1 : 0,
                             2,
-                            depth == FLOORS ? 1 : 0,
-                            depth < FLOORS ? SHOP_CHANCE : 0,
+                            depth % BOSS_EVERY == 0 ? 1 : 0,
+                            depth % BOSS_EVERY == 0 ? 0 : SHOP_CHANCE,
                             depth));
         }
         return new GameConfig(floors, 8, OptionalLong.empty());

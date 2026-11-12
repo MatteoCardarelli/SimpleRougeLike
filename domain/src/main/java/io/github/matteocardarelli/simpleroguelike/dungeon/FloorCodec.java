@@ -87,10 +87,12 @@ public final class FloorCodec {
                             where.y(),
                             enemy.health(),
                             jump,
-                            enemy.isTired() ? 1 : 0,
+                            // Il campo "stanco" del formato 1: oggi la fase sta in fondo.
+                            0,
                             enemy.isAngry() ? 1 : 0,
                             enemy.hasJustRetreated() ? 1 : 0,
-                            enemy.level()));
+                            enemy.level(),
+                            enemy.jumpPhase().name()));
         }
         for (Map.Entry<Position, Item> entry : floor.itemsOnGround().entrySet()) {
             Item item = entry.getValue();
@@ -130,6 +132,13 @@ public final class FloorCodec {
         lines.add("explored " + cells(floor.explored(), terrain));
         lines.add("visible " + cells(floor.visible(), terrain));
         floor.defeatedBoss().ifPresent(id -> lines.add("defeated " + id.value()));
+        if (!floor.bossRoom().isEmpty()) {
+            StringBuilder room = new StringBuilder("room");
+            for (Position cell : floor.bossRoom().positions()) {
+                room.append(' ').append(cell.x()).append(' ').append(cell.y());
+            }
+            lines.add(room.toString());
+        }
         Optional<Shop> shop = floor.shop();
         if (shop.isPresent()) {
             lines.add("shop " + shop.get().merchant().value());
@@ -224,10 +233,17 @@ public final class FloorCodec {
                     e[6].equals("-")
                             ? Optional.empty()
                             : Optional.of(new Position(integer(e[6]), integer(e[7])));
-            enemy.restoreState(jump, integer(e[8]) == 1, integer(e[9]) == 1);
+            // La fase è arrivata dopo il formato 1. Prima un salto annunciato lasciava il nemico a
+            // terra fino all'atterraggio: oggi è in aria, sopra la sua ombra.
+            JumpPhase phase =
+                    e.length > 12
+                            ? JumpPhase.valueOf(e[12])
+                            : jump.isPresent() ? JumpPhase.AIRBORNE : JumpPhase.RESTING;
+            enemy.restoreState(phase, jump, integer(e[9]) == 1);
             // Il campo è arrivato dopo il formato 1: un salvataggio di prima non ce l'ha.
             enemy.retreated(e.length > 10 && integer(e[10]) == 1);
-            builder.enemy(enemy, new Position(integer(e[3]), integer(e[4])));
+            Position where = new Position(integer(e[3]), integer(e[4]));
+            builder.enemy(enemy, e.length > 12 ? where : jump.orElse(where));
         }
         while (in.peek("ground")) {
             String[] g = in.next("ground");
@@ -260,6 +276,15 @@ public final class FloorCodec {
                 in.peek("defeated")
                         ? Optional.of(new EntityId(integer(in.next("defeated")[1])))
                         : Optional.empty();
+        // La stanza del boss è arrivata dopo il formato 1: senza, il boss salta dove può.
+        if (in.peek("room")) {
+            String[] r = in.next("room");
+            List<Position> room = new ArrayList<>();
+            for (int k = 1; k + 1 < r.length; k += 2) {
+                room.add(new Position(integer(r[k]), integer(r[k + 1])));
+            }
+            builder.bossRoom(room);
+        }
         Optional<Shop> shop = Optional.empty();
         List<EntityId> unpaid = new ArrayList<>();
         if (in.peek("shop")) {

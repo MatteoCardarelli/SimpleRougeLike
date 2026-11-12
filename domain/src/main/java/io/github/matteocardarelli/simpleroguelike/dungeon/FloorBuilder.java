@@ -1,8 +1,11 @@
 package io.github.matteocardarelli.simpleroguelike.dungeon;
 
+import io.github.matteocardarelli.simpleroguelike.model.CellSet;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeMap;
@@ -26,6 +29,7 @@ public final class FloorBuilder {
     private final LinkedHashMap<Position, Item> groundItems = new LinkedHashMap<>();
     private final TreeSet<EntityId> itemIds = new TreeSet<>();
     private final LinkedHashMap<Position, Fixture> fixtures = new LinkedHashMap<>();
+    private final List<Position> bossRoom = new ArrayList<>();
 
     public FloorBuilder terrain(Grid<TileType> terrain) {
         this.terrain = terrain;
@@ -41,8 +45,9 @@ public final class FloorBuilder {
         return this;
     }
 
+    /** Un nemico in aria non occupa celle: {@code at} è la cella di riferimento della sua ombra. */
     public FloorBuilder enemy(Enemy enemy, Position at) {
-        placeActor(enemy.id(), enemy.footprint().at(at), at);
+        placeActor(enemy.id(), enemy.isAirborne() ? List.of() : enemy.footprint().at(at), at);
         enemies.put(enemy.id(), enemy);
         return this;
     }
@@ -67,6 +72,12 @@ public final class FloorBuilder {
             requireNewId(inside.id());
             itemIds.add(inside.id());
         }
+        return this;
+    }
+
+    /** Le celle della stanza del boss, da cui il boss non esce mai. */
+    public FloorBuilder bossRoom(Collection<Position> cells) {
+        bossRoom.addAll(cells);
         return this;
     }
 
@@ -101,7 +112,15 @@ public final class FloorBuilder {
                                 "Un attore dentro " + fixture.kind().value() + " in " + at);
                     }
                 });
-        return new Floor(terrain, player, enemies, positions, groundItems, fixtures);
+        bossRoom.forEach(at -> requireWalkable(terrain, at, "La stanza del boss"));
+        return new Floor(
+                terrain,
+                player,
+                enemies,
+                positions,
+                groundItems,
+                fixtures,
+                CellSet.of(terrain.width(), terrain.height(), bossRoom));
     }
 
     private void placeActor(EntityId id, List<Position> cells, Position anchor) {

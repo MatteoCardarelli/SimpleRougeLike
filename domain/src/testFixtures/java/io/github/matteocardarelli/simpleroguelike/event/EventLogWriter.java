@@ -175,6 +175,15 @@ public final class EventLogWriter {
                 MerchantAngered.class,
                 e -> "MerchantAngered merchant=" + id(e.merchant()) + " at=" + at(e.at()));
         register(
+                JumpCharged.class,
+                e ->
+                        "JumpCharged jumper="
+                                + id(e.jumper())
+                                + " kind="
+                                + e.kind().value()
+                                + " cells="
+                                + path(e.cells()));
+        register(
                 JumpAnnounced.class,
                 e -> "JumpAnnounced jumper=" + id(e.jumper()) + " cells=" + path(e.cells()));
         register(

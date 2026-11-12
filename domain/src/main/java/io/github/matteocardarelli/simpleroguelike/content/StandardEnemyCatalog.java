@@ -69,7 +69,7 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
                             1,
                             0,
                             Footprint.circle(4),
-                            true),
+                            Footprint.circle(8)),
                     new EnemyDefinition(
                             MERCHANT,
                             new Stats(400, 30, 10, 40, 20),

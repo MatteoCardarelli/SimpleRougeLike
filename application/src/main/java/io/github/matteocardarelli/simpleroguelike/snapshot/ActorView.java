@@ -11,6 +11,8 @@ import io.github.matteocardarelli.simpleroguelike.model.Position;
  *     quadrato che lo contiene
  * @param size il lato di quel quadrato, in celle: 1 per un nemico normale
  * @param boss vero per il boss, di cui l'interfaccia mostra la salute
+ * @param charging vero per chi si carica per saltare
+ * @param airborne vero per chi è in aria sopra la sua ombra: non si colpisce
  */
 public record ActorView(
         EntityId id,
@@ -19,7 +21,21 @@ public record ActorView(
         int health,
         int maxHealth,
         int size,
-        boolean boss) {
+        boolean boss,
+        boolean charging,
+        boolean airborne) {
+
+    /** Un nemico a terra, fermo. */
+    public ActorView(
+            EntityId id,
+            Kind kind,
+            Position position,
+            int health,
+            int maxHealth,
+            int size,
+            boolean boss) {
+        this(id, kind, position, health, maxHealth, size, boss, false, false);
+    }
 
     /** Un nemico normale, di una cella. */
     public ActorView(EntityId id, Kind kind, Position position, int health, int maxHealth) {

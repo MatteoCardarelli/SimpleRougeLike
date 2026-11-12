@@ -58,10 +58,10 @@ class FloorCodecTest {
         floor.player().addCoins(45);
         Enemy goblin = floor.enemies().get(0);
         floor.damage(goblin.id(), 3);
-        goblin.restoreState(Optional.of(new Position(6, 2)), true, false);
+        goblin.restoreState(JumpPhase.AIRBORNE, Optional.of(new Position(6, 2)), false);
         floor.recordRetreat(goblin.id(), true);
         Enemy merchant = floor.enemies().get(1);
-        merchant.restoreState(Optional.empty(), false, true);
+        merchant.restoreState(JumpPhase.CHARGING, Optional.empty(), true);
         Set<Position> zone = new LinkedHashSet<>();
         for (int x = 4; x <= 7; x++) {
             zone.add(new Position(x, 2));
@@ -121,6 +121,8 @@ class FloorCodecTest {
         assertThat(read.shop().orElseThrow().bill()).isEqualTo(25);
         assertThat(read.enemies().get(1).isAngry()).isTrue();
         assertThat(read.enemies().get(0).pendingJump()).contains(new Position(6, 2));
+        assertThat(read.enemies().get(0).jumpPhase()).isEqualTo(JumpPhase.AIRBORNE);
+        assertThat(read.enemies().get(1).jumpPhase()).isEqualTo(JumpPhase.CHARGING);
         assertThat(read.enemies().get(0).hasJustRetreated()).isTrue();
         assertThat(read.enemies().get(1).hasJustRetreated()).isFalse();
     }
@@ -153,6 +155,54 @@ class FloorCodecTest {
 
         assertThat(read.enemies().get(0).hasJustRetreated()).isFalse();
         assertThat(read.enemies().get(0).level()).isEqualTo(1);
+    }
+
+    /**
+     * Prima un salto annunciato lasciava il nemico a terra fino all'atterraggio: un salvataggio di
+     * allora si rilegge con il nemico in aria, sopra la sua ombra; senza salto è fermo.
+     */
+    @Test
+    void read_ofAnOldAnnouncedJump_putsTheEnemyInTheAirAboveItsShadow() {
+        List<String> lines = new ArrayList<>();
+        for (String line : CODEC.write(played())) {
+            if (line.startsWith("enemy ")) {
+                String[] parts = line.split(" ");
+                lines.add(String.join(" ", java.util.Arrays.copyOf(parts, 12)));
+            } else {
+                lines.add(line);
+            }
+        }
+
+        Floor read = CODEC.read(lines);
+
+        Enemy goblin = read.enemies().get(0);
+        assertThat(goblin.jumpPhase()).isEqualTo(JumpPhase.AIRBORNE);
+        assertThat(read.positionOf(goblin.id())).isEqualTo(new Position(6, 2));
+        assertThat(read.actorAt(new Position(6, 2))).isEmpty();
+        assertThat(read.enemies().get(1).jumpPhase()).isEqualTo(JumpPhase.RESTING);
+    }
+
+    @Test
+    void read_restoresTheBossRoom_andAnOldSaveHasNone() {
+        Floor floor = played();
+        List<String> lines = new ArrayList<>();
+        for (String line : CODEC.write(floor)) {
+            if (line.startsWith("explored ")) {
+                lines.add(line);
+            } else if (line.startsWith("visible ")) {
+                lines.add(line);
+                lines.add("room 5 2 6 2 5 3");
+            } else {
+                lines.add(line);
+            }
+        }
+
+        Floor read = CODEC.read(lines);
+
+        assertThat(read.bossRoom().positions())
+                .containsExactly(new Position(5, 2), new Position(6, 2), new Position(5, 3));
+        assertThat(CODEC.write(read)).contains("room 5 2 6 2 5 3");
+        assertThat(CODEC.read(CODEC.write(floor)).bossRoom().isEmpty()).isTrue();
     }
 
     @Test

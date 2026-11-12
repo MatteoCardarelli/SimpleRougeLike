@@ -23,6 +23,7 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
+import io.github.matteocardarelli.simpleroguelike.event.JumpCharged;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
 import io.github.matteocardarelli.simpleroguelike.event.MerchantAngered;
@@ -131,6 +132,11 @@ class EventMessageFormatterTest {
                         formatter.format(
                                 new ItemDropped(new EntityId(9), Kind.of("potion"), AT), PLAYER))
                 .contains(R.string.log_item_dropped + "[" + R.string.kind_potion_name + "[]]");
+        assertThat(
+                        formatter.format(
+                                new JumpCharged(GOBLIN, Kind.of("giant_slime"), List.of(AT)),
+                                PLAYER))
+                .contains(R.string.log_jump_charged + "[" + R.string.kind_giant_slime_name + "[]]");
         assertThat(formatter.format(new JumpAnnounced(GOBLIN, List.of(AT)), PLAYER))
                 .contains(R.string.log_jump_announced + "[]");
         assertThat(formatter.format(new Landed(GOBLIN, Kind.of("giant_slime"), AT, AT), PLAYER))
