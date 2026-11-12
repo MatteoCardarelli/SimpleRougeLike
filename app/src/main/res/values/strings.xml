@@ -61,6 +61,7 @@
     <string name="inventory_equip">Equipaggia</string>
     <string name="inventory_unequip">Togli</string>
     <string name="inventory_throw">Lancia</string>
+    <string name="inventory_drop">Lascia</string>
     <string name="inventory_count">%1$s ×%2$d</string>
     <string name="boss_status">%1$s: %2$d/%3$d</string>
     <string name="ware_offer">%1$s · prezzo in monete: %2$d</string>
@@ -105,6 +106,9 @@
     <string name="log_fired_enemy">%1$s tira una freccia.</string>
     <string name="log_item_equipped">Equipaggi: %1$s.</string>
     <string name="log_item_unequipped">Togli: %1$s.</string>
+    <string name="log_item_put_down">Lasci a terra %1$s.</string>
+    <string name="log_drop_refused_fixture">Qui non puoi lasciare niente.</string>
+    <string name="log_drop_refused_unpaid">Prima pagalo, o lascialo nel negozio.</string>
 
     <string name="a11y_health">Salute</string>
     <string name="a11y_health_value">%1$d su %2$d</string>

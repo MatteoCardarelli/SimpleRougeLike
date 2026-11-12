@@ -22,9 +22,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * L'inventario: salute ed esperienza del player, una griglia di oggetti e, sotto, la scheda di
- * quello selezionato con il pulsante "Usa". Un tocco seleziona, non usa. Il dialog ha una finestra
- * sua che consuma indietro, quindi l'Activity non registra callback. Dopo una rotazione il sistema
- * lo ricrea da solo, e l'Activity evita di aprirne un secondo.
+ * quello selezionato con i pulsanti "Usa" e "Lascia". Un tocco seleziona, non usa. Il dialog ha una
+ * finestra sua che consuma indietro, quindi l'Activity non registra callback. Dopo una rotazione il
+ * sistema lo ricrea da solo, e l'Activity evita di aprirne un secondo.
  *
  * <p>Conosce solo {@link InventoryHost}: le scelte le decide il ViewModel, e lo sheet mostra lo
  * stato che riceve.
@@ -77,6 +77,7 @@ public final class InventorySheet extends BottomSheetDialogFragment {
         created.grid.setLayoutManager(new GridLayoutManager(requireContext(), COLUMNS));
         created.grid.setAdapter(created2);
         created.use.setOnClickListener(v -> host().onUseSelected());
+        created.drop.setOnClickListener(v -> host().onDropSelected());
         binding = created;
         adapter = created2;
         show(host().currentInventory());
@@ -119,6 +120,7 @@ public final class InventorySheet extends BottomSheetDialogFragment {
             binding.detailDescription.setText(content.descriptionRes(entry.kind()));
             // Una chiave non si usa: la consuma la porta che apre.
             binding.use.setEnabled(entry.usable() || entry.throwable() || entry.slot().isPresent());
+            binding.drop.setEnabled(true);
             binding.use.setText(
                     entry.throwable()
                             ? R.string.inventory_throw
@@ -135,6 +137,7 @@ public final class InventorySheet extends BottomSheetDialogFragment {
                             : R.string.inventory_select);
             binding.detailDescription.setText("");
             binding.use.setEnabled(false);
+            binding.drop.setEnabled(false);
             binding.use.setText(R.string.inventory_use);
         }
     }

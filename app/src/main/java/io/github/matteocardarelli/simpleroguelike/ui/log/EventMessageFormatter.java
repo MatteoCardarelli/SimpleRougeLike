@@ -9,6 +9,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
+import io.github.matteocardarelli.simpleroguelike.event.DropRefused;
 import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
@@ -18,6 +19,7 @@ import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
 import io.github.matteocardarelli.simpleroguelike.event.ItemDropped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
+import io.github.matteocardarelli.simpleroguelike.event.ItemPutDown;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
@@ -128,6 +130,15 @@ public final class EventMessageFormatter {
         register(
                 ItemDropped.class,
                 (e, player) -> texts.text(R.string.log_item_dropped, name(e.kind())));
+        register(
+                ItemPutDown.class,
+                (e, player) -> texts.text(R.string.log_item_put_down, name(e.kind())));
+        register(
+                DropRefused.class,
+                (e, player) ->
+                        e.reason() == DropRefused.Reason.FIXTURE
+                                ? texts.text(R.string.log_drop_refused_fixture)
+                                : texts.text(R.string.log_drop_refused_unpaid));
         register(
                 FloorChanged.class,
                 (e, player) -> texts.text(R.string.log_floor_changed, e.depth()));

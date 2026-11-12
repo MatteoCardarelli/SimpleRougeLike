@@ -15,12 +15,14 @@ import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
+import io.github.matteocardarelli.simpleroguelike.event.DropRefused;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.ItemDropped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
+import io.github.matteocardarelli.simpleroguelike.event.ItemPutDown;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.JumpCharged;
@@ -171,6 +173,26 @@ class EventMessageFormatterTest {
                 .contains(R.string.log_item_equipped + "[" + sword + "]");
         assertThat(formatter.format(new ItemUnequipped(new EntityId(7), kind, AT), PLAYER))
                 .contains(R.string.log_item_unequipped + "[" + sword + "]");
+    }
+
+    @Test
+    void format_dropAndRefusal_nameTheItemAndTheReason() {
+        Kind kind = Kind.of("sword");
+
+        assertThat(formatter.format(new ItemPutDown(new EntityId(7), kind, AT), PLAYER))
+                .contains(R.string.log_item_put_down + "[" + R.string.kind_sword_name + "[]]");
+        assertThat(
+                        formatter.format(
+                                new DropRefused(
+                                        new EntityId(7), kind, AT, DropRefused.Reason.FIXTURE),
+                                PLAYER))
+                .contains(R.string.log_drop_refused_fixture + "[]");
+        assertThat(
+                        formatter.format(
+                                new DropRefused(
+                                        new EntityId(7), kind, AT, DropRefused.Reason.UNPAID),
+                                PLAYER))
+                .contains(R.string.log_drop_refused_unpaid + "[]");
     }
 
     @Test

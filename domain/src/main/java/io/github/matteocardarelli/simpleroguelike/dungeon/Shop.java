@@ -66,6 +66,11 @@ public final class Shop {
         unpaid.add(item);
     }
 
+    /** Una merce presa e non pagata torna in vendita, con il suo prezzo. */
+    void giveBack(EntityId item) {
+        unpaid.remove(item);
+    }
+
     /** Tutto pagato, o rubato: le merci prese non sono più in vendita. */
     void settle() {
         for (EntityId item : unpaid) {

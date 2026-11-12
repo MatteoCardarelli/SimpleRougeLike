@@ -20,6 +20,9 @@ public interface InventoryHost {
     /** Il pulsante "Usa": usa l'oggetto selezionato; l'inventario resta aperto. */
     void onUseSelected();
 
+    /** Il pulsante "Lascia": lascia a terra l'oggetto selezionato; l'inventario resta aperto. */
+    void onDropSelected();
+
     /** Un doppio tap sopra lo sheet: lo chiude, come lo apre il doppio tap sulla mappa. */
     void onInventoryToggled();
 
