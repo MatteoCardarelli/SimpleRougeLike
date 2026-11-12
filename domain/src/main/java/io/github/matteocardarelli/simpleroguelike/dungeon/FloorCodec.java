@@ -92,7 +92,8 @@ public final class FloorCodec {
                             enemy.isAngry() ? 1 : 0,
                             enemy.hasJustRetreated() ? 1 : 0,
                             enemy.level(),
-                            enemy.jumpPhase().name()));
+                            enemy.jumpPhase().name(),
+                            enemy.pack().map(id -> String.valueOf(id.value())).orElse("-")));
         }
         for (Map.Entry<Position, Item> entry : floor.itemsOnGround().entrySet()) {
             Item item = entry.getValue();
@@ -227,7 +228,12 @@ public final class FloorCodec {
             // Il livello è arrivato dopo il formato 1: un salvataggio di prima ha nemici di livello
             // 1.
             int level = e.length > 11 ? integer(e[11]) : 1;
-            Enemy enemy = new Enemy(new EntityId(integer(e[1])), enemy(e[2]), level);
+            // Anche il branco è arrivato dopo: un nemico salvato senza va da solo.
+            Optional<EntityId> pack =
+                    e.length > 13 && !e[13].equals("-")
+                            ? Optional.of(new EntityId(integer(e[13])))
+                            : Optional.empty();
+            Enemy enemy = new Enemy(new EntityId(integer(e[1])), enemy(e[2]), level, pack);
             enemy.restoreSavedHealth(integer(e[5]));
             Optional<Position> jump =
                     e[6].equals("-")

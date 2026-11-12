@@ -21,20 +21,36 @@ public final class Enemy extends Actor {
     private boolean angry;
     private boolean retreated;
     private final int level;
+    private final Optional<EntityId> pack;
 
     public Enemy(EntityId id, EnemyDefinition definition) {
         this(id, definition, 1);
     }
 
+    /** Un nemico che non fa parte di un branco. */
+    public Enemy(EntityId id, EnemyDefinition definition, int level) {
+        this(id, definition, level, Optional.empty());
+    }
+
     /**
      * @param level il livello, da 1: ogni livello oltre il primo dà un quarto di salute ed
      *     esperienza in più, 2 di attacco, 3 di precisione, 1 di schivata e mezzo punto di difesa
+     * @param pack l'id del suo branco, quello del primo membro; vuoto per chi va da solo
      * @throws IllegalArgumentException se il livello è minore di 1
      */
-    public Enemy(EntityId id, EnemyDefinition definition, int level) {
+    public Enemy(EntityId id, EnemyDefinition definition, int level, Optional<EntityId> pack) {
         super(id, statsAt(definition, level));
         this.definition = definition;
         this.level = scales(definition) ? level : 1;
+        this.pack = pack;
+    }
+
+    /**
+     * L'id del branco, quello del primo membro: i membri decidono insieme, come una mente sola.
+     * Vuoto per chi va da solo.
+     */
+    public Optional<EntityId> pack() {
+        return pack;
     }
 
     private static boolean scales(EnemyDefinition definition) {

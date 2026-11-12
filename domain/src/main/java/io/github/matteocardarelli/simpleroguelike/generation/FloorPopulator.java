@@ -35,8 +35,10 @@ import java.util.Set;
  * zone chiuse, ogni nemico ad almeno {@code minSpawnDistance} passi dal player, mai due attori o
  * due oggetti nella stessa cella, mai un oggetto sotto un attore o un oggetto fisso. Il tipo di
  * ogni nemico e di ogni oggetto, anche negli scrigni, si sceglie a caso, in proporzione al suo
- * peso. Un nemico che va in branco nasce con i compagni nelle celle libere più vicine, entro
- * {@value #PACK_RADIUS} passi; il numero totale di nemici resta quello della specifica.
+ * peso. Un branco nasce intero, con i compagni nelle celle libere più vicine al primo membro entro
+ * {@value #PACK_RADIUS} passi, e ogni membro ha l'id del primo come id del branco; se non c'è posto
+ * per tutti, o il branco supererebbe il numero di nemici, al suo posto nasce un nemico che va da
+ * solo. Il numero totale di nemici resta quello della specifica.
  *
  * <p>Gli id si assegnano solo a piano riuscito, in quest'ordine: player, nemici, oggetti, contenuto
  * degli scrigni.
@@ -194,8 +196,11 @@ public final class FloorPopulator {
         free.removeAll(chosen);
         List<Position> enemyCells = new ArrayList<>();
         List<EnemyDefinition> enemyTypes = new ArrayList<>();
+        // Per ogni nemico, l'indice del primo membro del suo branco; -1 per chi va da solo.
+        List<Integer> packLeaders = new ArrayList<>();
         for (Position cell : chosen) {
-            if (enemyCells.size() >= spec.enemyCount()) {
+            int left = spec.enemyCount() - enemyCells.size();
+            if (left <= 0) {
                 // Le celle scelte e non usate, perché un branco ha preso il loro posto, tornano
                 // libere per gli oggetti.
                 free.add(cell);
@@ -203,18 +208,24 @@ public final class FloorPopulator {
             }
             EnemyDefinition type =
                     WeightedPicker.pick(enemies.all(), EnemyDefinition::spawnWeight, random);
+            List<Position> members = List.of();
+            if (type.packSize() > 1) {
+                members = packCells(free, cell, playerAt, spec, type.packSize() - 1);
+                if (type.packSize() > left || members.size() < type.packSize() - 1) {
+                    // Un branco nasce intero o non nasce: al suo posto, uno che va da solo.
+                    type = WeightedPicker.pick(loners(), EnemyDefinition::spawnWeight, random);
+                    members = List.of();
+                }
+            }
+            int leader = enemyCells.size();
             enemyCells.add(cell);
             enemyTypes.add(type);
-            for (int member = 1;
-                    member < type.packSize() && enemyCells.size() < spec.enemyCount();
-                    member++) {
-                Optional<Position> near = nearest(free, cell, playerAt, spec);
-                if (!near.isPresent()) {
-                    break;
-                }
-                free.remove(near.get());
-                enemyCells.add(near.get());
+            packLeaders.add(type.packSize() > 1 ? leader : -1);
+            for (Position member : members) {
+                free.remove(member);
+                enemyCells.add(member);
                 enemyTypes.add(type);
+                packLeaders.add(leader);
             }
         }
 
@@ -242,9 +253,15 @@ public final class FloorPopulator {
                 new FloorBuilder()
                         .terrain(terrain)
                         .player(existing.orElseGet(() -> new Player(ids.next(), player)), playerAt);
+        List<EntityId> enemyIds = new ArrayList<>();
         for (int i = 0; i < enemyCells.size(); i++) {
+            EntityId id = ids.next();
+            enemyIds.add(id);
+            int leader = packLeaders.get(i);
+            Optional<EntityId> pack =
+                    leader < 0 ? Optional.empty() : Optional.of(enemyIds.get(leader));
             builder.enemy(
-                    new Enemy(ids.next(), enemyTypes.get(i), spec.enemyLevel()), enemyCells.get(i));
+                    new Enemy(id, enemyTypes.get(i), spec.enemyLevel(), pack), enemyCells.get(i));
         }
         for (int i = 0; i < itemCells.size(); i++) {
             builder.item(new Item(ids.next(), itemTypes.get(i)), itemCells.get(i));
@@ -295,6 +312,39 @@ public final class FloorPopulator {
         Floor floor = builder.build();
         shop.ifPresent(floor::openShop);
         return floor;
+    }
+
+    /** I tipi di nemico che compaiono a caso e vanno da soli. */
+    private List<EnemyDefinition> loners() {
+        List<EnemyDefinition> loners = new ArrayList<>();
+        for (EnemyDefinition definition : enemies.all()) {
+            if (definition.packSize() == 1 && definition.spawnWeight() > 0) {
+                loners.add(definition);
+            }
+        }
+        if (loners.isEmpty()) {
+            throw new FloorGenerationException("Il catalogo non ha nemici che vanno da soli");
+        }
+        return loners;
+    }
+
+    /**
+     * Le celle dei compagni di un branco intorno a {@code center}, le più vicine una dopo l'altra:
+     * meno di {@code count} se non ce ne sono abbastanza. Non toglie niente da {@code free}.
+     */
+    private static List<Position> packCells(
+            List<Position> free, Position center, Position player, FloorSpec spec, int count) {
+        List<Position> left = new ArrayList<>(free);
+        List<Position> cells = new ArrayList<>();
+        while (cells.size() < count) {
+            Optional<Position> near = nearest(left, center, player, spec);
+            if (!near.isPresent()) {
+                break;
+            }
+            left.remove(near.get());
+            cells.add(near.get());
+        }
+        return cells;
     }
 
     /**
