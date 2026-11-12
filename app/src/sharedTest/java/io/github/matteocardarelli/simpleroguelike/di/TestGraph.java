@@ -73,6 +73,7 @@ public final class TestGraph {
         handlers.add(GameModule.equipHandler());
         handlers.add(GameModule.takeWareHandler());
         handlers.add(GameModule.unequipHandler());
+        handlers.add(GameModule.dropItemHandler());
         return handlers;
     }
 

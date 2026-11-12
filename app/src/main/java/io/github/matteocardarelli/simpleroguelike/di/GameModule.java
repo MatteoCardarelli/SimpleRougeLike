@@ -17,6 +17,7 @@ import io.github.matteocardarelli.simpleroguelike.ai.SurroundBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.WanderBehavior;
 import io.github.matteocardarelli.simpleroguelike.command.CommandDispatcher;
 import io.github.matteocardarelli.simpleroguelike.command.CommandHandler;
+import io.github.matteocardarelli.simpleroguelike.command.DropItemHandler;
 import io.github.matteocardarelli.simpleroguelike.command.EquipHandler;
 import io.github.matteocardarelli.simpleroguelike.command.MoveHandler;
 import io.github.matteocardarelli.simpleroguelike.command.TakeWareHandler;
@@ -165,6 +166,12 @@ public abstract class GameModule {
     @IntoSet
     static CommandHandler<?> unequipHandler() {
         return new UnequipHandler();
+    }
+
+    @Provides
+    @IntoSet
+    static CommandHandler<?> dropItemHandler() {
+        return new DropItemHandler();
     }
 
     /** Le regole di fine turno; l'insieme vuoto è ammesso. */

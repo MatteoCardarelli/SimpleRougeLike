@@ -7,11 +7,13 @@ import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
+import io.github.matteocardarelli.simpleroguelike.event.DropRefused;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
 import io.github.matteocardarelli.simpleroguelike.event.ItemEquipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
+import io.github.matteocardarelli.simpleroguelike.event.ItemPutDown;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
@@ -378,28 +380,42 @@ public final class Floor implements FloorView {
         if (item == null) {
             return Optional.empty();
         }
-        int coins = item.definition().coinValue();
-        if (coins > 0) {
-            groundItems.remove(at);
-            player.addCoins(coins);
-            return Optional.of(new CoinsPickedUp(coins, at));
-        }
         if (wareAt(at).isPresent()) {
             // La merce non si raccoglie da sola: il player sceglie se prenderla.
             return Optional.empty();
         }
+        Collected collected = collect(at, item);
+        if (collected.taken()) {
+            groundItems.remove(at);
+        }
+        return Optional.of(collected.event());
+    }
+
+    /** L'esito di prendere un oggetto da terra: l'evento, e se l'oggetto è stato preso davvero. */
+    private record Collected(GameEvent event, boolean taken) {}
+
+    /**
+     * Prende un oggetto che non è merce: le monete vanno nel loro contatore, le chiavi in quello
+     * delle chiavi, il resto nell'inventario. Non tocca l'oggetto a terra: lo toglie chi chiama.
+     *
+     * @return {@code CoinsPickedUp}, {@code ItemPickedUp} o {@code InventoryFull}
+     */
+    private Collected collect(Position at, Item item) {
+        int coins = item.definition().coinValue();
+        if (coins > 0) {
+            player.addCoins(coins);
+            return new Collected(new CoinsPickedUp(coins, at), true);
+        }
         Optional<KeyType> key = item.definition().key();
         if (key.isPresent()) {
             // Le chiavi non occupano posto: vanno nel loro contatore, come le monete.
-            groundItems.remove(at);
             player.addKeys(key.get(), item.count());
-            return Optional.of(new ItemPickedUp(item.id(), item.kind(), at));
+            return new Collected(new ItemPickedUp(item.id(), item.kind(), at), true);
         }
         if (!player.inventory().add(item)) {
-            return Optional.of(new InventoryFull(item.id(), item.kind(), at));
+            return new Collected(new InventoryFull(item.id(), item.kind(), at), false);
         }
-        groundItems.remove(at);
-        return Optional.of(new ItemPickedUp(item.id(), item.kind(), at));
+        return new Collected(new ItemPickedUp(item.id(), item.kind(), at), true);
     }
 
     /**
@@ -491,6 +507,57 @@ public final class Floor implements FloorView {
                                                 item.kind().value() + " non si lancia"));
         player.inventory().removeOne(itemId);
         return throwing;
+    }
+
+    /**
+     * Lascia a terra, nella cella del player, un oggetto dell'inventario: la pila va intera e, se
+     * era equipaggiato, prima viene tolto. Se nella cella c'è già un oggetto, i due si scambiano:
+     * quello a terra si prende come con {@link #pickUp} (o {@link #takeWare}, se è merce). Una
+     * merce presa e non pagata si può lasciare solo nella zona del negozio, dove torna in vendita.
+     * Non fa passare il turno e non si rifiuta mai per l'inventario pieno: l'oggetto lasciato ha
+     * già liberato il suo posto.
+     *
+     * @return {@code ItemUnequipped} (se era equipaggiato), {@code ItemPutDown} e l'evento di ciò
+     *     che si è preso nello scambio; {@code DropRefused}, senza cambiare niente, se la cella ha
+     *     un oggetto fisso o se la merce non pagata è fuori dal negozio
+     * @throws IllegalArgumentException se {@code user} non è il player o l'oggetto non è nel suo
+     *     inventario
+     * @throws IllegalStateException se il player è morto
+     */
+    public List<GameEvent> drop(EntityId user, EntityId itemId) {
+        Item item = requireInInventory(user, itemId);
+        Position at = positionOf(user);
+        if (fixtures.containsKey(at)) {
+            return List.of(new DropRefused(item.id(), item.kind(), at, DropRefused.Reason.FIXTURE));
+        }
+        Shop current = shop;
+        Shop billing = current != null && current.unpaid().contains(itemId) ? current : null;
+        if (billing != null && !billing.zone().contains(at)) {
+            return List.of(new DropRefused(item.id(), item.kind(), at, DropRefused.Reason.UNPAID));
+        }
+        List<GameEvent> events = new ArrayList<>();
+        if (player.isEquipped(itemId)) {
+            player.unequip(item);
+            events.add(new ItemUnequipped(itemId, item.kind(), at));
+        }
+        player.inventory().remove(itemId);
+        boolean lyingIsWare = wareAt(at).isPresent();
+        Item lying = groundItems.put(at, item);
+        if (billing != null) {
+            billing.giveBack(itemId);
+        }
+        events.add(new ItemPutDown(itemId, item.kind(), at));
+        if (lying != null) {
+            Collected taken =
+                    lyingIsWare && current != null
+                            ? collectWare(at, lying, current)
+                            : collect(at, lying);
+            if (!taken.taken()) {
+                throw new IllegalStateException("Nessun posto per " + lying.id());
+            }
+            events.add(taken.event());
+        }
+        return List.copyOf(events);
     }
 
     private Item requireInInventory(EntityId user, EntityId itemId) {
@@ -624,13 +691,27 @@ public final class Floor implements FloorView {
             return Optional.empty();
         }
         Item item = ware.get();
-        if (!player.inventory().add(item)) {
-            return Optional.of(new InventoryFull(item.id(), item.kind(), at));
+        Collected collected = collectWare(at, item, current);
+        if (collected.taken()) {
+            groundItems.remove(at);
         }
-        groundItems.remove(at);
+        return Optional.of(collected.event());
+    }
+
+    /**
+     * Mette una merce nell'inventario, da pagare. Non tocca l'oggetto a terra: lo toglie chi
+     * chiama.
+     *
+     * @return {@code WareTaken} o {@code InventoryFull}
+     */
+    private Collected collectWare(Position at, Item item, Shop current) {
+        if (!player.inventory().add(item)) {
+            return new Collected(new InventoryFull(item.id(), item.kind(), at), false);
+        }
         current.take(item.id());
-        return Optional.of(
-                new WareTaken(item.id(), item.kind(), current.priceOf(item.id()).orElse(0), at));
+        return new Collected(
+                new WareTaken(item.id(), item.kind(), current.priceOf(item.id()).orElse(0), at),
+                true);
     }
 
     /**

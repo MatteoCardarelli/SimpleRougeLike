@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import io.github.matteocardarelli.simpleroguelike.command.Command;
+import io.github.matteocardarelli.simpleroguelike.command.DropItemCommand;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.command.UseItemCommand;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
@@ -25,6 +26,7 @@ class CommandLogFormatTest {
         assertThat(format.line(new MoveCommand(Direction.LEFT))).isEqualTo("move left");
         assertThat(format.line(new MoveCommand(Direction.RIGHT))).isEqualTo("move right");
         assertThat(format.line(new UseItemCommand(new EntityId(12)))).isEqualTo("use item=12");
+        assertThat(format.line(new DropItemCommand(new EntityId(5)))).isEqualTo("drop item=5");
     }
 
     @Test
@@ -34,6 +36,7 @@ class CommandLogFormatTest {
             commands.add(new MoveCommand(direction));
         }
         commands.add(new UseItemCommand(new EntityId(7)));
+        commands.add(new DropItemCommand(new EntityId(7)));
 
         for (Command command : commands) {
             assertThat(format.parse(format.line(command))).isEqualTo(command);

@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.github.matteocardarelli.simpleroguelike.R;
+import io.github.matteocardarelli.simpleroguelike.command.DropItemCommand;
 import io.github.matteocardarelli.simpleroguelike.command.TakeWareCommand;
 import io.github.matteocardarelli.simpleroguelike.databinding.ActivityGameBinding;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
@@ -302,6 +303,11 @@ public class GameActivity extends AppCompatActivity
     @Override
     public void onUseSelected() {
         viewModel.state().selectedItem().ifPresent(input::chooseItem);
+    }
+
+    @Override
+    public void onDropSelected() {
+        viewModel.state().selectedItem().ifPresent(item -> input.submit(new DropItemCommand(item)));
     }
 
     @Override

@@ -122,4 +122,19 @@ class ShopTest {
         assertThat(leave.events()).noneMatch(MerchantAngered.class::isInstance);
         assertThat(floor.enemies().get(0).isAngry()).isFalse();
     }
+
+    @Test
+    void giveBack_removesTheWareFromTheBill_andKeepsItsPrice() {
+        Floor floor = shop("..@/M.", 60);
+        floor.move(floor.playerId(), Direction.RIGHT);
+        floor.takeWare(floor.playerId());
+        Shop shop = floor.shop().orElseThrow();
+        EntityId sword = shop.unpaid().iterator().next();
+
+        shop.giveBack(sword);
+
+        assertThat(shop.unpaid()).isEmpty();
+        assertThat(shop.bill()).isZero();
+        assertThat(shop.priceOf(sword)).contains(60);
+    }
 }

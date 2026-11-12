@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.feedback;
 
 import io.github.matteocardarelli.simpleroguelike.command.Command;
+import io.github.matteocardarelli.simpleroguelike.command.DropItemCommand;
 import io.github.matteocardarelli.simpleroguelike.command.EquipCommand;
 import io.github.matteocardarelli.simpleroguelike.command.MoveCommand;
 import io.github.matteocardarelli.simpleroguelike.command.TakeWareCommand;
@@ -63,6 +64,11 @@ public final class CommandLogFormat {
                 "unequip",
                 command -> "item=" + command.itemId().value(),
                 arguments -> new UnequipCommand(new EntityId(itemId(arguments))));
+        register(
+                DropItemCommand.class,
+                "drop",
+                command -> "item=" + command.itemId().value(),
+                arguments -> new DropItemCommand(new EntityId(itemId(arguments))));
     }
 
     /**

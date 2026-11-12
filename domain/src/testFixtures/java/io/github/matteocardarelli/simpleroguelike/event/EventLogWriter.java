@@ -145,6 +145,26 @@ public final class EventLogWriter {
                                 + e.kind().value()
                                 + " at="
                                 + at(e.at()));
+        register(
+                ItemPutDown.class,
+                e ->
+                        "ItemPutDown item="
+                                + id(e.item())
+                                + " kind="
+                                + e.kind().value()
+                                + " at="
+                                + at(e.at()));
+        register(
+                DropRefused.class,
+                e ->
+                        "DropRefused item="
+                                + id(e.item())
+                                + " kind="
+                                + e.kind().value()
+                                + " at="
+                                + at(e.at())
+                                + " reason="
+                                + e.reason());
         register(DoorOpened.class, e -> "DoorOpened at=" + at(e.at()));
         register(
                 CoinsPickedUp.class,
