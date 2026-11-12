@@ -206,6 +206,30 @@ class FloorCodecTest {
     }
 
     @Test
+    void read_restoresThePacks_andAnOldWolfIsAlone() {
+        Floor floor = FloorFixtures.parse("@.ww.W");
+
+        Floor read = CODEC.read(CODEC.write(floor));
+
+        assertThat(read.enemies())
+                .extracting(Enemy::pack)
+                .containsExactly(
+                        Optional.of(new EntityId(2)),
+                        Optional.of(new EntityId(2)),
+                        Optional.of(new EntityId(4)));
+        List<String> old = new ArrayList<>();
+        for (String line : CODEC.write(floor)) {
+            if (line.startsWith("enemy ")) {
+                String[] parts = line.split(" ");
+                old.add(String.join(" ", java.util.Arrays.copyOf(parts, 13)));
+            } else {
+                old.add(line);
+            }
+        }
+        assertThat(CODEC.read(old).enemies()).allMatch(enemy -> !enemy.pack().isPresent());
+    }
+
+    @Test
     void read_restoresTheKeys() {
         Floor floor = played();
         floor.player().addKeys(KeyType.COMMON, 2);

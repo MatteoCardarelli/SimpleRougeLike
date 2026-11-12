@@ -274,6 +274,55 @@ class FloorPopulatorTest {
         }
     }
 
+    /** Un branco nasce sempre intero, vicino al primo membro, con l'id del primo come branco. */
+    @Test
+    void populate_packsAreBornWhole_aroundTheirFirstMember() {
+        StringBuilder wall = new StringBuilder();
+        StringBuilder open = new StringBuilder("#");
+        for (int x = 0; x < 30; x++) {
+            wall.append('#');
+        }
+        for (int x = 0; x < 28; x++) {
+            open.append('.');
+        }
+        open.append('#');
+        String[] rows = new String[20];
+        for (int y = 0; y < 20; y++) {
+            rows[y] = y == 0 || y == 19 ? wall.toString() : open.toString();
+        }
+        Grid<TileType> terrain = FloorFixtures.terrain(rows);
+        FloorSpec spec = new FloorSpec(30, 20, 13, 0, 2, 1);
+        int packs = 0;
+
+        for (long seed = 1; seed <= 100; seed++) {
+            Floor floor =
+                    POPULATOR.populate(
+                            terrain, spec, new SeededRandomSource(seed), new EntityIdSequence());
+
+            assertThat(floor.enemies()).hasSize(13);
+            for (var enemy : floor.enemies()) {
+                boolean wolf = enemy.kind().equals(StandardEnemyCatalog.WOLF);
+                assertThat(enemy.pack().isPresent()).as("seed %d", seed).isEqualTo(wolf);
+                if (!wolf) {
+                    continue;
+                }
+                var leader = enemy.pack().orElseThrow();
+                var members =
+                        floor.enemies().stream()
+                                .filter(other -> other.pack().equals(enemy.pack()))
+                                .toList();
+                assertThat(members).as("seed %d", seed).hasSize(enemy.definition().packSize());
+                assertThat(members.get(0).id()).isEqualTo(leader);
+                assertThat(floor.positionOf(enemy.id()).distanceTo(floor.positionOf(leader)))
+                        .isLessThanOrEqualTo(FloorPopulator.PACK_RADIUS);
+                if (enemy.id().equals(leader)) {
+                    packs++;
+                }
+            }
+        }
+        assertThat(packs).isPositive();
+    }
+
     @Test
     void populate_noWalkableCell_fails() {
         Grid<TileType> rock = FloorFixtures.terrain("###", "###", "###");

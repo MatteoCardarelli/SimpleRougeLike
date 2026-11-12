@@ -2,12 +2,15 @@ package io.github.matteocardarelli.simpleroguelike.dungeon;
 
 import io.github.matteocardarelli.simpleroguelike.content.StandardEnemyCatalog;
 import io.github.matteocardarelli.simpleroguelike.content.StandardItemCatalog;
+import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import io.github.matteocardarelli.simpleroguelike.model.Stats;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -81,6 +84,7 @@ public final class FloorFixtures {
         List<Position> gates = new ArrayList<>();
         List<Position> levers = new ArrayList<>();
         List<Position> room = new ArrayList<>();
+        Map<Character, EntityId> packs = new LinkedHashMap<>();
         for (int y = 0; y < height; y++) {
             if (rows[y].length() != width) {
                 throw new IllegalArgumentException("Le righe devono avere la stessa lunghezza");
@@ -119,7 +123,13 @@ public final class FloorFixtures {
                                     at);
                     case 'g' -> builder.enemy(new Enemy(ids.next(), goblin()), at);
                     case 'a' -> builder.enemy(new Enemy(ids.next(), archer()), at);
-                    case 'w' -> builder.enemy(new Enemy(ids.next(), wolf()), at);
+                    case 'w', 'W' -> {
+                        // Tutti i 'w' sono un branco, tutti i 'W' un altro: l'id del branco è
+                        // quello del primo letto.
+                        EntityId id = ids.next();
+                        EntityId pack = packs.computeIfAbsent(cell, c -> id);
+                        builder.enemy(new Enemy(id, wolf(), 1, Optional.of(pack)), at);
+                    }
                     case 'S' -> builder.enemy(new Enemy(ids.next(), giantSlime()), at);
                     case 'M' -> builder.enemy(new Enemy(ids.next(), merchant()), at);
                     case 'c' ->
