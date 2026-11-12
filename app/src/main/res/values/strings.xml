@@ -91,7 +91,8 @@
     <string name="log_not_enough_coins">Non hai abbastanza monete: il conto è %1$d, ne hai %2$d.</string>
     <string name="log_merchant_greeted">Il mercante ti saluta.</string>
     <string name="log_merchant_angered">Il mercante ti ha visto rubare!</string>
-    <string name="log_jump_announced">Lo slime gigante si prepara a saltare: spostati!</string>
+    <string name="log_jump_charged">%1$s si carica per saltare.</string>
+    <string name="log_jump_announced">Lo slime gigante salta: la sua ombra ti copre, spostati!</string>
     <string name="log_landed">%1$s atterra con un tonfo.</string>
     <string name="log_door_unlocked">Apri la porta con la chiave.</string>
     <string name="log_door_locked">La porta è chiusa a chiave.</string>

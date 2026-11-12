@@ -67,7 +67,12 @@ public interface FloorView {
     /** Vero se il piano ha un boss ed è morto. */
     boolean isBossDefeated();
 
-    /** L'attore vivo nella cella, se c'è. */
+    /**
+     * Le celle della stanza del boss, da cui il boss non esce mai; vuote se il piano non ne ha una.
+     */
+    CellSet bossRoom();
+
+    /** L'attore vivo nella cella, se c'è. Un nemico in aria non sta in nessuna cella. */
     Optional<Actor> actorAt(Position position);
 
     Optional<Item> itemAt(Position position);

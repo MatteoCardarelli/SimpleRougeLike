@@ -21,6 +21,7 @@ import io.github.matteocardarelli.simpleroguelike.event.ItemPickedUp;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUnequipped;
 import io.github.matteocardarelli.simpleroguelike.event.ItemUsed;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
+import io.github.matteocardarelli.simpleroguelike.event.JumpCharged;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.LeveledUp;
 import io.github.matteocardarelli.simpleroguelike.event.LeverPulled;
@@ -117,6 +118,9 @@ public final class EventMessageFormatter {
                 (e, player) -> texts.text(R.string.log_not_enough_coins, e.bill(), e.coins()));
         register(MerchantGreeted.class, (e, player) -> texts.text(R.string.log_merchant_greeted));
         register(MerchantAngered.class, (e, player) -> texts.text(R.string.log_merchant_angered));
+        register(
+                JumpCharged.class,
+                (e, player) -> texts.text(R.string.log_jump_charged, name(e.kind())));
         register(JumpAnnounced.class, (e, player) -> texts.text(R.string.log_jump_announced));
         register(Landed.class, (e, player) -> texts.text(R.string.log_landed, name(e.kind())));
         register(DoorUnlocked.class, (e, player) -> texts.text(R.string.log_door_unlocked));

@@ -17,7 +17,7 @@ public final class Enemy extends Actor {
 
     private final EnemyDefinition definition;
     private Optional<Position> pendingJump = Optional.empty();
-    private boolean tired;
+    private JumpPhase jumpPhase = JumpPhase.RESTING;
     private boolean angry;
     private boolean retreated;
     private final int level;
@@ -112,14 +112,19 @@ public final class Enemy extends Actor {
         return definition.boss();
     }
 
-    /** Dove atterrerà al prossimo turno, se ha annunciato un salto. */
+    /** Dove atterrerà al prossimo turno, se è in aria: la cella di riferimento della sua ombra. */
     public Optional<Position> pendingJump() {
         return pendingJump;
     }
 
-    /** Vero subito dopo un atterraggio: il turno dopo riposa. */
-    public boolean isTired() {
-        return tired;
+    /** Il punto del ciclo del salto in cui si trova; {@link JumpPhase#RESTING} se non salta. */
+    public JumpPhase jumpPhase() {
+        return jumpPhase;
+    }
+
+    /** Vero mentre è in aria: non occupa celle e non si può colpire. */
+    public boolean isAirborne() {
+        return jumpPhase == JumpPhase.AIRBORNE;
     }
 
     /** Vero se la sua ultima azione è stata allontanarsi dal player: per ora non scappa più. */
@@ -132,23 +137,31 @@ public final class Enemy extends Actor {
     }
 
     /** Rimette lo stato salvato; solo per riprendere una partita. */
-    void restoreState(Optional<Position> pendingJump, boolean tired, boolean angry) {
+    void restoreState(JumpPhase phase, Optional<Position> pendingJump, boolean angry) {
+        if ((phase == JumpPhase.AIRBORNE) != pendingJump.isPresent()) {
+            throw new IllegalArgumentException("Solo un nemico in aria ha un'ombra: " + phase);
+        }
+        this.jumpPhase = phase;
         this.pendingJump = pendingJump;
-        this.tired = tired;
         this.angry = angry;
     }
 
-    void announceJump(Position anchor) {
+    void rested() {
+        jumpPhase = JumpPhase.READY;
+    }
+
+    void charged() {
+        jumpPhase = JumpPhase.CHARGING;
+    }
+
+    void liftedOff(Position anchor) {
+        jumpPhase = JumpPhase.AIRBORNE;
         pendingJump = Optional.of(anchor);
     }
 
     void landed() {
+        jumpPhase = JumpPhase.RESTING;
         pendingJump = Optional.empty();
-        tired = true;
-    }
-
-    void rested() {
-        tired = false;
     }
 
     public EnemyDefinition definition() {

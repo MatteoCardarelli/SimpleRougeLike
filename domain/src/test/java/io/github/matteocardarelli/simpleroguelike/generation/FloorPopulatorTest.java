@@ -262,6 +262,15 @@ class FloorPopulatorTest {
             Position player = floor.positionOf(floor.playerId());
             assertThat(floor.cellsOf(boss.id()).get(0).distanceTo(player)).isGreaterThan(1);
             assertThat(floor.enemies()).hasSize(6);
+            assertThat(floor.bossRoom().size()).isEqualTo(52);
+            assertThat(floor.bossRoom().positions()).containsAll(floor.cellsOf(boss.id()));
+            assertThat(floor.bossRoom().contains(player)).isFalse();
+            for (var enemy : floor.enemies()) {
+                if (!enemy.isBoss()) {
+                    assertThat(floor.bossRoom().positions())
+                            .doesNotContainAnyElementsOf(floor.cellsOf(enemy.id()));
+                }
+            }
         }
     }
 

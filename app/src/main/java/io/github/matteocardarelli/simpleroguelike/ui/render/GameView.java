@@ -9,9 +9,11 @@ import android.util.AttributeSet;
 import android.view.View;
 import androidx.appcompat.content.res.AppCompatResources;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
+import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.CellView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.FixtureView;
 import io.github.matteocardarelli.simpleroguelike.snapshot.GameSnapshot;
@@ -40,6 +42,14 @@ public final class GameView extends View {
 
     /** Il rosso semitrasparente delle celle dove sta per atterrare un nemico. */
     private static final int DANGER = 0x66FF1744;
+
+    private static final int SHADOW = 0x99000000;
+
+    /** Quanto si schiaccia uno slime che si carica, in proporzione alla sua altezza. */
+    private static final float SQUASH = 0.2f;
+
+    /** Quanto sta sopra la sua ombra uno slime in aria, in proporzione alla sua altezza. */
+    private static final float LIFT = 0.3f;
 
     private static final int RUG = 0xFF8E2430;
     private static final int RUG_BORDER = 0xFFE5B23C;
@@ -118,7 +128,7 @@ public final class GameView extends View {
         drawFixtures(canvas, content, cells, snapshot.fixtures(), cell);
         drawItems(canvas, content, snapshot.visibleItems(), cell);
         drawDanger(canvas, snapshot.danger(), cell);
-        drawSprites(canvas, content, scene.sprites(), cell);
+        drawSprites(canvas, content, scene.sprites(), phases(snapshot), cell);
         drawEffects(canvas, content, scene.effects(), cell);
         canvas.restore();
         if (scene.isAnimating()) {
@@ -245,17 +255,56 @@ public final class GameView extends View {
         }
     }
 
+    /** I nemici visibili che si caricano per saltare o sono in aria, per id. */
+    private static Map<EntityId, ActorView> phases(GameSnapshot snapshot) {
+        Map<EntityId, ActorView> phases = new LinkedHashMap<>();
+        for (ActorView enemy : snapshot.visibleEnemies()) {
+            if (enemy.charging() || enemy.airborne()) {
+                phases.put(enemy.id(), enemy);
+            }
+        }
+        return phases;
+    }
+
+    /**
+     * Gli attori. Chi si carica per saltare è schiacciato verso terra; chi è in aria sta sopra la
+     * sua ombra, un po' trasparente.
+     */
     private void drawSprites(
-            Canvas canvas, ContentPresentation content, List<Sprite> sprites, float cell) {
+            Canvas canvas,
+            ContentPresentation content,
+            List<Sprite> sprites,
+            Map<EntityId, ActorView> phases,
+            float cell) {
         for (Sprite sprite : sprites) {
-            drawArt(
-                    canvas,
-                    content,
-                    sprite.kind(),
-                    sprite.x() * cell,
-                    sprite.y() * cell,
-                    sprite.size() * cell,
-                    sprite.alpha());
+            float side = sprite.size() * cell;
+            float x = sprite.x() * cell;
+            float y = sprite.y() * cell;
+            ActorView jumper = phases.get(sprite.id());
+            if (jumper != null && jumper.charging()) {
+                float wider = side * SQUASH / 2;
+                drawArt(
+                        canvas,
+                        content,
+                        sprite.kind(),
+                        x - wider,
+                        y + side * SQUASH,
+                        side + 2 * wider,
+                        side * (1 - SQUASH),
+                        sprite.alpha());
+            } else if (jumper != null && jumper.airborne()) {
+                drawArt(
+                        canvas,
+                        content,
+                        sprite.kind(),
+                        x,
+                        y - side * LIFT,
+                        side,
+                        side,
+                        sprite.alpha() * 0.85f);
+            } else {
+                drawArt(canvas, content, sprite.kind(), x, y, side, side, sprite.alpha());
+            }
         }
     }
 
@@ -268,8 +317,21 @@ public final class GameView extends View {
             float y,
             float side,
             float alpha) {
+        drawArt(canvas, content, kind, x, y, side, side, alpha);
+    }
+
+    /** L'illustrazione di un {@code Kind} nel rettangolo che parte da (x, y). */
+    private void drawArt(
+            Canvas canvas,
+            ContentPresentation content,
+            Kind kind,
+            float x,
+            float y,
+            float width,
+            float height,
+            float alpha) {
         Drawable art = art(content, kind);
-        art.setBounds(Math.round(x), Math.round(y), Math.round(x + side), Math.round(y + side));
+        art.setBounds(Math.round(x), Math.round(y), Math.round(x + width), Math.round(y + height));
         art.setAlpha(Math.round(alpha * 255));
         art.draw(canvas);
         art.setAlpha(255);
@@ -324,13 +386,35 @@ public final class GameView extends View {
         paint.setAlpha(255);
     }
 
-    /** Le celle dove un nemico atterrerà al prossimo turno, in rosso. */
+    /**
+     * L'ombra di chi è in aria, dove atterrerà al prossimo turno: le sue celle in rosso e un ovale
+     * scuro sopra.
+     */
     private void drawDanger(Canvas canvas, List<Position> danger, float cell) {
+        if (danger.isEmpty()) {
+            return;
+        }
         paint.setColor(DANGER);
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
         for (Position at : danger) {
             canvas.drawRect(
                     at.x() * cell, at.y() * cell, (at.x() + 1) * cell, (at.y() + 1) * cell, paint);
+            minX = Math.min(minX, at.x());
+            minY = Math.min(minY, at.y());
+            maxX = Math.max(maxX, at.x());
+            maxY = Math.max(maxY, at.y());
         }
+        paint.setColor(SHADOW);
+        float inset = cell * 0.4f;
+        canvas.drawOval(
+                minX * cell + inset,
+                minY * cell + inset,
+                (maxX + 1) * cell - inset,
+                (maxY + 1) * cell - inset,
+                paint);
     }
 
     /** Gli effetti, come un proiettile in volo: piccoli, sopra gli attori. */

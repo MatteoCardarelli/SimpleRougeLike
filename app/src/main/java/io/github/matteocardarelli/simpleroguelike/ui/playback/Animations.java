@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
+import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
@@ -37,6 +38,7 @@ public final class Animations {
         player.register(Damaged.class, Animations::flash);
         player.register(Died.class, Animations::fade);
         player.register(Fired.class, Animations::projectile);
+        player.register(JumpAnnounced.class, Animations::liftOff);
         player.register(Landed.class, Animations::landing);
         return player;
     }
@@ -51,6 +53,36 @@ public final class Animations {
                 animation(
                         STEP_MS,
                         f -> sprite.moveTo(lerp(from.x(), to.x(), f), lerp(from.y(), to.y(), f))));
+    }
+
+    /**
+     * Il salto: lo sprite si alza e vola sopra la sua ombra, più lento di un passo. La cella di
+     * riferimento dell'ombra è l'angolo in alto a sinistra delle sue celle.
+     */
+    static Optional<Animation> liftOff(JumpAnnounced event, Scene scene) {
+        if (event.cells().isEmpty()) {
+            return Optional.empty();
+        }
+        int toX = Integer.MAX_VALUE;
+        int toY = Integer.MAX_VALUE;
+        for (Position cell : event.cells()) {
+            toX = Math.min(toX, cell.x());
+            toY = Math.min(toY, cell.y());
+        }
+        int targetX = toX;
+        int targetY = toY;
+        return scene.sprite(event.jumper())
+                .map(
+                        sprite -> {
+                            float fromX = sprite.x();
+                            float fromY = sprite.y();
+                            return animation(
+                                    LANDING_MS,
+                                    f ->
+                                            sprite.moveTo(
+                                                    fromX + (targetX - fromX) * f,
+                                                    fromY + (targetY - fromY) * f));
+                        });
     }
 
     /** L'atterraggio di un salto: lo sprite vola fino alla cella nuova, più lento di un passo. */

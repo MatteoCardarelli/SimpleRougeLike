@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.session;
 
 import io.github.matteocardarelli.simpleroguelike.ai.BehaviorBinding;
+import io.github.matteocardarelli.simpleroguelike.ai.ChargeIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.EnemyBehavior;
 import io.github.matteocardarelli.simpleroguelike.ai.EnemyIntent;
 import io.github.matteocardarelli.simpleroguelike.ai.JumpIntent;
@@ -122,6 +123,7 @@ public final class EnemyTurnRunner {
                                             RangedRules.ARROW,
                                             enemy.stats().attack(),
                                             run.gameplay()));
+                    case ChargeIntent() -> events.add(floor.chargeJump(enemy.id()));
                     case JumpIntent(Position anchor) ->
                             events.add(floor.announceJump(enemy.id(), anchor));
                     case LandIntent() -> events.addAll(jumps.land(floor, enemy.id()));

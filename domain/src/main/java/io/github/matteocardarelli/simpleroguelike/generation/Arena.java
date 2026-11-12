@@ -1,5 +1,6 @@
 package io.github.matteocardarelli.simpleroguelike.generation;
 
+import io.github.matteocardarelli.simpleroguelike.dungeon.Footprint;
 import io.github.matteocardarelli.simpleroguelike.dungeon.TileType;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.Grid;
@@ -13,15 +14,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
- * L'arena del boss, ricavata nel terreno generato: una stanza di {@value #INNER_WIDTH}×{@value
- * #INNER_HEIGHT} celle chiusa da muri, con una sola porta sul lato che guarda il centro del piano e
- * un corridoio scavato da lì fino al primo pavimento del resto del piano. Il boss sta al centro.
+ * La stanza del boss, costruita in una fascia lungo un lato del piano che prima diventa tutta muro:
+ * così niente del resto del piano la tocca. La stanza ha la forma della definizione del boss; dal
+ * suo lato verso il piano esce la porta del boss, poi un corridoio largo una cella e lungo {@value
+ * #CORRIDOR}, con muro ai due lati, fino al bordo della fascia. Da lì, se serve, si scava un
+ * corridoio normale fino al primo pavimento del resto del piano. Le celle del resto del piano che
+ * non si raggiungono più dal corridoio diventano muro. Il boss sta al centro della stanza.
  *
- * @param terrain il terreno con l'arena e il corridoio
- * @param interior le celle dentro l'arena, dove non nasce niente altro
+ * @param terrain il terreno con la stanza e il corridoio
+ * @param interior le celle della stanza, dove non nasce niente altro
  * @param door la cella della porta del boss
+ * @param corridor le celle del corridoio, dalla porta verso il resto del piano
  * @param bossAnchor la cella di riferimento del boss
  * @param outside le celle del resto del piano collegate al corridoio: il player nasce qui
  */
@@ -29,107 +35,168 @@ record Arena(
         Grid<TileType> terrain,
         Set<Position> interior,
         Position door,
+        List<Position> corridor,
         Position bossAnchor,
         Set<Position> outside) {
 
-    static final int INNER_WIDTH = 10;
-    static final int INNER_HEIGHT = 8;
+    /** Quante celle è lungo il corridoio tra la porta del boss e il resto del piano. */
+    static final int CORRIDOR = 5;
+
+    /** Quante celle deve avere almeno il resto del piano per una partita. */
+    static final int MIN_OUTSIDE = 80;
+
     private static final int ATTEMPTS = 40;
 
     Arena {
         interior = Collections.unmodifiableSet(new LinkedHashSet<>(interior));
+        corridor = List.copyOf(corridor);
         outside = Collections.unmodifiableSet(new LinkedHashSet<>(outside));
     }
 
+    /** Il lato del piano dove sta la fascia della stanza. */
+    private enum Side {
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT
+    }
+
     /**
-     * Ricava l'arena in una posizione a caso, provando più posizioni.
+     * Costruisce la stanza su un lato a caso, provando più posizioni.
      *
+     * @param room la forma della stanza
      * @param bossSize il lato del quadrato che contiene il boss
      * @throws FloorGenerationException se il terreno è troppo piccolo o nessuna posizione va bene
      */
-    static Arena carve(Grid<TileType> terrain, int bossSize, RandomSource random) {
-        int outerWidth = INNER_WIDTH + 2;
-        int outerHeight = INNER_HEIGHT + 2;
-        if (terrain.width() < outerWidth + 4 || terrain.height() < outerHeight + 4) {
-            throw new FloorGenerationException("Piano troppo piccolo per l'arena del boss");
+    static Arena build(Grid<TileType> terrain, Footprint room, int bossSize, RandomSource random) {
+        int side = room.size();
+        int band = band(side);
+        if (Math.min(terrain.width(), terrain.height()) < side + 4
+                || Math.max(terrain.width(), terrain.height()) < band + 4) {
+            throw new FloorGenerationException("Piano troppo piccolo per la stanza del boss");
         }
+        Side[] sides = Side.values();
         for (int attempt = 0; attempt < ATTEMPTS; attempt++) {
-            int x0 = 1 + random.nextInt(terrain.width() - outerWidth - 1);
-            int y0 = 1 + random.nextInt(terrain.height() - outerHeight - 1);
-            Optional<Arena> arena = tryAt(terrain, x0, y0, bossSize);
+            Side chosen = sides[random.nextInt(sides.length)];
+            int length = along(terrain, chosen);
+            int depth = across(terrain, chosen);
+            if (length < side + 4 || depth < band + 4) {
+                continue;
+            }
+            int offset = 1 + random.nextInt(length - side - 2);
+            Optional<Arena> arena = tryAt(terrain, room, bossSize, chosen, offset);
             if (arena.isPresent()) {
                 return arena.get();
             }
         }
-        throw new FloorGenerationException("Nessuna posizione per l'arena del boss");
+        throw new FloorGenerationException("Nessuna posizione per la stanza del boss");
     }
 
-    private static Optional<Arena> tryAt(Grid<TileType> terrain, int x0, int y0, int bossSize) {
-        int outerWidth = INNER_WIDTH + 2;
-        int outerHeight = INNER_HEIGHT + 2;
+    /** Quante righe occupa la fascia: muro, stanza, porta e corridoio. */
+    private static int band(int side) {
+        return 1 + side + 1 + CORRIDOR;
+    }
+
+    private static Optional<Arena> tryAt(
+            Grid<TileType> terrain, Footprint room, int bossSize, Side side, int offset) {
+        int size = room.size();
+        int band = band(size);
+        int length = along(terrain, side);
+        int depth = across(terrain, side);
         List<TileType> cells = new ArrayList<>(terrain.cells());
-        Set<Position> interior = new LinkedHashSet<>();
-        Set<Position> rect = new LinkedHashSet<>();
-        for (int y = y0; y < y0 + outerHeight; y++) {
-            for (int x = x0; x < x0 + outerWidth; x++) {
-                Position cell = new Position(x, y);
-                rect.add(cell);
-                boolean border =
-                        x == x0 || y == y0 || x == x0 + outerWidth - 1 || y == y0 + outerHeight - 1;
-                cells.set(index(terrain, cell), border ? TileType.WALL : TileType.FLOOR);
-                if (!border) {
-                    interior.add(cell);
-                }
+        Set<Position> bandCells = new LinkedHashSet<>();
+        for (int y = 0; y < band; y++) {
+            for (int x = 0; x < length; x++) {
+                Position cell = toMap(terrain, side, x, y);
+                bandCells.add(cell);
+                cells.set(index(terrain, cell), TileType.WALL);
             }
         }
-        // La porta sta sul lato che guarda il centro del piano.
-        int dx = (x0 + outerWidth / 2) - terrain.width() / 2;
-        int dy = (y0 + outerHeight / 2) - terrain.height() / 2;
-        Direction out;
-        Position door;
-        if (Math.abs(dx) >= Math.abs(dy)) {
-            out = dx > 0 ? Direction.LEFT : Direction.RIGHT;
-            int x = dx > 0 ? x0 : x0 + outerWidth - 1;
-            door = new Position(x, y0 + outerHeight / 2);
-        } else {
-            out = dy > 0 ? Direction.UP : Direction.DOWN;
-            int y = dy > 0 ? y0 : y0 + outerHeight - 1;
-            door = new Position(x0 + outerWidth / 2, y);
+        Set<Position> interior = new LinkedHashSet<>();
+        for (Position local : room.at(new Position(offset, 1))) {
+            Position cell = toMap(terrain, side, local.x(), local.y());
+            interior.add(cell);
+            cells.set(index(terrain, cell), TileType.FLOOR);
         }
+        int doorX = offset + size / 2;
+        Position door = toMap(terrain, side, doorX, size + 1);
         cells.set(index(terrain, door), TileType.FLOOR);
-        Position cell = door.translate(out);
-        Optional<Position> reached = Optional.empty();
-        while (terrain.isInside(cell)) {
-            if (!rect.contains(cell) && terrain.get(cell).isWalkable()) {
-                reached = Optional.of(cell);
+        List<Position> corridor = new ArrayList<>();
+        for (int y = size + 2; y < band; y++) {
+            Position cell = toMap(terrain, side, doorX, y);
+            corridor.add(cell);
+            cells.set(index(terrain, cell), TileType.FLOOR);
+        }
+        // Dal bordo della fascia si scava fino al primo pavimento del resto del piano.
+        @Nullable Position start = null;
+        for (int y = band; y < depth - 1; y++) {
+            Position cell = toMap(terrain, side, doorX, y);
+            boolean floor = cells.get(index(terrain, cell)).isWalkable();
+            cells.set(index(terrain, cell), TileType.FLOOR);
+            if (floor) {
+                start = toMap(terrain, side, doorX, band);
                 break;
             }
-            cells.set(index(terrain, cell), TileType.FLOOR);
-            cell = cell.translate(out);
         }
-        if (!reached.isPresent()) {
+        if (start == null) {
             return Optional.empty();
         }
         Grid<TileType> carved = new Grid<>(terrain.width(), terrain.height(), cells);
-        Set<Position> outside = reachable(carved, reached.get(), door, rect);
-        if (outside.size() < INNER_WIDTH * INNER_HEIGHT) {
-            // Il resto del piano collegato all'arena è troppo piccolo per una partita.
+        Set<Position> outside = reachable(carved, start, bandCells);
+        if (outside.size() < MIN_OUTSIDE) {
             return Optional.empty();
         }
-        Position anchor =
-                new Position(
-                        x0 + 1 + (INNER_WIDTH - bossSize) / 2,
-                        y0 + 1 + (INNER_HEIGHT - bossSize) / 2);
-        return Optional.of(new Arena(carved, interior, door, anchor, outside));
+        // Il resto del piano che non si raggiunge più dal corridoio diventa muro.
+        for (Position cell : carved.positions()) {
+            if (!bandCells.contains(cell)
+                    && carved.get(cell).isWalkable()
+                    && !outside.contains(cell)) {
+                cells.set(index(terrain, cell), TileType.WALL);
+            }
+        }
+        Grid<TileType> result = new Grid<>(terrain.width(), terrain.height(), cells);
+        int inset = (size - bossSize) / 2;
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        for (Position local : Footprint.square(size).at(new Position(offset, 1))) {
+            Position cell = toMap(terrain, side, local.x(), local.y());
+            minX = Math.min(minX, cell.x());
+            minY = Math.min(minY, cell.y());
+        }
+        Position anchor = new Position(minX + inset, minY + inset);
+        return Optional.of(new Arena(result, interior, door, corridor, anchor, outside));
+    }
+
+    /** Quante celle è lungo il lato. */
+    private static int along(Grid<TileType> terrain, Side side) {
+        return side == Side.TOP || side == Side.BOTTOM ? terrain.width() : terrain.height();
+    }
+
+    /** Quante celle va il piano dal lato verso quello opposto. */
+    private static int across(Grid<TileType> terrain, Side side) {
+        return side == Side.TOP || side == Side.BOTTOM ? terrain.height() : terrain.width();
+    }
+
+    /**
+     * La cella del piano che corrisponde a ({@code x}, {@code y}) contati dal lato: {@code x} lungo
+     * il lato, {@code y} verso l'interno.
+     */
+    private static Position toMap(Grid<TileType> terrain, Side side, int x, int y) {
+        return switch (side) {
+            case TOP -> new Position(x, y);
+            case BOTTOM -> new Position(x, terrain.height() - 1 - y);
+            case LEFT -> new Position(y, x);
+            case RIGHT -> new Position(terrain.width() - 1 - y, x);
+        };
     }
 
     private static int index(Grid<TileType> terrain, Position cell) {
         return cell.y() * terrain.width() + cell.x();
     }
 
-    /** Le celle attraversabili raggiungibili da {@code start} senza entrare nell'arena. */
+    /** Le celle attraversabili raggiungibili da {@code start} senza entrare nella fascia. */
     private static Set<Position> reachable(
-            Grid<TileType> terrain, Position start, Position door, Set<Position> arena) {
+            Grid<TileType> terrain, Position start, Set<Position> band) {
         Set<Position> seen = new LinkedHashSet<>();
         Deque<Position> queue = new ArrayDeque<>();
         seen.add(start);
@@ -139,9 +206,8 @@ record Arena(
             for (Direction direction : Direction.values()) {
                 Position next = cell.translate(direction);
                 if (terrain.isInside(next)
+                        && !band.contains(next)
                         && terrain.get(next).isWalkable()
-                        && !next.equals(door)
-                        && !arena.contains(next)
                         && seen.add(next)) {
                     queue.add(next);
                 }

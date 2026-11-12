@@ -50,6 +50,20 @@ public record Footprint(List<Position> offsets) {
         return new Footprint(cells);
     }
 
+    /** Un quadrato pieno di {@code side} celle di lato. */
+    public static Footprint square(int side) {
+        if (side < 1) {
+            throw new IllegalArgumentException("Lato non valido: " + side);
+        }
+        List<Position> cells = new ArrayList<>();
+        for (int y = 0; y < side; y++) {
+            for (int x = 0; x < side; x++) {
+                cells.add(new Position(x, y));
+            }
+        }
+        return new Footprint(cells);
+    }
+
     /** Il lato del quadrato che contiene la forma, in celle: 1 per una cella sola. */
     public int size() {
         int size = 0;

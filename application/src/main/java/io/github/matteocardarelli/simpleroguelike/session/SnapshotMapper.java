@@ -5,6 +5,7 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.Equipment;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Fixture;
 import io.github.matteocardarelli.simpleroguelike.dungeon.FloorView;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Item;
+import io.github.matteocardarelli.simpleroguelike.dungeon.JumpPhase;
 import io.github.matteocardarelli.simpleroguelike.dungeon.KeyType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Shop;
@@ -69,7 +70,9 @@ public final class SnapshotMapper {
                                 enemy.health(),
                                 enemy.stats().maxHealth(),
                                 enemy.footprint().size(),
-                                enemy.isBoss()));
+                                enemy.isBoss(),
+                                enemy.jumpPhase() == JumpPhase.CHARGING,
+                                enemy.isAirborne()));
                 if (enemy.pendingJump().isPresent()) {
                     danger.addAll(enemy.footprint().at(enemy.pendingJump().get()));
                 }

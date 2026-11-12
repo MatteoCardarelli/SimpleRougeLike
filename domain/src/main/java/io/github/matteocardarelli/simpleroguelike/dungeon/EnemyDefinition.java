@@ -19,6 +19,8 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
  * @param boss vero per il boss dell'ultimo piano: sconfiggerlo vince la partita
  * @param merchant vero per un mercante: neutrale finché il player non lo deruba
  * @param speed quante azioni fa in un turno: 1 per quasi tutti
+ * @param arena per un boss, la forma della sua stanza, un quadrato o un cerchio più grande della
+ *     sua impronta; per gli altri non conta
  */
 public record EnemyDefinition(
         Kind kind,
@@ -33,7 +35,8 @@ public record EnemyDefinition(
         Footprint footprint,
         boolean boss,
         boolean merchant,
-        int speed) {
+        int speed,
+        Footprint arena) {
 
     public EnemyDefinition {
         if (stats.maxHealth() <= 0) {
@@ -61,6 +64,72 @@ public record EnemyDefinition(
                             + ", dropChance="
                             + dropChance);
         }
+        if (boss && arena.size() <= footprint.size()) {
+            throw new IllegalArgumentException(
+                    "La stanza del boss deve essere più grande del boss: " + arena.size());
+        }
+    }
+
+    /** Un nemico con una stanza grande il doppio della sua impronta, se è un boss. */
+    public EnemyDefinition(
+            Kind kind,
+            Stats stats,
+            int experienceReward,
+            int aggroRange,
+            BehaviorKey behavior,
+            int spawnWeight,
+            int range,
+            int packSize,
+            int dropChance,
+            Footprint footprint,
+            boolean boss,
+            boolean merchant,
+            int speed) {
+        this(
+                kind,
+                stats,
+                experienceReward,
+                aggroRange,
+                behavior,
+                spawnWeight,
+                range,
+                packSize,
+                dropChance,
+                footprint,
+                boss,
+                merchant,
+                speed,
+                Footprint.square(2 * footprint.size()));
+    }
+
+    /** Un boss con la sua stanza, con un'azione per turno. */
+    public EnemyDefinition(
+            Kind kind,
+            Stats stats,
+            int experienceReward,
+            int aggroRange,
+            BehaviorKey behavior,
+            int spawnWeight,
+            int range,
+            int packSize,
+            int dropChance,
+            Footprint footprint,
+            Footprint arena) {
+        this(
+                kind,
+                stats,
+                experienceReward,
+                aggroRange,
+                behavior,
+                spawnWeight,
+                range,
+                packSize,
+                dropChance,
+                footprint,
+                true,
+                false,
+                1,
+                arena);
     }
 
     /** Un nemico che non è un mercante, con un'azione per turno. */
