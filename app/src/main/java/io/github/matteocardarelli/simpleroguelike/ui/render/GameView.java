@@ -1,9 +1,11 @@
 package io.github.matteocardarelli.simpleroguelike.ui.render;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -55,6 +57,9 @@ public final class GameView extends View {
     private static final int RUG_BORDER = 0xFFE5B23C;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint bitmapPaint = pixelArtPaint();
+    private final RectF bitmapBounds = new RectF();
+    private @Nullable HeroSprites heroSprites;
     private final Map<Kind, Drawable> arts = new LinkedHashMap<>();
     private @Nullable Camera camera;
     private @Nullable TilePalette palette;
@@ -128,7 +133,8 @@ public final class GameView extends View {
         drawFixtures(canvas, content, cells, snapshot.fixtures(), cell);
         drawItems(canvas, content, snapshot.visibleItems(), cell);
         drawDanger(canvas, snapshot.danger(), cell);
-        drawSprites(canvas, content, scene.sprites(), phases(snapshot), cell);
+        drawSprites(
+                canvas, content, scene.sprites(), phases(snapshot), snapshot.player().id(), cell);
         drawEffects(canvas, content, scene.effects(), cell);
         canvas.restore();
         if (scene.isAnimating()) {
@@ -275,11 +281,16 @@ public final class GameView extends View {
             ContentPresentation content,
             List<Sprite> sprites,
             Map<EntityId, ActorView> phases,
+            EntityId playerId,
             float cell) {
         for (Sprite sprite : sprites) {
             float side = sprite.size() * cell;
             float x = sprite.x() * cell;
             float y = sprite.y() * cell;
+            if (sprite.id().equals(playerId)) {
+                drawHero(canvas, sprite, x, y, side);
+                continue;
+            }
             ActorView jumper = phases.get(sprite.id());
             if (jumper != null && jumper.charging()) {
                 float wider = side * SQUASH / 2;
@@ -306,6 +317,28 @@ public final class GameView extends View {
                 drawArt(canvas, content, sprite.kind(), x, y, side, side, sprite.alpha());
             }
         }
+    }
+
+    /** Per la pixel art niente filtri né sfumature: i pixel restano nitidi. */
+    private static Paint pixelArtPaint() {
+        Paint pixelPaint = new Paint();
+        pixelPaint.setAntiAlias(false);
+        pixelPaint.setFilterBitmap(false);
+        pixelPaint.setDither(false);
+        return pixelPaint;
+    }
+
+    /** L'eroe: l'immagine pixel art per dove guarda e per il fotogramma di camminata. */
+    private void drawHero(Canvas canvas, Sprite sprite, float x, float y, float side) {
+        HeroSprites heroes = heroSprites;
+        if (heroes == null) {
+            heroes = new HeroSprites(getContext());
+            heroSprites = heroes;
+        }
+        Bitmap bitmap = heroes.bitmap(sprite.facing(), sprite.walkFrame());
+        bitmapPaint.setAlpha(Math.round(sprite.alpha() * 255));
+        bitmapBounds.set(x, y, x + side, y + side);
+        canvas.drawBitmap(bitmap, null, bitmapBounds, bitmapPaint);
     }
 
     /** L'illustrazione di un {@code Kind} nel quadrato di lato {@code side} che parte da (x, y). */

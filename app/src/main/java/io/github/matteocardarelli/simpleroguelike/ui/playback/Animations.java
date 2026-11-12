@@ -49,10 +49,22 @@ public final class Animations {
                         .orElseGet(() -> scene.spawn(event.actor(), event.kind(), event.from()));
         Position from = event.from();
         Position to = event.to();
+        // I passi alternano i due mezzi cicli di camminata: il conto si fa qui, alla creazione,
+        // così resta giusto anche se finish() salta alla fine.
+        int half = sprite.steps() % 2;
+        sprite.countStep();
+        Facings.toward(from, to).ifPresent(sprite::face);
         return Optional.of(
                 animation(
                         STEP_MS,
-                        f -> sprite.moveTo(lerp(from.x(), to.x(), f), lerp(from.y(), to.y(), f))));
+                        f -> {
+                            sprite.moveTo(lerp(from.x(), to.x(), f), lerp(from.y(), to.y(), f));
+                            if (f < 1f) {
+                                sprite.setWalkFrame(half * 3 + Math.min(2, (int) (f * 3)));
+                            } else {
+                                sprite.stand();
+                            }
+                        }));
     }
 
     /**
@@ -107,6 +119,7 @@ public final class Animations {
                         sprite -> {
                             Position from = event.attackerAt();
                             Position to = event.targetAt();
+                            Facings.toward(from, to).ifPresent(sprite::face);
                             return animation(
                                     BUMP_MS,
                                     f -> {
@@ -145,6 +158,10 @@ public final class Animations {
         }
         Position from = event.from();
         Position to = event.path().get(event.path().size() - 1);
+        scene.sprite(event.shooter())
+                .ifPresent(
+                        shooter ->
+                                Facings.toward(from, event.path().get(0)).ifPresent(shooter::face));
         Sprite projectile = new Sprite(event.shooter(), event.projectile(), from.x(), from.y());
         scene.addEffect(projectile);
         long duration = Math.max(PROJECTILE_MIN_MS, PROJECTILE_MS_PER_CELL * event.path().size());

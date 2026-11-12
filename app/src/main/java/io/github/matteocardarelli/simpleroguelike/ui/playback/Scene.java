@@ -85,11 +85,19 @@ public final class Scene {
      * sprite di chi non si vede più e gli effetti spariscono.
      */
     public void syncWith(GameSnapshot snapshot) {
+        Map<EntityId, Sprite> before = new LinkedHashMap<>(sprites);
         sprites.clear();
         effects.clear();
         for (ActorView enemy : snapshot.visibleEnemies()) {
             spawn(enemy.id(), enemy.kind(), enemy.position(), enemy.size());
         }
         spawn(snapshot.player().id(), playerKind, snapshot.player().position());
+        // Chi c'era già conserva dove guarda e quanti passi ha fatto.
+        for (Sprite sprite : sprites.values()) {
+            Sprite old = before.get(sprite.id());
+            if (old != null) {
+                sprite.keepPoseOf(old);
+            }
+        }
     }
 }
