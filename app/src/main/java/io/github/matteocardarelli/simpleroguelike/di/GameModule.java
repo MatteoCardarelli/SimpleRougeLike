@@ -38,6 +38,7 @@ import io.github.matteocardarelli.simpleroguelike.port.TerrainGenerator;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
+import io.github.matteocardarelli.simpleroguelike.session.CeilingFall;
 import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.LootHook;
@@ -45,6 +46,7 @@ import io.github.matteocardarelli.simpleroguelike.session.SaveCodec;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidFieldOfView;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidTerrainGenerator;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -192,7 +194,15 @@ public abstract class GameModule {
             ActionRules actions,
             RangedRules ranged,
             JumpRules jumps) {
-        return new EnemyTurnRunner(behaviors, enemies, actions, ranged, jumps);
+        return new EnemyTurnRunner(
+                behaviors,
+                enemies,
+                actions,
+                ranged,
+                jumps,
+                Optional.of(
+                        new CeilingFall(
+                                StandardEnemyCatalog.GIANT_SLIME, StandardEnemyCatalog.GOBLIN)));
     }
 
     @Provides

@@ -10,6 +10,7 @@ import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
 import io.github.matteocardarelli.simpleroguelike.event.DropRefused;
+import io.github.matteocardarelli.simpleroguelike.event.EnemyFell;
 import io.github.matteocardarelli.simpleroguelike.event.ExperienceGained;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
@@ -125,6 +126,9 @@ public final class EventMessageFormatter {
                 (e, player) -> texts.text(R.string.log_jump_charged, name(e.kind())));
         register(JumpAnnounced.class, (e, player) -> texts.text(R.string.log_jump_announced));
         register(Landed.class, (e, player) -> texts.text(R.string.log_landed, name(e.kind())));
+        register(
+                EnemyFell.class,
+                (e, player) -> texts.text(R.string.log_enemy_fell, name(e.kind())));
         register(DoorUnlocked.class, (e, player) -> texts.text(R.string.log_door_unlocked));
         register(DoorLocked.class, (e, player) -> texts.text(R.string.log_door_locked));
         register(

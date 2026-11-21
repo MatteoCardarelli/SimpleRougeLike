@@ -16,6 +16,7 @@ import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
 import io.github.matteocardarelli.simpleroguelike.event.DropRefused;
+import io.github.matteocardarelli.simpleroguelike.event.EnemyFell;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.FloorChanged;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
@@ -143,6 +144,8 @@ class EventMessageFormatterTest {
                 .contains(R.string.log_jump_announced + "[]");
         assertThat(formatter.format(new Landed(GOBLIN, Kind.of("giant_slime"), AT, AT), PLAYER))
                 .contains(R.string.log_landed + "[" + R.string.kind_giant_slime_name + "[]]");
+        assertThat(formatter.format(new EnemyFell(GOBLIN, Kind.of("goblin"), AT), PLAYER))
+                .contains(R.string.log_enemy_fell + "[" + R.string.kind_goblin_name + "[]]");
         assertThat(formatter.format(new CoinsPickedUp(15, AT), PLAYER))
                 .contains(R.string.log_coins + "[15]");
         assertThat(formatter.format(new WaresPaid(60, AT), PLAYER))

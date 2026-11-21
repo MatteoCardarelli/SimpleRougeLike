@@ -15,9 +15,9 @@ class StandardCatalogsTest {
     void items_containThePotionAndTheGreaterPotion() {
         assertThat(new StandardItemCatalog().all())
                 .startsWith(
-                        new ItemDefinition(StandardItemCatalog.POTION, new HealEffect(25), true, 6),
+                        new ItemDefinition(StandardItemCatalog.POTION, new HealEffect(25), true, 3),
                         new ItemDefinition(
-                                StandardItemCatalog.GREATER_POTION, new HealEffect(60), true, 2));
+                                StandardItemCatalog.GREATER_POTION, new HealEffect(60), true, 1));
     }
 
     @Test
@@ -82,6 +82,7 @@ class StandardCatalogsTest {
                             assertThat(slime.spawnWeight()).isZero();
                             assertThat(slime.footprint().offsets()).hasSize(12);
                             assertThat(slime.footprint().size()).isEqualTo(4);
+                            assertThat(slime.stats().maxHealth()).isEqualTo(500);
                         });
     }
 

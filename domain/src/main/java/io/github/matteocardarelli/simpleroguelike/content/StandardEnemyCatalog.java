@@ -60,7 +60,7 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
                             WOLF, new Stats(14, 5, 0, 5, 10), 15, 10, PACK, 3, 0, 3, 15),
                     new EnemyDefinition(
                             GIANT_SLIME,
-                            new Stats(220, 16, 4, 10, 0),
+                            new Stats(500, 16, 4, 10, 0),
                             300,
                             14,
                             JUMP_AND_CRUSH,

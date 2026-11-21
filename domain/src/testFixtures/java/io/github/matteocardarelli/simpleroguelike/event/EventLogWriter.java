@@ -217,6 +217,15 @@ public final class EventLogWriter {
                                 + at(e.from())
                                 + " to="
                                 + at(e.to()));
+        register(
+                EnemyFell.class,
+                e ->
+                        "EnemyFell enemy="
+                                + id(e.enemy())
+                                + " kind="
+                                + e.kind().value()
+                                + " at="
+                                + at(e.at()));
         register(DoorUnlocked.class, e -> "DoorUnlocked at=" + at(e.at()));
         register(DoorLocked.class, e -> "DoorLocked at=" + at(e.at()));
         register(

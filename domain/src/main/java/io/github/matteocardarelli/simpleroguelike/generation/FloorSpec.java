@@ -6,6 +6,9 @@ package io.github.matteocardarelli.simpleroguelike.generation;
  * @param minSpawnDistance la distanza minima, in passi, tra il player e ogni nemico all'inizio
  * @param maxAttempts quanti terreni provare prima di arrendersi, se uno non basta a rispettare il
  *     resto della specifica
+ * @param itemCountMin quanti oggetti a terra, al minimo
+ * @param itemCountMax quanti oggetti a terra, al massimo: il numero si sceglie a caso tra i due,
+ *     dal seed del piano
  * @param doorCount quante porte, nei corridoi
  * @param chestCount quanti scrigni, ognuno con un oggetto
  * @param gateCount quanti cancelli con la loro leva, ognuno davanti a una zona chiusa con uno
@@ -22,7 +25,8 @@ public record FloorSpec(
         int width,
         int height,
         int enemyCount,
-        int itemCount,
+        int itemCountMin,
+        int itemCountMax,
         int minSpawnDistance,
         int maxAttempts,
         int doorCount,
@@ -39,7 +43,8 @@ public record FloorSpec(
             throw new IllegalArgumentException("Piano troppo piccolo: " + width + "x" + height);
         }
         if (enemyCount < 0
-                || itemCount < 0
+                || itemCountMin < 0
+                || itemCountMax < itemCountMin
                 || minSpawnDistance < 0
                 || maxAttempts < 1
                 || doorCount < 0
@@ -58,7 +63,9 @@ public record FloorSpec(
                     "Valori non validi: enemyCount="
                             + enemyCount
                             + ", itemCount="
-                            + itemCount
+                            + itemCountMin
+                            + ".."
+                            + itemCountMax
                             + ", minSpawnDistance="
                             + minSpawnDistance
                             + ", maxAttempts="
@@ -80,6 +87,40 @@ public record FloorSpec(
                             + ", enemyLevel="
                             + enemyLevel);
         }
+    }
+
+    /** Un piano con un numero fisso di oggetti, {@code itemCount}. */
+    public FloorSpec(
+            int width,
+            int height,
+            int enemyCount,
+            int itemCount,
+            int minSpawnDistance,
+            int maxAttempts,
+            int doorCount,
+            int chestCount,
+            int gateCount,
+            int stairsCount,
+            int lockedDoorCount,
+            int bossCount,
+            int shopChance,
+            int enemyLevel) {
+        this(
+                width,
+                height,
+                enemyCount,
+                itemCount,
+                itemCount,
+                minSpawnDistance,
+                maxAttempts,
+                doorCount,
+                chestCount,
+                gateCount,
+                stairsCount,
+                lockedDoorCount,
+                bossCount,
+                shopChance,
+                enemyLevel);
     }
 
     /** Un piano con i nemici di livello 1. */
