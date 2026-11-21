@@ -335,6 +335,16 @@ class GameViewModelTest {
         assertThat(viewModel.state().selectedItem()).isEmpty();
     }
 
+    @Test
+    void playerFacing_defaultsToDownAndIsRemembered() {
+        GameViewModel viewModel = viewModel();
+
+        assertThat(viewModel.playerFacing()).isEqualTo(Direction.DOWN);
+        viewModel.setPlayerFacing(Direction.LEFT);
+
+        assertThat(viewModel.playerFacing()).isEqualTo(Direction.LEFT);
+    }
+
     /** Dopo una rotazione la nuova Activity non ripete le animazioni già mostrate. */
     @Test
     void claimPlayback_isTrueOnlyTheFirstTimeForARevision() {

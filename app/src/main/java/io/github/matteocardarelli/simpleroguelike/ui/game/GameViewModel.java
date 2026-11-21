@@ -89,6 +89,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
     private boolean inventoryOpen;
     private @Nullable EntityId selectedItem;
     private @Nullable EntityId aimingItem;
+    private Direction playerFacing = Direction.DOWN;
     private boolean previousGameLost;
     private Settings settings;
     private long lastClaimedRevision;
@@ -240,6 +241,19 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         start();
     }
 
+    /**
+     * Dove guarda il player sullo schermo: è solo disegno, ma la nuova Activity dopo una rotazione
+     * deve ripartire da lì e non dal sud.
+     */
+    public Direction playerFacing() {
+        return playerFacing;
+    }
+
+    /** Ricorda dove guarda il player, perché sopravviva alla ricreazione dell'Activity. */
+    public void setPlayerFacing(Direction facing) {
+        this.playerFacing = facing;
+    }
+
     /** Le impostazioni di adesso. */
     public Settings settings() {
         return settings;
@@ -303,6 +317,7 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         inventoryOpen = false;
         selectedItem = null;
         aimingItem = null;
+        playerFacing = Direction.DOWN;
         log.clear();
         TurnResult result = session.newGame(seed);
         saved.set(GAME_IN_PROGRESS, true);
