@@ -107,6 +107,9 @@ final class Sessions {
                 new StandardEnemyCatalog(),
                 ACTIONS,
                 RANGED,
-                JUMPS);
+                JUMPS,
+                java.util.Optional.of(
+                        new CeilingFall(
+                                StandardEnemyCatalog.GIANT_SLIME, StandardEnemyCatalog.GOBLIN)));
     }
 }

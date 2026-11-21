@@ -8,6 +8,7 @@ import io.github.matteocardarelli.simpleroguelike.event.DoorLocked;
 import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
 import io.github.matteocardarelli.simpleroguelike.event.DropRefused;
+import io.github.matteocardarelli.simpleroguelike.event.EnemyFell;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Healed;
 import io.github.matteocardarelli.simpleroguelike.event.InventoryFull;
@@ -852,6 +853,26 @@ public final class Floor implements FloorView {
             events.add(new Moved(player.id(), player.kind(), playerAt, out.get()));
         }
         return List.copyOf(events);
+    }
+
+    /**
+     * Fa comparire un nemico nuovo sul piano, come se cadesse dal soffitto.
+     *
+     * @throws IllegalArgumentException se l'id è già in uso
+     * @throws IllegalStateException se la cella non è libera per l'impronta del nemico
+     */
+    public EnemyFell spawnEnemy(Enemy enemy, Position at) {
+        if (enemies.containsKey(enemy.id()) || positions.containsKey(enemy.id())) {
+            throw new IllegalArgumentException("Id già in uso: " + enemy.id());
+        }
+        for (Position cell : enemy.footprint().at(at)) {
+            if (!isFree(cell)) {
+                throw new IllegalStateException("Cella non libera per " + enemy.id() + ": " + cell);
+            }
+        }
+        enemies.put(enemy.id(), enemy);
+        positions.put(enemy.id(), at);
+        return new EnemyFell(enemy.id(), enemy.kind(), at);
     }
 
     /** Ricorda se l'ultima azione del nemico è stata allontanarsi dal player. */

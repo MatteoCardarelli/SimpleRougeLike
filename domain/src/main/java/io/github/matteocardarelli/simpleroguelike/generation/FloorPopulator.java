@@ -229,7 +229,12 @@ public final class FloorPopulator {
             }
         }
 
-        List<Position> itemCells = take(free, spec.itemCount(), random, "oggetti");
+        int itemCount =
+                spec.itemCountMax() > spec.itemCountMin()
+                        ? spec.itemCountMin()
+                                + random.nextInt(spec.itemCountMax() - spec.itemCountMin() + 1)
+                        : spec.itemCountMin();
+        List<Position> itemCells = take(free, itemCount, random, "oggetti");
         List<ItemDefinition> itemTypes = new ArrayList<>();
         for (int i = 0; i < itemCells.size(); i++) {
             itemTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));

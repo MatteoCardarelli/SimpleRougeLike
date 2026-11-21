@@ -3,6 +3,7 @@ package io.github.matteocardarelli.simpleroguelike.ui.playback;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.Damaged;
 import io.github.matteocardarelli.simpleroguelike.event.Died;
+import io.github.matteocardarelli.simpleroguelike.event.EnemyFell;
 import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
@@ -24,11 +25,15 @@ public final class Animations {
     static final long FLASH_MS = 140;
     static final long FADE_MS = 180;
     static final long LANDING_MS = 260;
+    static final long FALL_MS = 260;
     static final long PROJECTILE_MS_PER_CELL = 35;
     static final long PROJECTILE_MIN_MS = 90;
 
     /** Quanto si sposta verso il bersaglio chi attacca, in celle. */
     static final float BUMP_DISTANCE = 0.3f;
+
+    /** Da quanto in alto, in celle, cade un nemico dal soffitto. */
+    static final float FALL_HEIGHT = 2f;
 
     private Animations() {}
 
@@ -41,6 +46,7 @@ public final class Animations {
         player.register(Fired.class, Animations::projectile);
         player.register(JumpAnnounced.class, Animations::liftOff);
         player.register(Landed.class, Animations::landing);
+        player.register(EnemyFell.class, Animations::dropIn);
         return player;
     }
 
@@ -112,6 +118,27 @@ public final class Animations {
                                                     lerp(from.x(), to.x(), f),
                                                     lerp(from.y(), to.y(), f)));
                         });
+    }
+
+    /**
+     * Un nemico cade dal soffitto: lo sprite compare sopra la sua cella, trasparente, e scende fino
+     * a posarsi mentre prende colore.
+     */
+    static Optional<Animation> dropIn(EnemyFell event, Scene scene) {
+        Sprite sprite =
+                scene.sprite(event.enemy())
+                        .orElseGet(() -> scene.spawn(event.enemy(), event.kind(), event.at()));
+        float x = event.at().x();
+        float y = event.at().y();
+        sprite.setAlpha(0f);
+        sprite.moveTo(x, y - FALL_HEIGHT);
+        return Optional.of(
+                animation(
+                        FALL_MS,
+                        f -> {
+                            sprite.moveTo(x, y - FALL_HEIGHT * (1f - f));
+                            sprite.setAlpha(f);
+                        }));
     }
 
     static Optional<Animation> bump(Attacked event, Scene scene) {

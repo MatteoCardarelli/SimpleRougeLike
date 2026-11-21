@@ -59,6 +59,11 @@ public final class FloorFixtures {
         return parse(new EntityIdSequence(), INVENTORY_CAPACITY, Optional.empty(), true, rows);
     }
 
+    /** Come {@link #parseBossRoom(String...)}, prendendo gli id da una sequenza esistente. */
+    public static Floor parseBossRoom(EntityIdSequence ids, String... rows) {
+        return parse(ids, INVENTORY_CAPACITY, Optional.empty(), true, rows);
+    }
+
     /** Come gli altri, ma con un player che esiste già al posto di {@code @}. */
     public static Floor parse(
             EntityIdSequence ids,

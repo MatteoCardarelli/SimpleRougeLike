@@ -143,7 +143,8 @@ public final class GameSession {
         }
         if (outcome.turnConsumed()) {
             if (floor.player().isAlive()) {
-                events.addAll(enemies.run(current));
+                events.addAll(
+                        enemies.run(current, floorSpecs.get(current.depth() - 1).enemyLevel()));
             }
             for (TurnHook hook : hooks) {
                 if (!floor.player().isAlive()) {

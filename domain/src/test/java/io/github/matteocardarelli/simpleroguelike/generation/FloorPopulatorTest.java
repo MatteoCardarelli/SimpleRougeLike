@@ -337,6 +337,19 @@ class FloorPopulatorTest {
                 .isInstanceOf(FloorGenerationException.class);
     }
 
+    @Test
+    void populate_itemRange_picksFiveToSevenFromTheSeed_reachingBothBounds() {
+        FloorSpec spec = new FloorSpec(10, 7, 0, 5, 7, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1);
+        java.util.Set<Integer> counts = new java.util.TreeSet<>();
+
+        for (long seed = 1; seed <= 60; seed++) {
+            counts.add(populate(spec, seed).itemsOnGround().size());
+        }
+
+        assertThat(counts).containsExactly(5, 6, 7);
+        assertThat(describe(populate(spec, 9))).isEqualTo(describe(populate(spec, 9)));
+    }
+
     private static Floor populate(FloorSpec spec, long seed) {
         return POPULATOR.populate(ROOM, spec, new SeededRandomSource(seed), new EntityIdSequence());
     }
