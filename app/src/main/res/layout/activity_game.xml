@@ -24,7 +24,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|start"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="72dp" />
 
         <!-- Le impostazioni: la partita, il registro dei messaggi e, nelle build di debug, le note -->
         <ImageButton

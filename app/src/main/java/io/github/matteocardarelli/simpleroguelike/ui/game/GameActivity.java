@@ -40,6 +40,7 @@ import io.github.matteocardarelli.simpleroguelike.ui.playback.GatedPlayerInput;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.TurnPlayback;
 import io.github.matteocardarelli.simpleroguelike.ui.render.Camera;
+import io.github.matteocardarelli.simpleroguelike.ui.render.CellSize;
 import io.github.matteocardarelli.simpleroguelike.ui.render.TilePalette;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsHost;
@@ -81,6 +82,7 @@ public class GameActivity extends AppCompatActivity
     private @Nullable Snackbar lostGameNotice;
     private @Nullable Snackbar wareNotice;
     private @Nullable EntityId wareShown;
+    private boolean facingRestored;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,7 +96,7 @@ public class GameActivity extends AppCompatActivity
         playback.setOnIdle(input::flush);
 
         binding.gameView.setUp(
-                new Camera(getResources().getDimension(R.dimen.cell_size)),
+                new Camera(CellSize.pixelPerfect(getResources().getDimension(R.dimen.cell_size))),
                 TilePalette.from(this),
                 content);
         gestures =
@@ -139,6 +141,7 @@ public class GameActivity extends AppCompatActivity
     private void render(GameUiState state) {
         GameSnapshot snapshot = state.result().snapshot();
         playback.show(state.result(), viewModel.claimPlayback(state.result().revision()));
+        restorePlayerFacing(snapshot);
         binding.gameView.show(snapshot, scene);
 
         PlayerBars.showOnMap(binding.bars, snapshot.player(), snapshot.depth(), snapshot.floors());
@@ -165,6 +168,27 @@ public class GameActivity extends AppCompatActivity
         syncInventorySheet(state);
         showLostGameNotice(state.previousGameLost());
         showWare(snapshot);
+    }
+
+    /**
+     * Alla prima visualizzazione di una nuova Activity, dopo una rotazione, il player guarda dove
+     * guardava prima: la scena si ricrea dallo snapshot, che non porta la direzione.
+     */
+    private void restorePlayerFacing(GameSnapshot snapshot) {
+        if (!facingRestored) {
+            facingRestored = true;
+            scene.sprite(snapshot.player().id()).ifPresent(s -> s.face(viewModel.playerFacing()));
+        }
+    }
+
+    /** La direzione del player resta nel ViewModel, che sopravvive alla ricreazione. */
+    @Override
+    protected void onDestroy() {
+        if (viewModel != null && viewModel.uiState().getValue() != null) {
+            scene.sprite(viewModel.state().result().snapshot().player().id())
+                    .ifPresent(s -> viewModel.setPlayerFacing(s.facing()));
+        }
+        super.onDestroy();
     }
 
     /** Nome e salute del boss, quando è visibile. */

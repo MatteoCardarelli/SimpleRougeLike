@@ -455,14 +455,29 @@ public final class GameView extends View {
             Canvas canvas, ContentPresentation content, List<Sprite> effects, float cell) {
         for (Sprite effect : effects) {
             float inset = cell * 0.25f;
-            drawArt(
-                    canvas,
-                    content,
-                    effect.kind(),
-                    effect.x() * cell + inset,
-                    effect.y() * cell + inset,
-                    cell - 2 * inset,
-                    1f);
+            float left = effect.x() * cell + inset;
+            float top = effect.y() * cell + inset;
+            float size = cell - 2 * inset;
+            canvas.save();
+            canvas.rotate(
+                    projectileRotation(effect.facing()),
+                    effect.x() * cell + cell / 2f,
+                    effect.y() * cell + cell / 2f);
+            drawArt(canvas, content, effect.kind(), left, top, size, 1f);
+            canvas.restore();
         }
+    }
+
+    /**
+     * Di quanti gradi, in senso orario sullo schermo, si ruota un proiettile perché punti verso
+     * {@code facing}: le immagini di frecce e coltelli guardano in alto a destra (nord-est).
+     */
+    static float projectileRotation(Direction facing) {
+        return switch (facing) {
+            case RIGHT -> 45f;
+            case DOWN -> 135f;
+            case LEFT -> -135f;
+            case UP -> -45f;
+        };
     }
 }

@@ -7,6 +7,7 @@ import io.github.matteocardarelli.simpleroguelike.event.Fired;
 import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
+import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.Optional;
 
@@ -163,6 +164,10 @@ public final class Animations {
                         shooter ->
                                 Facings.toward(from, event.path().get(0)).ifPresent(shooter::face));
         Sprite projectile = new Sprite(event.shooter(), event.projectile(), from.x(), from.y());
+        // Il proiettile punta dove va: come il tiratore se il percorso non dà una direzione.
+        Direction shooterFacing =
+                scene.sprite(event.shooter()).map(Sprite::facing).orElse(Direction.RIGHT);
+        projectile.face(Facings.toward(from, to).orElse(shooterFacing));
         scene.addEffect(projectile);
         long duration = Math.max(PROJECTILE_MIN_MS, PROJECTILE_MS_PER_CELL * event.path().size());
         return Optional.of(
