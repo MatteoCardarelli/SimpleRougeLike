@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.ui.game;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -30,6 +31,7 @@ import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.feedback.FeedbackHost;
 import io.github.matteocardarelli.simpleroguelike.ui.hud.PlayerBars;
+import io.github.matteocardarelli.simpleroguelike.ui.input.HoldToWalk;
 import io.github.matteocardarelli.simpleroguelike.ui.input.SwipeInputMapper;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryContent;
 import io.github.matteocardarelli.simpleroguelike.ui.inventory.InventoryHost;
@@ -79,6 +81,8 @@ public class GameActivity extends AppCompatActivity
     private TurnPlayback playback;
     private GatedPlayerInput input;
     private GestureDetector gestures;
+    private HoldToWalk walk;
+    private final Runnable repeatStep = this::repeatStep;
     private @Nullable Snackbar lostGameNotice;
     private @Nullable Snackbar wareNotice;
     private @Nullable EntityId wareShown;
@@ -93,17 +97,18 @@ public class GameActivity extends AppCompatActivity
 
         playback = new TurnPlayback(eventPlayer, scene);
         input = new GatedPlayerInput(viewModel, playback);
-        playback.setOnIdle(input::flush);
+        playback.setOnIdle(
+                () -> {
+                    input.flush();
+                    repeatStep();
+                });
 
         binding.gameView.setUp(
                 new Camera(CellSize.pixelPerfect(getResources().getDimension(R.dimen.cell_size))),
                 TilePalette.from(this),
                 content);
-        gestures =
-                new GestureDetector(
-                        this,
-                        new SwipeInputMapper(
-                                input, getResources().getDimension(R.dimen.swipe_min_distance)));
+        gestures = new GestureDetector(this, new SwipeInputMapper(input));
+        walk = new HoldToWalk(getResources().getDimension(R.dimen.swipe_min_distance));
         binding.newGameButton.setOnClickListener(v -> viewModel.newGame());
         binding.settingsButton.setOnClickListener(v -> showSettingsDialog());
         keepTextAwayFromSystemBars();
@@ -111,10 +116,67 @@ public class GameActivity extends AppCompatActivity
         viewModel.uiState().observe(this, this::render);
     }
 
-    /** I tocchi che nessuna vista ha consumato sono gesti sulla mappa. */
+    /**
+     * I tocchi che nessuna vista ha consumato sono gesti sulla mappa: il doppio tap va al
+     * rilevatore, il resto a {@link HoldToWalk}, il joystick invisibile.
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return gestures.onTouchEvent(event) || super.onTouchEvent(event);
+        boolean handled = gestures.onTouchEvent(event);
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN -> {
+                walk.press(event.getX(), event.getY());
+                handled = true;
+            }
+            case MotionEvent.ACTION_MOVE -> {
+                boolean aiming = viewModel.state().aimingItem().isPresent();
+                walk.drag(event.getX(), event.getY(), SystemClock.uptimeMillis(), aiming)
+                        .ifPresent(input::swipe);
+                scheduleRepeat();
+            }
+            case MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> stopWalking();
+            default -> {}
+        }
+        return handled || super.onTouchEvent(event);
+    }
+
+    /**
+     * Il dito non c'è più, o la mappa non è più il bersaglio dei tocchi: si smette di camminare.
+     */
+    private void stopWalking() {
+        walk.release();
+        binding.getRoot().removeCallbacks(repeatStep);
+    }
+
+    @Override
+    protected void onPause() {
+        stopWalking();
+        super.onPause();
+    }
+
+    /**
+     * Ripete il passo tenuto, se si può: a riproduzione finita e dopo l'attesa minima. Se manca
+     * ancora tempo si riprova alla scadenza; se la riproduzione è in corso ci pensa la sua fine.
+     */
+    private void repeatStep() {
+        binding.getRoot().removeCallbacks(repeatStep);
+        if (playback.isBusy()) {
+            return;
+        }
+        long now = SystemClock.uptimeMillis();
+        long wait = walk.repeatWait(now);
+        if (wait > 0) {
+            binding.getRoot().postDelayed(repeatStep, wait);
+        } else if (wait == 0) {
+            walk.repeat(now).ifPresent(input::swipe);
+        }
+    }
+
+    /** Dopo un primo passo ancora in coda o già mostrato, prepara la ripetizione. */
+    private void scheduleRepeat() {
+        if (!playback.isBusy()) {
+            repeatStep();
+        }
     }
 
     /**
@@ -140,6 +202,10 @@ public class GameActivity extends AppCompatActivity
      */
     private void render(GameUiState state) {
         GameSnapshot snapshot = state.result().snapshot();
+        walk.onTurnShown(TurnSummaries.of(state.result(), snapshot.player().id()));
+        if (state.inventoryOpen()) {
+            stopWalking();
+        }
         playback.show(state.result(), viewModel.claimPlayback(state.result().revision()));
         restorePlayerFacing(snapshot);
         binding.gameView.show(snapshot, scene);
