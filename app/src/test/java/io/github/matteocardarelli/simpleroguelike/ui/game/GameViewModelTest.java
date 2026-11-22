@@ -514,6 +514,18 @@ class GameViewModelTest {
     }
 
     @Test
+    void setSoundOn_savesTheChoice_andIsReadAfterARestart() {
+        GameViewModel viewModel = viewModel();
+        assertThat(viewModel.settings().soundOn()).isTrue();
+
+        viewModel.setSoundOn(false);
+
+        assertThat(settings.load().soundOn()).isFalse();
+        assertThat(viewModel().settings().soundOn()).isFalse();
+        assertThat(viewModel().settings().logVisible()).isTrue();
+    }
+
+    @Test
     void newGame_keepsTheSettings() {
         GameViewModel viewModel = viewModel();
         viewModel.setLogVisible(false);

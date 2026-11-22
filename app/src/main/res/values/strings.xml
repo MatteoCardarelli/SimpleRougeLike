@@ -148,6 +148,9 @@
     <string name="settings_section_screen">Schermata</string>
     <string name="settings_show_log">Mostra il registro dei messaggi</string>
     <string name="settings_show_log_summary">Le ultime azioni, in fondo alla mappa</string>
+    <string name="settings_section_audio">Audio</string>
+    <string name="settings_sound">Suoni</string>
+    <string name="settings_sound_summary">Effetti sonori, al volume dei contenuti multimediali</string>
     <string name="settings_section_testing">Collaudo</string>
     <string name="settings_write_note">Scrivi una nota di collaudo</string>
     <string name="settings_write_note_summary">Cosa non va, con la partita per rigiocarla</string>

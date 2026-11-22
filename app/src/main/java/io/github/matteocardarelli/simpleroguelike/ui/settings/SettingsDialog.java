@@ -20,10 +20,10 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Le impostazioni, a tutto schermo e scure come il gioco: il seed della partita da copiare, la
- * partita nuova, l'interruttore del registro dei messaggi e, nelle build di debug, la nota di
- * collaudo. Si chiudono con la X in alto o con indietro. È un {@link DialogFragment}: dopo una
- * rotazione il sistema la ricrea. Conosce solo {@link SettingsHost}, che l'Activity deve
- * implementare.
+ * partita nuova, l'interruttore del registro dei messaggi, quello dei suoni e, nelle build di
+ * debug, la nota di collaudo. Si chiudono con la X in alto o con indietro. È un {@link
+ * DialogFragment}: dopo una rotazione il sistema la ricrea. Conosce solo {@link SettingsHost}, che
+ * l'Activity deve implementare.
  */
 public final class SettingsDialog extends DialogFragment {
 
@@ -58,6 +58,10 @@ public final class SettingsDialog extends DialogFragment {
         binding.logSwitch.setChecked(host().currentSettings().logVisible());
         binding.logSwitch.setOnCheckedChangeListener(
                 (button, checked) -> host().onLogVisibilityChanged(checked));
+
+        binding.soundSwitch.setChecked(host().currentSettings().soundOn());
+        binding.soundSwitch.setOnCheckedChangeListener(
+                (button, checked) -> host().onSoundChanged(checked));
 
         if (getResources().getBoolean(R.bool.feedback_enabled)) {
             binding.testingSection.setVisibility(View.VISIBLE);

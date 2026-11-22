@@ -13,6 +13,7 @@ public final class PreferencesSettingsStore implements SettingsStore {
     public static final String FILE = "settings";
 
     private static final String LOG_VISIBLE = "log_visible";
+    private static final String SOUND_ON = "sound_on";
 
     private final SharedPreferences preferences;
 
@@ -22,11 +23,17 @@ public final class PreferencesSettingsStore implements SettingsStore {
 
     @Override
     public Settings load() {
-        return new Settings(preferences.getBoolean(LOG_VISIBLE, Settings.DEFAULT.logVisible()));
+        return new Settings(
+                preferences.getBoolean(LOG_VISIBLE, Settings.DEFAULT.logVisible()),
+                preferences.getBoolean(SOUND_ON, Settings.DEFAULT.soundOn()));
     }
 
     @Override
     public void save(Settings settings) {
-        preferences.edit().putBoolean(LOG_VISIBLE, settings.logVisible()).apply();
+        preferences
+                .edit()
+                .putBoolean(LOG_VISIBLE, settings.logVisible())
+                .putBoolean(SOUND_ON, settings.soundOn())
+                .apply();
     }
 }

@@ -229,6 +229,14 @@ class AppArchitectureTest {
                                     + " sessione, e i test lo provano sulla JVM senza Android");
 
     @ArchTest
+    static final ArchRule uiSoundUsesOnlyPlayback =
+            onlyDependOn(
+                    "ui.sound",
+                    "la scelta dei suoni dipende solo dagli eventi, e suona attraverso"
+                            + " l'ascoltatore della riproduzione",
+                    "ui.playback");
+
+    @ArchTest
     static final ArchRule uiLogUsesOnlyContent =
             onlyDependOn(
                     "ui.log",

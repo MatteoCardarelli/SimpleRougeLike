@@ -268,6 +268,14 @@ public final class GameViewModel extends ViewModel implements PlayerInput {
         }
     }
 
+    /** Accende o spegne i suoni, e lo ricorda anche dopo la chiusura dell'app. */
+    public void setSoundOn(boolean on) {
+        if (settings.soundOn() != on) {
+            settings = settings.withSoundOn(on);
+            settingsStore.save(settings);
+        }
+    }
+
     /** Il giocatore ha letto l'avviso della partita persa. */
     public void acknowledgeLostGame() {
         previousGameLost = false;
