@@ -269,31 +269,42 @@ public final class GameView extends View {
                 continue;
             }
             ActorView jumper = phases.get(sprite.id());
+            float alpha = sprite.alpha();
+            float width = side;
+            float height = side;
             if (jumper != null && jumper.charging()) {
                 float wider = side * SQUASH / 2;
-                drawArt(
-                        canvas,
-                        content,
-                        sprite.kind(),
-                        x - wider,
-                        y + side * SQUASH,
-                        side + 2 * wider,
-                        side * (1 - SQUASH),
-                        sprite.alpha());
+                x -= wider;
+                y += side * SQUASH;
+                width = side + 2 * wider;
+                height = side * (1 - SQUASH);
             } else if (jumper != null && jumper.airborne()) {
-                drawArt(
-                        canvas,
-                        content,
-                        sprite.kind(),
-                        x,
-                        y - side * LIFT,
-                        side,
-                        side,
-                        sprite.alpha() * 0.85f);
+                y -= side * LIFT;
+                alpha *= 0.85f;
+            } else if (sprite.walkFrame() >= 0) {
+                y -= Math.round(2 * (sprite.walkFrame() % 2) * cell / 64f);
+            }
+            int actorSprite = ActorSprites.sprite(sprite.kind(), sprite.facing());
+            if (actorSprite != 0) {
+                drawActor(canvas, actorSprite, x, y, width, height, alpha);
             } else {
-                drawArt(canvas, content, sprite.kind(), x, y, side, side, sprite.alpha());
+                drawArt(canvas, content, sprite.kind(), x, y, width, height, alpha);
             }
         }
+    }
+
+    /** Un attore in pixel art nel rettangolo che parte da (x, y). */
+    private void drawActor(
+            Canvas canvas, int id, float x, float y, float width, float height, float alpha) {
+        PixelSprites pixels = sprites;
+        if (pixels == null) {
+            pixels = new PixelSprites(getContext());
+            sprites = pixels;
+        }
+        bitmapPaint.setColorFilter(null);
+        bitmapPaint.setAlpha(Math.round(alpha * 255));
+        bitmapBounds.set(x, y, x + width, y + height);
+        canvas.drawBitmap(pixels.bitmap(id), null, bitmapBounds, bitmapPaint);
     }
 
     /** L'eroe: l'immagine pixel art per dove guarda e per il fotogramma di camminata. */

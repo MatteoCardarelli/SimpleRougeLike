@@ -50,6 +50,14 @@ class ContentPresentationTest {
         }
     }
 
+    /** Ogni nemico del catalogo ha la sua immagine pixel art. */
+    @Test
+    void everyEnemyOfTheCatalog_hasItsSprite() {
+        for (EnemyDefinition enemy : new StandardEnemyCatalog().all()) {
+            assertThat(content.spriteRes(enemy.kind())).as(enemy.kind().value()).isNotZero();
+        }
+    }
+
     @Test
     void style_withoutSprite_hasNone() {
         assertThat(new ContentPresentation.Style(1, 1, 1, 1).sprite()).isZero();

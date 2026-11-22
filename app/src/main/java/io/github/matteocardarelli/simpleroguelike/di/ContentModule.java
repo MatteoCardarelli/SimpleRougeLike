@@ -215,10 +215,11 @@ public final class ContentModule {
         styles.put(
                 StandardEnemyCatalog.GOBLIN,
                 new ContentPresentation.Style(
-                        R.string.kind_goblin_name,
-                        R.string.kind_goblin_description,
-                        R.color.kind_goblin,
-                        R.drawable.art_goblin));
+                                R.string.kind_goblin_name,
+                                R.string.kind_goblin_description,
+                                R.color.kind_goblin,
+                                R.drawable.art_goblin)
+                        .withSprite(R.drawable.enemy_goblin_south));
         styles.put(
                 StandardItemCatalog.THROWING_KNIFE,
                 new ContentPresentation.Style(
@@ -230,31 +231,35 @@ public final class ContentModule {
         styles.put(
                 StandardEnemyCatalog.ARCHER,
                 new ContentPresentation.Style(
-                        R.string.kind_archer_name,
-                        R.string.kind_archer_description,
-                        R.color.kind_archer,
-                        R.drawable.art_archer));
+                                R.string.kind_archer_name,
+                                R.string.kind_archer_description,
+                                R.color.kind_archer,
+                                R.drawable.art_archer)
+                        .withSprite(R.drawable.enemy_archer_south));
         styles.put(
                 StandardEnemyCatalog.GIANT_SLIME,
                 new ContentPresentation.Style(
-                        R.string.kind_giant_slime_name,
-                        R.string.kind_giant_slime_description,
-                        R.color.kind_giant_slime,
-                        R.drawable.art_giant_slime));
+                                R.string.kind_giant_slime_name,
+                                R.string.kind_giant_slime_description,
+                                R.color.kind_giant_slime,
+                                R.drawable.art_giant_slime)
+                        .withSprite(R.drawable.boss_giant_slime));
         styles.put(
                 StandardEnemyCatalog.WOLF,
                 new ContentPresentation.Style(
-                        R.string.kind_wolf_name,
-                        R.string.kind_wolf_description,
-                        R.color.kind_wolf,
-                        R.drawable.art_wolf));
+                                R.string.kind_wolf_name,
+                                R.string.kind_wolf_description,
+                                R.color.kind_wolf,
+                                R.drawable.art_wolf)
+                        .withSprite(R.drawable.enemy_wolf_south));
         styles.put(
                 StandardEnemyCatalog.SPIDER,
                 new ContentPresentation.Style(
-                        R.string.kind_spider_name,
-                        R.string.kind_spider_description,
-                        R.color.kind_spider,
-                        R.drawable.art_spider));
+                                R.string.kind_spider_name,
+                                R.string.kind_spider_description,
+                                R.color.kind_spider,
+                                R.drawable.art_spider)
+                        .withSprite(R.drawable.enemy_spider_south));
         styles.put(
                 StandardItemCatalog.KEY,
                 new ContentPresentation.Style(
@@ -288,10 +293,11 @@ public final class ContentModule {
         styles.put(
                 StandardEnemyCatalog.MERCHANT,
                 new ContentPresentation.Style(
-                        R.string.kind_merchant_name,
-                        R.string.kind_merchant_description,
-                        R.color.kind_merchant,
-                        R.drawable.art_merchant));
+                                R.string.kind_merchant_name,
+                                R.string.kind_merchant_description,
+                                R.color.kind_merchant,
+                                R.drawable.art_merchant)
+                        .withSprite(R.drawable.enemy_merchant_south));
         styles.put(
                 StandardItemCatalog.COINS,
                 new ContentPresentation.Style(
