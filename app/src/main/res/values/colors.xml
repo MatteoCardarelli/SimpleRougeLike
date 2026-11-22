@@ -9,10 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Le celle: visibile ed esplorata si distinguono per luminosità, non solo per tinta -->
-    <color name="tile_visible_floor">#FF444444</color>
-    <color name="tile_visible_wall">#FF8B4513</color>
-    <color name="tile_explored_floor">#FF282828</color>
-    <color name="tile_explored_wall">#FF321905</color>
 
     <!-- Gli attori e gli oggetti, finché non arrivano le illustrazioni -->
     <color name="kind_player">#FF00FF00</color>

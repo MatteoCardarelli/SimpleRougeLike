@@ -130,59 +130,67 @@ public final class ContentModule {
         styles.put(
                 StandardItemCatalog.POTION,
                 new ContentPresentation.Style(
-                        R.string.kind_potion_name,
-                        R.string.kind_potion_description,
-                        R.color.kind_potion,
-                        R.drawable.art_potion));
+                                R.string.kind_potion_name,
+                                R.string.kind_potion_description,
+                                R.color.kind_potion,
+                                R.drawable.art_potion)
+                        .withSprite(R.drawable.item_potion));
         styles.put(
                 StandardItemCatalog.GREATER_POTION,
                 new ContentPresentation.Style(
-                        R.string.kind_greater_potion_name,
-                        R.string.kind_greater_potion_description,
-                        R.color.kind_greater_potion,
-                        R.drawable.art_greater_potion));
+                                R.string.kind_greater_potion_name,
+                                R.string.kind_greater_potion_description,
+                                R.color.kind_greater_potion,
+                                R.drawable.art_greater_potion)
+                        .withSprite(R.drawable.item_greater_potion));
         styles.put(
                 StandardItemCatalog.SWORD,
                 new ContentPresentation.Style(
-                        R.string.kind_sword_name,
-                        R.string.kind_sword_description,
-                        R.color.kind_sword,
-                        R.drawable.art_sword));
+                                R.string.kind_sword_name,
+                                R.string.kind_sword_description,
+                                R.color.kind_sword,
+                                R.drawable.art_sword)
+                        .withSprite(R.drawable.item_sword));
         styles.put(
                 StandardItemCatalog.AXE,
                 new ContentPresentation.Style(
-                        R.string.kind_axe_name,
-                        R.string.kind_axe_description,
-                        R.color.kind_axe,
-                        R.drawable.art_axe));
+                                R.string.kind_axe_name,
+                                R.string.kind_axe_description,
+                                R.color.kind_axe,
+                                R.drawable.art_axe)
+                        .withSprite(R.drawable.item_axe));
         styles.put(
                 StandardItemCatalog.LEATHER_ARMOR,
                 new ContentPresentation.Style(
-                        R.string.kind_leather_armor_name,
-                        R.string.kind_leather_armor_description,
-                        R.color.kind_leather_armor,
-                        R.drawable.art_leather_armor));
+                                R.string.kind_leather_armor_name,
+                                R.string.kind_leather_armor_description,
+                                R.color.kind_leather_armor,
+                                R.drawable.art_leather_armor)
+                        .withSprite(R.drawable.item_leather_armor));
         styles.put(
                 StandardItemCatalog.CHAIN_MAIL,
                 new ContentPresentation.Style(
-                        R.string.kind_chain_mail_name,
-                        R.string.kind_chain_mail_description,
-                        R.color.kind_chain_mail,
-                        R.drawable.art_chain_mail));
+                                R.string.kind_chain_mail_name,
+                                R.string.kind_chain_mail_description,
+                                R.color.kind_chain_mail,
+                                R.drawable.art_chain_mail)
+                        .withSprite(R.drawable.item_chain_mail));
         styles.put(
                 StandardItemCatalog.RING_OF_ACCURACY,
                 new ContentPresentation.Style(
-                        R.string.kind_ring_of_accuracy_name,
-                        R.string.kind_ring_of_accuracy_description,
-                        R.color.kind_ring_of_accuracy,
-                        R.drawable.art_ring_of_accuracy));
+                                R.string.kind_ring_of_accuracy_name,
+                                R.string.kind_ring_of_accuracy_description,
+                                R.color.kind_ring_of_accuracy,
+                                R.drawable.art_ring_of_accuracy)
+                        .withSprite(R.drawable.item_ring_of_accuracy));
         styles.put(
                 StandardItemCatalog.RING_OF_VIGOR,
                 new ContentPresentation.Style(
-                        R.string.kind_ring_of_vigor_name,
-                        R.string.kind_ring_of_vigor_description,
-                        R.color.kind_ring_of_vigor,
-                        R.drawable.art_ring_of_vigor));
+                                R.string.kind_ring_of_vigor_name,
+                                R.string.kind_ring_of_vigor_description,
+                                R.color.kind_ring_of_vigor,
+                                R.drawable.art_ring_of_vigor)
+                        .withSprite(R.drawable.item_ring_of_vigor));
         styles.put(
                 StandardEnemyCatalog.GOBLIN,
                 new ContentPresentation.Style(
@@ -193,10 +201,11 @@ public final class ContentModule {
         styles.put(
                 StandardItemCatalog.THROWING_KNIFE,
                 new ContentPresentation.Style(
-                        R.string.kind_throwing_knife_name,
-                        R.string.kind_throwing_knife_description,
-                        R.color.kind_throwing_knife,
-                        R.drawable.art_throwing_knife));
+                                R.string.kind_throwing_knife_name,
+                                R.string.kind_throwing_knife_description,
+                                R.color.kind_throwing_knife,
+                                R.drawable.art_throwing_knife)
+                        .withSprite(R.drawable.item_throwing_knife));
         styles.put(
                 StandardEnemyCatalog.ARCHER,
                 new ContentPresentation.Style(
@@ -221,17 +230,19 @@ public final class ContentModule {
         styles.put(
                 StandardItemCatalog.KEY,
                 new ContentPresentation.Style(
-                        R.string.kind_key_name,
-                        R.string.kind_key_description,
-                        R.color.kind_key,
-                        R.drawable.art_key));
+                                R.string.kind_key_name,
+                                R.string.kind_key_description,
+                                R.color.kind_key,
+                                R.drawable.art_key)
+                        .withSprite(R.drawable.item_key));
         styles.put(
                 StandardItemCatalog.BOSS_KEY,
                 new ContentPresentation.Style(
-                        R.string.kind_boss_key_name,
-                        R.string.kind_boss_key_description,
-                        R.color.kind_boss_key,
-                        R.drawable.art_boss_key));
+                                R.string.kind_boss_key_name,
+                                R.string.kind_boss_key_description,
+                                R.color.kind_boss_key,
+                                R.drawable.art_boss_key)
+                        .withSprite(R.drawable.item_boss_key));
         styles.put(
                 FixtureType.LOCKED_DOOR.kind(),
                 new ContentPresentation.Style(
@@ -256,10 +267,11 @@ public final class ContentModule {
         styles.put(
                 StandardItemCatalog.COINS,
                 new ContentPresentation.Style(
-                        R.string.kind_coins_name,
-                        R.string.kind_coins_description,
-                        R.color.kind_coins,
-                        R.drawable.art_coins));
+                                R.string.kind_coins_name,
+                                R.string.kind_coins_description,
+                                R.color.kind_coins,
+                                R.drawable.art_coins)
+                        .withSprite(R.drawable.item_coins));
         // Gli oggetti fissi del piano.
         styles.put(
                 FixtureType.STAIRS.kind(),
@@ -300,10 +312,11 @@ public final class ContentModule {
         styles.put(
                 RangedRules.ARROW,
                 new ContentPresentation.Style(
-                        R.string.kind_arrow_name,
-                        R.string.kind_arrow_description,
-                        R.color.kind_arrow,
-                        R.drawable.art_arrow));
+                                R.string.kind_arrow_name,
+                                R.string.kind_arrow_description,
+                                R.color.kind_arrow,
+                                R.drawable.art_arrow)
+                        .withSprite(R.drawable.item_arrow));
         return new ContentPresentation(styles);
     }
 

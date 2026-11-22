@@ -40,6 +40,19 @@ class ContentPresentationTest {
         }
     }
 
+    /** Ogni oggetto del catalogo ha la sua immagine pixel art. */
+    @Test
+    void everyItemOfTheCatalog_hasItsSprite() {
+        for (ItemDefinition item : new StandardItemCatalog().all()) {
+            assertThat(content.spriteRes(item.kind())).as(item.kind().value()).isNotZero();
+        }
+    }
+
+    @Test
+    void style_withoutSprite_hasNone() {
+        assertThat(new ContentPresentation.Style(1, 1, 1, 1).sprite()).isZero();
+    }
+
     @Test
     void style_withoutArt_isRejected() {
         assertThatThrownBy(() -> new ContentPresentation.Style(1, 1, 1, 0))

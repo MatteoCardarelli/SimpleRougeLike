@@ -11,6 +11,7 @@ import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.databinding.ItemInventoryEntryBinding;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
+import io.github.matteocardarelli.simpleroguelike.ui.content.ArtViews;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import java.util.List;
 import java.util.function.Consumer;
@@ -75,7 +76,7 @@ final class InventoryAdapter extends ListAdapter<InventoryEntry, InventoryAdapte
                                 .getString(R.string.inventory_count, kindName, entry.count())
                         : kindName;
         binding.name.setText(name);
-        binding.art.setImageResource(content.artRes(entry.kind()));
+        ArtViews.show(binding.art, content, entry.kind());
         binding.equipped.setVisibility(entry.equipped() ? View.VISIBLE : View.GONE);
         binding.getRoot()
                 .setContentDescription(

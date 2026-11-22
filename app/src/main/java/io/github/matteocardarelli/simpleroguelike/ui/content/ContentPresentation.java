@@ -24,7 +24,22 @@ public final class ContentPresentation {
             @StringRes int name,
             @StringRes int description,
             @ColorRes int color,
-            @DrawableRes int art) {
+            @DrawableRes int art,
+            @DrawableRes int sprite) {
+
+        /** Un aspetto senza pixel art, solo con l'illustrazione vettoriale. */
+        public Style(
+                @StringRes int name,
+                @StringRes int description,
+                @ColorRes int color,
+                @DrawableRes int art) {
+            this(name, description, color, art, 0);
+        }
+
+        /** Lo stesso aspetto con la sua immagine pixel art. */
+        public Style withSprite(@DrawableRes int sprite) {
+            return new Style(name, description, color, art, sprite);
+        }
 
         public Style {
             if (art == 0) {
@@ -58,6 +73,12 @@ public final class ContentPresentation {
     @DrawableRes
     public int artRes(Kind kind) {
         return style(kind).art();
+    }
+
+    /** L'immagine pixel art del {@code Kind}, o 0 se ha solo l'illustrazione vettoriale. */
+    @DrawableRes
+    public int spriteRes(Kind kind) {
+        return style(kind).sprite();
     }
 
     /** I {@code Kind} che hanno un aspetto. */

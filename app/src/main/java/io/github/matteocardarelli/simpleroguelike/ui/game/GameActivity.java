@@ -43,7 +43,6 @@ import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.TurnPlayback;
 import io.github.matteocardarelli.simpleroguelike.ui.render.Camera;
 import io.github.matteocardarelli.simpleroguelike.ui.render.CellSize;
-import io.github.matteocardarelli.simpleroguelike.ui.render.TilePalette;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsHost;
 import java.io.IOException;
@@ -105,7 +104,6 @@ public class GameActivity extends AppCompatActivity
 
         binding.gameView.setUp(
                 new Camera(CellSize.pixelPerfect(getResources().getDimension(R.dimen.cell_size))),
-                TilePalette.from(this),
                 content);
         gestures = new GestureDetector(this, new SwipeInputMapper(input));
         walk = new HoldToWalk(getResources().getDimension(R.dimen.swipe_min_distance));
