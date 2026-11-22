@@ -16,7 +16,7 @@ final class FixtureSprites {
         return switch (kind) {
             case "door" -> open ? R.drawable.fixture_door_open : R.drawable.fixture_door;
             case "locked_door" ->
-                    open ? R.drawable.fixture_locked_door_open : R.drawable.fixture_locked_door;
+                    open ? R.drawable.fixture_door_open : R.drawable.fixture_locked_door;
             case "boss_door" ->
                     open ? R.drawable.fixture_boss_door_open : R.drawable.fixture_boss_door;
             case "gate" -> open ? R.drawable.fixture_gate_open : R.drawable.fixture_gate;

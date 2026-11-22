@@ -9,6 +9,7 @@ import io.github.matteocardarelli.simpleroguelike.event.JumpAnnounced;
 import io.github.matteocardarelli.simpleroguelike.event.Landed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
+import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.Optional;
 
@@ -21,13 +22,21 @@ import java.util.Optional;
 public final class Animations {
 
     static final long STEP_MS = 110;
-    static final long BUMP_MS = 120;
+    static final long BUMP_MS = 150;
     static final long FLASH_MS = 140;
-    static final long FADE_MS = 180;
+    static final long FADE_MS = 210;
     static final long LANDING_MS = 260;
     static final long FALL_MS = 260;
     static final long PROJECTILE_MS_PER_CELL = 35;
     static final long PROJECTILE_MIN_MS = 90;
+
+    /** Il segno degli effetti di UI: non sono contenuto di gioco e non hanno uno stile. */
+    public static final Kind FX_SLASH = Kind.of("fx_slash");
+
+    public static final Kind FX_PUFF = Kind.of("fx_puff");
+
+    static final int SLASH_FRAMES = 3;
+    static final int PUFF_FRAMES = 4;
 
     /** Quanto si sposta verso il bersaglio chi attacca, in celle. */
     static final float BUMP_DISTANCE = 0.3f;
@@ -148,9 +157,16 @@ public final class Animations {
                             Position from = event.attackerAt();
                             Position to = event.targetAt();
                             Facings.toward(from, to).ifPresent(sprite::face);
+                            Sprite slash = new Sprite(event.target(), FX_SLASH, to.x(), to.y());
+                            slash.setWalkFrame(0);
+                            scene.addEffect(slash);
                             return animation(
                                     BUMP_MS,
                                     f -> {
+                                        slash.setWalkFrame(frameAt(f, SLASH_FRAMES));
+                                        if (f >= 1f) {
+                                            scene.removeEffect(slash);
+                                        }
                                         float push = BUMP_DISTANCE * (float) Math.sin(Math.PI * f);
                                         sprite.moveTo(
                                                 from.x() + (to.x() - from.x()) * push,
@@ -177,7 +193,22 @@ public final class Animations {
 
     static Optional<Animation> fade(Died event, Scene scene) {
         return scene.sprite(event.actor())
-                .map(sprite -> animation(FADE_MS, f -> sprite.setAlpha(1f - f)));
+                .map(
+                        sprite -> {
+                            Sprite puff =
+                                    new Sprite(event.actor(), FX_PUFF, sprite.x(), sprite.y());
+                            puff.setWalkFrame(0);
+                            scene.addEffect(puff);
+                            return animation(
+                                    FADE_MS,
+                                    f -> {
+                                        sprite.setAlpha(1f - f);
+                                        puff.setWalkFrame(frameAt(f, PUFF_FRAMES));
+                                        if (f >= 1f) {
+                                            scene.removeEffect(puff);
+                                        }
+                                    });
+                        });
     }
 
     static Optional<Animation> projectile(Fired event, Scene scene) {
@@ -206,6 +237,11 @@ public final class Animations {
                                 scene.removeEffect(projectile);
                             }
                         }));
+    }
+
+    /** Il fotogramma, da 0 a {@code frames - 1}, di un effetto alla frazione {@code fraction}. */
+    static int frameAt(float fraction, int frames) {
+        return Math.min(frames - 1, (int) (fraction * frames));
     }
 
     private static float lerp(int from, int to, float fraction) {

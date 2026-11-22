@@ -434,6 +434,17 @@ public final class GameView extends View {
     private void drawEffects(
             Canvas canvas, ContentPresentation content, List<Sprite> effects, float cell) {
         for (Sprite effect : effects) {
+            int fx = EffectSprites.drawable(effect.kind(), effect.walkFrame());
+            if (fx != 0 && sprites != null) {
+                drawBitmap(
+                        canvas,
+                        sprites.bitmap(fx),
+                        effect.x() * cell,
+                        effect.y() * cell,
+                        cell,
+                        255);
+                continue;
+            }
             float inset = cell * 0.25f;
             float left = effect.x() * cell + inset;
             float top = effect.y() * cell + inset;
