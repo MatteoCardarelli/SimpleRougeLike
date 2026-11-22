@@ -9,6 +9,7 @@ final class Rules {
     static final DamageRules DAMAGE = new DamageRules(LEVELING);
     static final CombatRules COMBAT = new CombatRules(DAMAGE);
     static final ActionRules ACTIONS = new ActionRules(COMBAT);
+    static final PoisonRules POISON = new PoisonRules(DAMAGE);
 
     private Rules() {}
 }

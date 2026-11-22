@@ -28,6 +28,7 @@ import java.util.Optional;
  * K  porta chiusa a chiave   k  chiave a terra
  * S  slime gigante, con la cella di riferimento in alto a sinistra del suo cerchio 4×4
  * M  mercante           c  mucchio di monete
+ * x  ragno
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -137,6 +138,7 @@ public final class FloorFixtures {
                     }
                     case 'S' -> builder.enemy(new Enemy(ids.next(), giantSlime()), at);
                     case 'M' -> builder.enemy(new Enemy(ids.next(), merchant()), at);
+                    case 'x' -> builder.enemy(new Enemy(ids.next(), spider()), at);
                     case 'c' ->
                             builder.item(new Item(ids.next(), item(StandardItemCatalog.COINS)), at);
                     case '-' ->
@@ -199,6 +201,10 @@ public final class FloorFixtures {
 
     public static EnemyDefinition merchant() {
         return new StandardEnemyCatalog().all().get(4);
+    }
+
+    public static EnemyDefinition spider() {
+        return new StandardEnemyCatalog().all().get(5);
     }
 
     public static ItemDefinition potion() {

@@ -72,7 +72,8 @@ public final class SnapshotMapper {
                                 enemy.footprint().size(),
                                 enemy.isBoss(),
                                 enemy.jumpPhase() == JumpPhase.CHARGING,
-                                enemy.isAirborne()));
+                                enemy.isAirborne(),
+                                enemy.poisonTurns()));
                 if (enemy.pendingJump().isPresent()) {
                     danger.addAll(enemy.footprint().at(enemy.pendingJump().get()));
                 }
@@ -116,7 +117,8 @@ public final class SnapshotMapper {
                         player.stats().evasion(),
                         player.coins(),
                         player.keys(KeyType.COMMON),
-                        player.keys(KeyType.BOSS));
+                        player.keys(KeyType.BOSS),
+                        player.poisonTurns());
 
         List<FixtureView> fixtures = new ArrayList<>();
         for (Map.Entry<Position, Fixture> entry : floor.fixtures().entrySet()) {

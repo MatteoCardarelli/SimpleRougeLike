@@ -25,6 +25,9 @@ import io.github.matteocardarelli.simpleroguelike.event.MerchantAngered;
 import io.github.matteocardarelli.simpleroguelike.event.MerchantGreeted;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
+import io.github.matteocardarelli.simpleroguelike.event.PoisonCured;
+import io.github.matteocardarelli.simpleroguelike.event.PoisonEnded;
+import io.github.matteocardarelli.simpleroguelike.event.Poisoned;
 import io.github.matteocardarelli.simpleroguelike.event.WareTaken;
 import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
@@ -353,6 +356,64 @@ public final class Floor implements FloorView {
         return new DamageResult(applied, actor.health(), killed, events);
     }
 
+    /** Quanti turni dura il veleno, da quando l'attore è avvelenato o riavvelenato. */
+    public static final int POISON_TURNS = 5;
+
+    /**
+     * Avvelena un attore vivo per {@link #POISON_TURNS} turni: se era già avvelenato ricomincia da
+     * capo, senza sommare il danno.
+     *
+     * @return vuoto se l'attore è morto
+     */
+    public Optional<Poisoned> poison(EntityId target) {
+        Actor actor = requireActor(target);
+        if (!actor.isAlive()) {
+            return Optional.empty();
+        }
+        actor.poisonFor(POISON_TURNS);
+        return Optional.of(new Poisoned(target, positionOf(target), POISON_TURNS));
+    }
+
+    /**
+     * Toglie il veleno a un attore.
+     *
+     * @return vuoto se l'attore non era avvelenato
+     */
+    public Optional<PoisonCured> curePoison(EntityId target) {
+        Actor actor = requireActor(target);
+        if (!actor.curePoison()) {
+            return Optional.empty();
+        }
+        return Optional.of(new PoisonCured(target, positionOf(target)));
+    }
+
+    /** Gli attori vivi avvelenati: il player per primo, poi i nemici. */
+    public List<EntityId> poisonedActors() {
+        List<EntityId> poisoned = new ArrayList<>();
+        if (player.isAlive() && player.isPoisoned()) {
+            poisoned.add(player.id());
+        }
+        for (Enemy enemy : enemies()) {
+            if (enemy.isAlive() && enemy.isPoisoned()) {
+                poisoned.add(enemy.id());
+            }
+        }
+        return poisoned;
+    }
+
+    /**
+     * Consuma un turno di veleno di un attore vivo.
+     *
+     * @return {@code PoisonEnded} se il veleno è finito con questo turno, altrimenti vuoto
+     */
+    public Optional<PoisonEnded> wearPoison(EntityId target) {
+        Actor actor = requireActor(target);
+        if (actor.isAlive() && actor.wearPoison()) {
+            return Optional.of(new PoisonEnded(target, positionOf(target)));
+        }
+        return Optional.empty();
+    }
+
     /**
      * Cura un attore vivo, senza superare la sua salute massima.
      *
@@ -422,7 +483,8 @@ public final class Floor implements FloorView {
     /**
      * Usa un oggetto dell'inventario: applica il suo effetto e, se è consumabile, lo toglie.
      *
-     * @return {@code ItemUsed} seguito dagli eventi dell'effetto
+     * @return {@code ItemUsed} seguito dagli eventi dell'effetto; vuoto, senza consumare niente, se
+     *     l'effetto rifiuta di agire (un antidoto senza veleno)
      * @throws IllegalArgumentException se {@code user} non è il player o l'oggetto non è nel suo
      *     inventario
      * @throws IllegalStateException se il player è morto
@@ -437,9 +499,14 @@ public final class Floor implements FloorView {
                                 () ->
                                         new IllegalArgumentException(
                                                 itemId + " non è nell'inventario"));
+        List<GameEvent> effectEvents =
+                item.definition().effect().apply(new EffectContext(user, this, random));
+        if (!item.definition().effect().spentBy(effectEvents)) {
+            return List.of();
+        }
         List<GameEvent> events = new ArrayList<>();
         events.add(new ItemUsed(itemId, item.kind(), positionOf(user)));
-        events.addAll(item.definition().effect().apply(new EffectContext(user, this, random)));
+        events.addAll(effectEvents);
         if (item.isConsumable()) {
             player.inventory().remove(itemId);
         }

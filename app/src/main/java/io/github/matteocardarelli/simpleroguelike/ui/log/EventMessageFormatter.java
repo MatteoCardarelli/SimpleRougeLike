@@ -33,6 +33,9 @@ import io.github.matteocardarelli.simpleroguelike.event.MerchantGreeted;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
+import io.github.matteocardarelli.simpleroguelike.event.PoisonCured;
+import io.github.matteocardarelli.simpleroguelike.event.PoisonEnded;
+import io.github.matteocardarelli.simpleroguelike.event.Poisoned;
 import io.github.matteocardarelli.simpleroguelike.event.WareTaken;
 import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -99,6 +102,24 @@ public final class EventMessageFormatter {
                         e.target().equals(player)
                                 ? amount(R.plurals.log_healed_player, e.amount())
                                 : amount(R.plurals.log_healed_enemy, e.amount()));
+        register(
+                Poisoned.class,
+                (e, player) ->
+                        e.target().equals(player)
+                                ? texts.text(R.string.log_poisoned_player, e.turns())
+                                : texts.text(R.string.log_poisoned_enemy));
+        register(
+                PoisonEnded.class,
+                (e, player) ->
+                        e.target().equals(player)
+                                ? texts.text(R.string.log_poison_ended_player)
+                                : texts.text(R.string.log_poison_ended_enemy));
+        register(
+                PoisonCured.class,
+                (e, player) ->
+                        e.target().equals(player)
+                                ? texts.text(R.string.log_poison_cured_player)
+                                : texts.text(R.string.log_poison_cured_enemy));
         register(
                 ExperienceGained.class,
                 (e, player) -> amount(R.plurals.log_experience, e.amount()));

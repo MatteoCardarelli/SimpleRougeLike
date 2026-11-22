@@ -25,6 +25,7 @@ import io.github.matteocardarelli.simpleroguelike.rules.CombatRules;
 import io.github.matteocardarelli.simpleroguelike.rules.DamageRules;
 import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.LevelingRules;
+import io.github.matteocardarelli.simpleroguelike.rules.PoisonRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.save.FileGameStore;
 import io.github.matteocardarelli.simpleroguelike.save.GameStore;
@@ -69,6 +70,12 @@ public final class ContentModule {
     @Singleton
     static DamageRules damageRules(LevelingRules leveling) {
         return new DamageRules(leveling);
+    }
+
+    @Provides
+    @Singleton
+    static PoisonRules poisonRules(DamageRules damage) {
+        return new PoisonRules(damage);
     }
 
     @Provides
@@ -143,6 +150,13 @@ public final class ContentModule {
                                 R.color.kind_greater_potion,
                                 R.drawable.art_greater_potion)
                         .withSprite(R.drawable.item_greater_potion));
+        styles.put(
+                StandardItemCatalog.ANTIDOTE,
+                ContentPresentation.Style.ofSprite(
+                        R.string.kind_antidote_name,
+                        R.string.kind_antidote_description,
+                        R.color.kind_antidote,
+                        R.drawable.item_antidote));
         styles.put(
                 StandardItemCatalog.SWORD,
                 new ContentPresentation.Style(
@@ -227,6 +241,13 @@ public final class ContentModule {
                         R.string.kind_wolf_description,
                         R.color.kind_wolf,
                         R.drawable.art_wolf));
+        styles.put(
+                StandardEnemyCatalog.SPIDER,
+                new ContentPresentation.Style(
+                        R.string.kind_spider_name,
+                        R.string.kind_spider_description,
+                        R.color.kind_spider,
+                        R.drawable.art_spider));
         styles.put(
                 StandardItemCatalog.KEY,
                 new ContentPresentation.Style(

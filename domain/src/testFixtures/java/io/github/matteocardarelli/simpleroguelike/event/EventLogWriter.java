@@ -195,6 +195,21 @@ public final class EventLogWriter {
                 MerchantAngered.class,
                 e -> "MerchantAngered merchant=" + id(e.merchant()) + " at=" + at(e.at()));
         register(
+                Poisoned.class,
+                e ->
+                        "Poisoned target="
+                                + id(e.target())
+                                + " at="
+                                + at(e.at())
+                                + " turns="
+                                + e.turns());
+        register(
+                PoisonEnded.class,
+                e -> "PoisonEnded target=" + id(e.target()) + " at=" + at(e.at()));
+        register(
+                PoisonCured.class,
+                e -> "PoisonCured target=" + id(e.target()) + " at=" + at(e.at()));
+        register(
                 JumpCharged.class,
                 e ->
                         "JumpCharged jumper="

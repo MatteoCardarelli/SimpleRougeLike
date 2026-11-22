@@ -350,6 +350,31 @@ class FloorPopulatorTest {
         assertThat(describe(populate(spec, 9))).isEqualTo(describe(populate(spec, 9)));
     }
 
+    private static FloorSpec atDepth(int depth) {
+        return new FloorSpec(10, 7, 10, 0, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, depth);
+    }
+
+    @Test
+    void populate_spiderNeverOnTheFirstFloor() {
+        for (long seed = 1; seed <= 60; seed++) {
+            assertThat(populate(atDepth(1), seed).enemies())
+                    .as("seed %d", seed)
+                    .extracting(Enemy::kind)
+                    .doesNotContain(StandardEnemyCatalog.SPIDER);
+        }
+    }
+
+    @Test
+    void populate_spiderCanAppearFromTheSecondFloor() {
+        boolean found = false;
+        for (long seed = 1; seed <= 60 && !found; seed++) {
+            found =
+                    populate(atDepth(2), seed).enemies().stream()
+                            .anyMatch(e -> e.kind().equals(StandardEnemyCatalog.SPIDER));
+        }
+        assertThat(found).isTrue();
+    }
+
     private static Floor populate(FloorSpec spec, long seed) {
         return POPULATOR.populate(ROOM, spec, new SeededRandomSource(seed), new EntityIdSequence());
     }

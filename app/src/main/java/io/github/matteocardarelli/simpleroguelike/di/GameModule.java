@@ -37,11 +37,13 @@ import io.github.matteocardarelli.simpleroguelike.port.Pathfinder;
 import io.github.matteocardarelli.simpleroguelike.port.TerrainGenerator;
 import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
+import io.github.matteocardarelli.simpleroguelike.rules.PoisonRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
 import io.github.matteocardarelli.simpleroguelike.session.CeilingFall;
 import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.LootHook;
+import io.github.matteocardarelli.simpleroguelike.session.PoisonHook;
 import io.github.matteocardarelli.simpleroguelike.session.SaveCodec;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidFieldOfView;
@@ -179,6 +181,13 @@ public abstract class GameModule {
     /** Le regole di fine turno; l'insieme vuoto è ammesso. */
     @Multibinds
     abstract Set<TurnHook> hooks();
+
+    /** Il veleno, a fine turno: prima del bottino, perché può uccidere. */
+    @Provides
+    @IntoSet
+    static TurnHook poisonHook(PoisonRules rules) {
+        return new PoisonHook(rules);
+    }
 
     /** Il bottino dei nemici morti. */
     @Provides

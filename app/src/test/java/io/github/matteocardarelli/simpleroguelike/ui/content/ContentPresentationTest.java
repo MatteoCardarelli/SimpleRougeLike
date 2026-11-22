@@ -36,7 +36,9 @@ class ContentPresentationTest {
 
         assertThat(content.kinds()).containsAll(kinds);
         for (Kind kind : kinds) {
-            assertThat(content.artRes(kind)).as(kind.value()).isNotZero();
+            assertThat(content.artRes(kind) != 0 || content.spriteRes(kind) != 0)
+                    .as(kind.value())
+                    .isTrue();
         }
     }
 
@@ -54,8 +56,16 @@ class ContentPresentationTest {
     }
 
     @Test
-    void style_withoutArt_isRejected() {
+    void style_withoutArtNorSprite_isRejected() {
         assertThatThrownBy(() -> new ContentPresentation.Style(1, 1, 1, 0))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void style_withASpriteOnly_isAccepted() {
+        ContentPresentation.Style style = ContentPresentation.Style.ofSprite(1, 1, 1, 7);
+
+        assertThat(style.art()).isZero();
+        assertThat(style.sprite()).isEqualTo(7);
     }
 }

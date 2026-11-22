@@ -52,6 +52,22 @@ class SnapshotMapperTest {
     }
 
     @Test
+    void from_poison_isExposedForThePlayerAndForVisibleEnemies() {
+        Floor floor = FloorFixtures.parse("@x");
+        floor.updateVisibility(visible(floor, 0, 1));
+        floor.poison(new EntityId(1));
+        floor.poison(new EntityId(2));
+
+        GameSnapshot snapshot = MAPPER.from(floor, Phase.PLAYING, 1, 1);
+
+        assertThat(snapshot.player().poisonTurns()).isEqualTo(5);
+        assertThat(snapshot.visibleEnemies())
+                .singleElement()
+                .extracting(ActorView::poisonTurns)
+                .isEqualTo(5);
+    }
+
+    @Test
     void from_cellsTellWallsAndVisibility() {
         Floor floor = FloorFixtures.parse("#@..g#");
         floor.updateVisibility(visible(floor, 0, 1, 2));

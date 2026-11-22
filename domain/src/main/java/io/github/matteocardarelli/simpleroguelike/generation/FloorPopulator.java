@@ -207,13 +207,13 @@ public final class FloorPopulator {
                 continue;
             }
             EnemyDefinition type =
-                    WeightedPicker.pick(enemies.all(), EnemyDefinition::spawnWeight, random);
+                    WeightedPicker.pick(available(spec), EnemyDefinition::spawnWeight, random);
             List<Position> members = List.of();
             if (type.packSize() > 1) {
                 members = packCells(free, cell, playerAt, spec, type.packSize() - 1);
                 if (type.packSize() > left || members.size() < type.packSize() - 1) {
                     // Un branco nasce intero o non nasce: al suo posto, uno che va da solo.
-                    type = WeightedPicker.pick(loners(), EnemyDefinition::spawnWeight, random);
+                    type = WeightedPicker.pick(loners(spec), EnemyDefinition::spawnWeight, random);
                     members = List.of();
                 }
             }
@@ -319,10 +319,21 @@ public final class FloorPopulator {
         return floor;
     }
 
-    /** I tipi di nemico che compaiono a caso e vanno da soli. */
-    private List<EnemyDefinition> loners() {
-        List<EnemyDefinition> loners = new ArrayList<>();
+    /** I tipi di nemico che possono comparire a questa profondità. */
+    private List<EnemyDefinition> available(FloorSpec spec) {
+        List<EnemyDefinition> available = new ArrayList<>();
         for (EnemyDefinition definition : enemies.all()) {
+            if (definition.minDepth() <= spec.enemyLevel()) {
+                available.add(definition);
+            }
+        }
+        return available;
+    }
+
+    /** I tipi di nemico che compaiono a caso a questa profondità e vanno da soli. */
+    private List<EnemyDefinition> loners(FloorSpec spec) {
+        List<EnemyDefinition> loners = new ArrayList<>();
+        for (EnemyDefinition definition : available(spec)) {
             if (definition.packSize() == 1 && definition.spawnWeight() > 0) {
                 loners.add(definition);
             }

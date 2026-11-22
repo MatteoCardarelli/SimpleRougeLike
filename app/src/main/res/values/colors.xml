@@ -29,6 +29,8 @@
     <color name="kind_chest">#FFD4A017</color>
     <color name="kind_throwing_knife">#FFCFD8DC</color>
     <color name="kind_archer">#FFFFA000</color>
+    <color name="kind_antidote">#FF9CCC65</color>
+    <color name="kind_spider">#FF455A64</color>
     <color name="kind_potion">#FF00FFFF</color>
     <color name="kind_greater_potion">#FF4D7CFF</color>
     <color name="kind_sword">#FFB0BEC5</color>
@@ -37,6 +39,10 @@
     <color name="kind_chain_mail">#FF90A4AE</color>
     <color name="kind_ring_of_accuracy">#FFFFD54F</color>
     <color name="kind_ring_of_vigor">#FFE57373</color>
+
+    <!-- La barra di salute, e quando il player è avvelenato -->
+    <color name="health">#FF669900</color>
+    <color name="health_poisoned">#FFAEEA00</color>
 
     <!-- Il fondo del registro e della fine partita, sopra la mappa -->
     <color name="overlay">#CC000000</color>

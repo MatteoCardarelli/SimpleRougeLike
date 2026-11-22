@@ -106,6 +106,11 @@ public final class Enemy extends Actor {
         return definition.experienceReward() * (3 + level) / 4;
     }
 
+    /** Vero se ogni suo morso che va a segno avvelena. */
+    public boolean poisons() {
+        return definition.poisons();
+    }
+
     public int aggroRange() {
         return definition.aggroRange();
     }

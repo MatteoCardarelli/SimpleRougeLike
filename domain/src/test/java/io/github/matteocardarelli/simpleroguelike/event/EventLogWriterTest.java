@@ -58,7 +58,10 @@ class EventLogWriterTest {
                         "t12 WaresPaid amount=60 at=3,4",
                         "t12 NotEnoughCoins bill=60 coins=10 at=3,4",
                         "t12 MerchantGreeted at=3,4",
-                        "t12 MerchantAngered merchant=1 at=3,4");
+                        "t12 MerchantAngered merchant=1 at=3,4",
+                        "t12 Poisoned target=1 at=3,4 turns=5",
+                        "t12 PoisonEnded target=1 at=3,4",
+                        "t12 PoisonCured target=1 at=3,4");
     }
 
     @Test
@@ -123,7 +126,10 @@ class EventLogWriterTest {
                         List.of(P),
                         List.of(P),
                         List.of(P),
-                        List.of());
+                        List.of(),
+                        List.of(P),
+                        List.of(P),
+                        List.of(P));
     }
 
     private static List<GameEvent> everyEvent() {
@@ -160,6 +166,9 @@ class EventLogWriterTest {
                 new WaresPaid(60, P),
                 new NotEnoughCoins(60, 10, P),
                 new MerchantGreeted(P),
-                new MerchantAngered(A, P));
+                new MerchantAngered(A, P),
+                new Poisoned(A, P, 5),
+                new PoisonEnded(A, P),
+                new PoisonCured(A, P));
     }
 }

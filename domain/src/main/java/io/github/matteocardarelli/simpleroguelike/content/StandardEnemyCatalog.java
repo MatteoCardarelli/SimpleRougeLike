@@ -39,6 +39,9 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
     /** Sta al banco; derubato colpisce da vicino e da lontano e insegue. */
     public static final BehaviorKey MERCHANT_BEHAVIOR = BehaviorKey.of("merchant");
 
+    /** Debole ma velenoso: ogni morso che va a segno avvelena; compare dal secondo piano. */
+    public static final Kind SPIDER = Kind.of("spider");
+
     /** Tiene la distanza e tira; se il player è lontano, vaga. */
     public static final BehaviorKey KEEP_DISTANCE = BehaviorKey.of("keep_distance");
 
@@ -82,6 +85,23 @@ public final class StandardEnemyCatalog implements EnemyCatalog {
                             0,
                             Footprint.SINGLE,
                             false,
+                            true,
+                            2),
+                    new EnemyDefinition(
+                            SPIDER,
+                            new Stats(12, 4, 0, 5, 15),
+                            20,
+                            8,
+                            CHASE_OR_WANDER,
+                            20,
+                            0,
+                            1,
+                            20,
+                            Footprint.SINGLE,
+                            false,
+                            false,
+                            1,
+                            Footprint.square(2),
                             true,
                             2));
 

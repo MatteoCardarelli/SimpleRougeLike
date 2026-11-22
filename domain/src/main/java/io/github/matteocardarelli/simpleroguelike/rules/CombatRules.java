@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.rules;
 
 import io.github.matteocardarelli.simpleroguelike.dungeon.Actor;
+import io.github.matteocardarelli.simpleroguelike.dungeon.Enemy;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Floor;
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
@@ -75,6 +76,10 @@ public final class CombatRules {
         if (random.nextInt(100) < hitChance(offense, defense)) {
             events.addAll(
                     damage.apply(floor, Optional.of(attacker), defender, damage(offense, defense)));
+            // Il morso avvelena solo chi è sopravvissuto al colpo.
+            if (floor.enemy(attacker).map(Enemy::poisons).orElse(false)) {
+                floor.poison(defender).ifPresent(events::add);
+            }
         } else {
             events.add(new Missed(attacker, defender, attackerAt, defenderAt));
         }

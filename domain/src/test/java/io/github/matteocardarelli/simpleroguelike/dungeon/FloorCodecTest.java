@@ -128,6 +128,41 @@ class FloorCodecTest {
     }
 
     @Test
+    void read_restoresThePoisonOfThePlayerAndOfAnEnemy() {
+        Floor floor = played();
+        floor.poison(floor.playerId());
+        floor.wearPoison(floor.playerId());
+        floor.poison(floor.enemies().get(0).id());
+
+        Floor read = CODEC.read(CODEC.write(floor));
+
+        assertThat(read.player().poisonTurns()).isEqualTo(4);
+        assertThat(read.enemies().get(0).poisonTurns()).isEqualTo(5);
+        assertThat(read.enemies().get(1).isPoisoned()).isFalse();
+    }
+
+    /** Un salvataggio di prima del veleno non ha il campo: nessuno è avvelenato. */
+    @Test
+    void read_ofLinesWithoutThePoisonField_readsThemAsNotPoisoned() {
+        Floor floor = played();
+        floor.poison(floor.playerId());
+        floor.poison(floor.enemies().get(0).id());
+        List<String> lines = new ArrayList<>();
+        for (String line : CODEC.write(floor)) {
+            if (line.startsWith("player ") || line.startsWith("enemy ")) {
+                lines.add(line.substring(0, line.lastIndexOf(' ')));
+            } else {
+                lines.add(line);
+            }
+        }
+
+        Floor read = CODEC.read(lines);
+
+        assertThat(read.player().isPoisoned()).isFalse();
+        assertThat(read.enemies().get(0).isPoisoned()).isFalse();
+    }
+
+    @Test
     void read_restoresExploredAndVisibleCells() {
         Floor floor = played();
 

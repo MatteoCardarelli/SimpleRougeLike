@@ -12,6 +12,14 @@ public interface ItemEffect {
     /** Nessun effetto: per gli oggetti che si equipaggiano invece di usarsi. */
     ItemEffect NONE = context -> List.of();
 
+    /**
+     * Se l'uso va a segno dati gli eventi prodotti. Se vale falso l'oggetto non si usa e non si
+     * consuma: di solito vale sempre vero.
+     */
+    default boolean spentBy(List<GameEvent> events) {
+        return true;
+    }
+
     /** Applica l'effetto e restituisce gli eventi prodotti, vuoti se non è cambiato niente. */
     List<GameEvent> apply(EffectContext context);
 }
