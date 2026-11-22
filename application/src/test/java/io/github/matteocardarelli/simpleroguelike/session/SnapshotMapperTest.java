@@ -121,6 +121,23 @@ class SnapshotMapperTest {
                 .containsExactly(new FixtureView(new Position(1, 0), Kind.of("door"), false));
     }
 
+    /** Una trappola nascosta non esce dal dominio; scoperta o scattata, sì. */
+    @Test
+    void from_traps_areAbsentWhileHidden_andPresentOnceDiscoveredOrTriggered() {
+        Floor floor = FloorFixtures.parse("@^v^");
+        floor.updateVisibility(visible(floor, 0, 1, 2, 3));
+
+        assertThat(MAPPER.from(floor, Phase.PLAYING, 1, 1).fixtures()).isEmpty();
+
+        floor.discoverTrap(new Position(1, 0));
+        floor.springTrap(new Position(2, 0));
+
+        assertThat(MAPPER.from(floor, Phase.PLAYING, 1, 1).fixtures())
+                .containsExactly(
+                        new FixtureView(new Position(1, 0), Kind.of("trap_spikes"), false),
+                        new FixtureView(new Position(2, 0), Kind.of("trap_dart"), true));
+    }
+
     @Test
     void from_deadEnemiesAreNotShown() {
         Floor floor = FloorFixtures.parse("@g");

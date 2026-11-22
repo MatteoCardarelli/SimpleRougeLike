@@ -122,8 +122,9 @@ public final class SnapshotMapper {
 
         List<FixtureView> fixtures = new ArrayList<>();
         for (Map.Entry<Position, Fixture> entry : floor.fixtures().entrySet()) {
-            if (explored.contains(entry.getKey())) {
-                Fixture fixture = entry.getValue();
+            Fixture fixture = entry.getValue();
+            // Una trappola nascosta non esce dal dominio: l'interfaccia non può barare.
+            if (explored.contains(entry.getKey()) && !fixture.isHidden()) {
                 fixtures.add(new FixtureView(entry.getKey(), fixture.kind(), fixture.isOpen()));
             }
         }

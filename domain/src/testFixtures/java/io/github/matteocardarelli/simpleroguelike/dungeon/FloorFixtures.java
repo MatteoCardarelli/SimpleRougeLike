@@ -29,6 +29,7 @@ import java.util.Optional;
  * S  slime gigante, con la cella di riferimento in alto a sinistra del suo cerchio 4×4
  * M  mercante           c  mucchio di monete
  * x  ragno
+ * ^  trappola a punte nascosta   v  trappola a dardi nascosta
  * </pre>
  *
  * Gli id si assegnano da 1 in ordine di lettura, da sinistra a destra e dall'alto in basso: in
@@ -109,6 +110,8 @@ public final class FloorFixtures {
                     case 'k' ->
                             builder.item(new Item(ids.next(), item(StandardItemCatalog.KEY)), at);
                     case '>' -> builder.fixture(Fixture.stairs(), at);
+                    case '^' -> builder.fixture(Fixture.spikesTrap(), at);
+                    case 'v' -> builder.fixture(Fixture.dartTrap(), at);
                     case 'G' -> {
                         builder.fixture(Fixture.gate(), at);
                         gates.add(at);

@@ -24,6 +24,9 @@ import java.util.Set;
  */
 public final class FloorCodec {
 
+    /** Il codice di una trappola scoperta ma non scattata, nel campo "aperto". */
+    private static final int DISCOVERED = 2;
+
     private final ItemCatalog items;
     private final EnemyCatalog enemies;
 
@@ -117,7 +120,7 @@ public final class FloorCodec {
                                     entry.getKey().x(),
                                     entry.getKey().y(),
                                     fixture.type().name(),
-                                    fixture.isOpen() ? 1 : 0,
+                                    openCode(fixture),
                                     fixture.contents()
                                             .map(
                                                     i ->
@@ -279,6 +282,8 @@ public final class FloorCodec {
             // Si apre prima di metterlo sul piano: un attore può stare in una porta aperta.
             if (integer(f[4]) == 1) {
                 fixture.restoreOpen();
+            } else if (integer(f[4]) == DISCOVERED) {
+                fixture.restoreDiscovered();
             }
             builder.fixture(fixture, at);
         }
@@ -362,6 +367,18 @@ public final class FloorCodec {
         throw new IllegalArgumentException("Nemico sconosciuto: " + kind);
     }
 
+    /**
+     * Il campo "aperto" di un oggetto fisso: 1 se è aperto o scattato, 0 altrimenti; per una
+     * trappola 0 è nascosta, {@value #DISCOVERED} scoperta e 1 scattata. Un salvataggio senza
+     * trappole non cambia.
+     */
+    private static int openCode(Fixture fixture) {
+        if (fixture.isOpen()) {
+            return 1;
+        }
+        return fixture.type().isTrap() && !fixture.isHidden() ? DISCOVERED : 0;
+    }
+
     private static Fixture fixture(
             FixtureType type, List<Position> linked, Optional<Item> contents) {
         return switch (type) {
@@ -372,6 +389,8 @@ public final class FloorCodec {
             case LEVER -> Fixture.lever(linked);
             case CHEST -> Fixture.chest(contents);
             case STAIRS -> Fixture.stairs();
+            case TRAP_SPIKES -> Fixture.spikesTrap();
+            case TRAP_DART -> Fixture.dartTrap();
         };
     }
 

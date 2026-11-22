@@ -20,7 +20,11 @@ public enum FixtureType {
     /** Si apre urtandolo e lascia a terra quello che contiene; chiuso blocca il passaggio. */
     CHEST("chest", true, false, true),
     /** Si scende al piano successivo passandoci sopra; non blocca niente. */
-    STAIRS("stairs", false, false, true);
+    STAIRS("stairs", false, false, true),
+    /** Una trappola a punte: nascosta, scatta quando il player ci entra; non blocca niente. */
+    TRAP_SPIKES("trap_spikes", false, false, true),
+    /** Una trappola a dardi avvelenati: come quella a punte, ma avvelena. */
+    TRAP_DART("trap_dart", false, false, true);
 
     private final String kind;
     private final boolean blocksWhileClosed;
@@ -46,6 +50,11 @@ public enum FixtureType {
 
     public boolean opaqueWhileClosed() {
         return opaqueWhileClosed;
+    }
+
+    /** Vero per le trappole, che stanno nascoste finché non si scoprono o scattano. */
+    public boolean isTrap() {
+        return this == TRAP_SPIKES || this == TRAP_DART;
     }
 
     /** Vero se sta su una cella di pavimento; falso se sta nel muro, come la leva. */

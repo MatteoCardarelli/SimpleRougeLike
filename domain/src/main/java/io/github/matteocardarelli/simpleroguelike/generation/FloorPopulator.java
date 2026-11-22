@@ -254,6 +254,12 @@ public final class FloorPopulator {
         for (int i = 0; i < layout.chests().size(); i++) {
             chestTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
         }
+        // Le trappole si tirano per ultime: senza, il resto del piano nasce come prima.
+        List<Position> trapCells = trapCells(free, playerAt, spec.trapCount(), random);
+        List<Fixture> traps = new ArrayList<>();
+        for (int i = 0; i < trapCells.size(); i++) {
+            traps.add(random.nextInt(2) == 0 ? Fixture.spikesTrap() : Fixture.dartTrap());
+        }
         FloorBuilder builder =
                 new FloorBuilder()
                         .terrain(terrain)
@@ -299,6 +305,9 @@ public final class FloorPopulator {
             builder.bossRoom(arena.get().interior());
         }
         layout.stairs().ifPresent(stairs -> builder.fixture(Fixture.stairs(), stairs));
+        for (int i = 0; i < trapCells.size(); i++) {
+            builder.fixture(traps.get(i), trapCells.get(i));
+        }
         Optional<Shop> shop = Optional.empty();
         if (shopPlan.isPresent()) {
             ShopPlan plan = shopPlan.get();
@@ -317,6 +326,28 @@ public final class FloorPopulator {
         Floor floor = builder.build();
         shop.ifPresent(floor::openShop);
         return floor;
+    }
+
+    /**
+     * Le celle delle trappole, tra quelle ancora libere: mai nelle otto celle intorno al player.
+     * Quelle libere non hanno oggetti fissi, oggetti a terra né attori, e non sono nella stanza del
+     * boss, che è riservata. Le celle scelte si tolgono da {@code free}.
+     */
+    private static List<Position> trapCells(
+            List<Position> free, Position playerAt, int count, RandomSource random) {
+        if (count == 0) {
+            return List.of();
+        }
+        List<Position> candidates = new ArrayList<>();
+        for (Position cell : free) {
+            if (Math.max(Math.abs(cell.x() - playerAt.x()), Math.abs(cell.y() - playerAt.y()))
+                    > 1) {
+                candidates.add(cell);
+            }
+        }
+        List<Position> cells = take(candidates, count, random, "trappole");
+        free.removeAll(cells);
+        return cells;
     }
 
     /** I tipi di nemico che possono comparire a questa profondità. */

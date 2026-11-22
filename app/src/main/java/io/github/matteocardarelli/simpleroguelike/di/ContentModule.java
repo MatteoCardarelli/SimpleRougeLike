@@ -27,6 +27,7 @@ import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.LevelingRules;
 import io.github.matteocardarelli.simpleroguelike.rules.PoisonRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
+import io.github.matteocardarelli.simpleroguelike.rules.TrapRules;
 import io.github.matteocardarelli.simpleroguelike.save.FileGameStore;
 import io.github.matteocardarelli.simpleroguelike.save.GameStore;
 import io.github.matteocardarelli.simpleroguelike.settings.PreferencesSettingsStore;
@@ -76,6 +77,12 @@ public final class ContentModule {
     @Singleton
     static PoisonRules poisonRules(DamageRules damage) {
         return new PoisonRules(damage);
+    }
+
+    @Provides
+    @Singleton
+    static TrapRules trapRules(DamageRules damage) {
+        return new TrapRules(damage);
     }
 
     @Provides
@@ -301,6 +308,20 @@ public final class ContentModule {
                         R.string.kind_stairs_description,
                         R.color.kind_stairs,
                         R.drawable.art_stairs));
+        styles.put(
+                FixtureType.TRAP_SPIKES.kind(),
+                ContentPresentation.Style.ofSprite(
+                        R.string.kind_trap_spikes_name,
+                        R.string.kind_trap_spikes_description,
+                        R.color.kind_trap_spikes,
+                        R.drawable.trap_spikes));
+        styles.put(
+                FixtureType.TRAP_DART.kind(),
+                ContentPresentation.Style.ofSprite(
+                        R.string.kind_trap_dart_name,
+                        R.string.kind_trap_dart_description,
+                        R.color.kind_trap_dart,
+                        R.drawable.trap_dart));
         styles.put(
                 FixtureType.DOOR.kind(),
                 new ContentPresentation.Style(

@@ -28,6 +28,7 @@ import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
 import io.github.matteocardarelli.simpleroguelike.event.PoisonCured;
 import io.github.matteocardarelli.simpleroguelike.event.PoisonEnded;
 import io.github.matteocardarelli.simpleroguelike.event.Poisoned;
+import io.github.matteocardarelli.simpleroguelike.event.TrapDiscovered;
 import io.github.matteocardarelli.simpleroguelike.event.WareTaken;
 import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.CellSet;
@@ -687,8 +688,37 @@ public final class Floor implements FloorView {
                 changed();
                 yield List.of(new ChestOpened(at, item.map(Item::kind)));
             }
-            case GATE, STAIRS -> List.of();
+            case GATE, STAIRS, TRAP_SPIKES, TRAP_DART -> List.of();
         };
+    }
+
+    /**
+     * Scopre la trappola nascosta in {@code at}.
+     *
+     * @return l'evento; vuoto se lì non c'è una trappola nascosta
+     */
+    public Optional<TrapDiscovered> discoverTrap(Position at) {
+        Fixture fixture = fixtures.get(at);
+        if (fixture == null || !fixture.type().isTrap() || !fixture.isHidden()) {
+            return Optional.empty();
+        }
+        fixture.discover();
+        return Optional.of(new TrapDiscovered(fixture.kind(), at));
+    }
+
+    /**
+     * Spegne la trappola in {@code at}, nascosta o scoperta, che non sia già scattata: scatta una
+     * volta sola. Il danno e il veleno li applica {@code TrapRules}.
+     *
+     * @return il tipo della trappola; vuoto se lì non c'è una trappola armata
+     */
+    public Optional<FixtureType> springTrap(Position at) {
+        Fixture fixture = fixtures.get(at);
+        if (fixture == null || !fixture.type().isTrap() || fixture.isOpen()) {
+            return Optional.empty();
+        }
+        fixture.trigger();
+        return Optional.of(fixture.type());
     }
 
     /**

@@ -35,6 +35,10 @@
     <string name="kind_chest_description">Urtalo per aprirlo: dentro c\'è un oggetto.</string>
     <string name="kind_stairs_name">Scale</string>
     <string name="kind_stairs_description">Passaci sopra per scendere al piano successivo.</string>
+    <string name="kind_trap_spikes_name">Trappola a punte</string>
+    <string name="kind_trap_spikes_description">Punte nascoste nel pavimento: scattano quando ci entri e fanno 8 danni, una volta sola.</string>
+    <string name="kind_trap_dart_name">Trappola a dardi</string>
+    <string name="kind_trap_dart_description">Un dardo avvelenato parte quando ci entri: 3 danni e veleno, una volta sola.</string>
     <string name="kind_giant_slime_name">Slime gigante</string>
     <string name="kind_giant_slime_description">Il signore dell\'ultimo piano. Salta e schiaccia: quando vedi le celle rosse, spostati.</string>
     <string name="kind_wolf_name">Lupo</string>
@@ -160,6 +164,10 @@
     <string name="feedback_empty">Nota vuota: non salvata</string>
     <string name="feedback_failed">Impossibile salvare la nota</string>
 
+    <string name="log_trap_discovered_spikes">Scopri una trappola a punte.</string>
+    <string name="log_trap_discovered_dart">Scopri una trappola a dardi avvelenati.</string>
+    <string name="log_trap_triggered_spikes">Una trappola a punte ti ferisce!</string>
+    <string name="log_trap_triggered_dart">Un dardo avvelenato ti colpisce!</string>
     <string name="log_poisoned_player">Sei avvelenato: 2 danni per turno, per %1$d turni.</string>
     <string name="log_poisoned_enemy">Un nemico è avvelenato.</string>
     <string name="log_poison_ended_player">Il veleno è finito.</string>

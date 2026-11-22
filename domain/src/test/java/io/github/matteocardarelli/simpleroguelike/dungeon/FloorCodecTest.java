@@ -128,6 +128,36 @@ class FloorCodecTest {
     }
 
     @Test
+    void read_restoresTheThreeStatesOfATrap() {
+        Floor floor = FloorFixtures.parse("@^v^.");
+        floor.discoverTrap(new Position(2, 0));
+        floor.springTrap(new Position(3, 0));
+
+        Floor read = CODEC.read(CODEC.write(floor));
+
+        Fixture hidden = read.fixtureAt(new Position(1, 0)).orElseThrow();
+        Fixture discovered = read.fixtureAt(new Position(2, 0)).orElseThrow();
+        Fixture spent = read.fixtureAt(new Position(3, 0)).orElseThrow();
+        assertThat(hidden.type()).isEqualTo(FixtureType.TRAP_SPIKES);
+        assertThat(hidden.isHidden()).isTrue();
+        assertThat(hidden.isOpen()).isFalse();
+        assertThat(discovered.type()).isEqualTo(FixtureType.TRAP_DART);
+        assertThat(discovered.isHidden()).isFalse();
+        assertThat(discovered.isOpen()).isFalse();
+        assertThat(spent.isHidden()).isFalse();
+        assertThat(spent.isOpen()).isTrue();
+        assertThat(CODEC.write(read)).isEqualTo(CODEC.write(floor));
+    }
+
+    /** Un salvataggio di prima delle trappole non ha righe di trappola: il piano non ne ha. */
+    @Test
+    void read_ofAFloorWithoutTraps_hasNone() {
+        Floor read = CODEC.read(CODEC.write(played()));
+
+        assertThat(read.fixtures().values()).noneMatch(f -> f.type().isTrap());
+    }
+
+    @Test
     void read_restoresThePoisonOfThePlayerAndOfAnEnemy() {
         Floor floor = played();
         floor.poison(floor.playerId());

@@ -37,6 +37,16 @@ class FixtureSpritesTest {
     }
 
     @Test
+    void traps_haveOneImageEach_whetherSpentOrNot() {
+        assertThat(FixtureSprites.sprite("trap_spikes", false))
+                .isEqualTo(FixtureSprites.sprite("trap_spikes", true))
+                .isEqualTo(R.drawable.trap_spikes);
+        assertThat(FixtureSprites.sprite("trap_dart", false))
+                .isEqualTo(FixtureSprites.sprite("trap_dart", true))
+                .isEqualTo(R.drawable.trap_dart);
+    }
+
+    @Test
     void unknownKind_hasNoSprite() {
         assertThat(FixtureSprites.sprite("unknown", false)).isZero();
     }

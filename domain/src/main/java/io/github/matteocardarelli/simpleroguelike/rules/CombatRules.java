@@ -33,6 +33,11 @@ public final class CombatRules {
         this.damage = damage;
     }
 
+    /** Le regole del danno di questo combattimento. */
+    DamageRules damageRules() {
+        return damage;
+    }
+
     /** La probabilità, in percentuale, che un colpo di {@code attacker} vada a segno. */
     public static int hitChance(Stats attacker, Stats defender) {
         int chance = BASE_HIT_CHANCE + attacker.accuracy() - defender.evasion();

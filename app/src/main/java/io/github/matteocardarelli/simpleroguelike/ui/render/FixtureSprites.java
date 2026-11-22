@@ -23,6 +23,9 @@ final class FixtureSprites {
             case "lever" -> open ? R.drawable.fixture_lever_open : R.drawable.fixture_lever;
             case "chest" -> open ? R.drawable.fixture_chest_open : R.drawable.fixture_chest;
             case "stairs" -> R.drawable.fixture_stairs;
+            // Una trappola scattata resta com'è: si vede dove ha colpito.
+            case "trap_spikes" -> R.drawable.trap_spikes;
+            case "trap_dart" -> R.drawable.trap_dart;
             default -> 0;
         };
     }

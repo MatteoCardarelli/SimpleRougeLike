@@ -39,12 +39,14 @@ import io.github.matteocardarelli.simpleroguelike.rules.ActionRules;
 import io.github.matteocardarelli.simpleroguelike.rules.JumpRules;
 import io.github.matteocardarelli.simpleroguelike.rules.PoisonRules;
 import io.github.matteocardarelli.simpleroguelike.rules.RangedRules;
+import io.github.matteocardarelli.simpleroguelike.rules.TrapRules;
 import io.github.matteocardarelli.simpleroguelike.session.CeilingFall;
 import io.github.matteocardarelli.simpleroguelike.session.EnemyTurnRunner;
 import io.github.matteocardarelli.simpleroguelike.session.GameSession;
 import io.github.matteocardarelli.simpleroguelike.session.LootHook;
 import io.github.matteocardarelli.simpleroguelike.session.PoisonHook;
 import io.github.matteocardarelli.simpleroguelike.session.SaveCodec;
+import io.github.matteocardarelli.simpleroguelike.session.TrapDiscoveryHook;
 import io.github.matteocardarelli.simpleroguelike.session.TurnHook;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidFieldOfView;
 import io.github.matteocardarelli.simpleroguelike.squidlib.SquidTerrainGenerator;
@@ -187,6 +189,13 @@ public abstract class GameModule {
     @IntoSet
     static TurnHook poisonHook(PoisonRules rules) {
         return new PoisonHook(rules);
+    }
+
+    /** La scoperta delle trappole accanto al player, prima del veleno. */
+    @Provides
+    @IntoSet
+    static TurnHook trapDiscoveryHook(TrapRules rules) {
+        return new TrapDiscoveryHook(rules);
     }
 
     /** Il bottino dei nemici morti. */

@@ -210,6 +210,18 @@ public final class EventLogWriter {
                 PoisonCured.class,
                 e -> "PoisonCured target=" + id(e.target()) + " at=" + at(e.at()));
         register(
+                TrapDiscovered.class,
+                e -> "TrapDiscovered kind=" + e.kind().value() + " at=" + at(e.at()));
+        register(
+                TrapTriggered.class,
+                e ->
+                        "TrapTriggered kind="
+                                + e.kind().value()
+                                + " at="
+                                + at(e.at())
+                                + " damage="
+                                + e.damage());
+        register(
                 JumpCharged.class,
                 e ->
                         "JumpCharged jumper="

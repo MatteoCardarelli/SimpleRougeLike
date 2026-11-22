@@ -36,6 +36,8 @@ import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
 import io.github.matteocardarelli.simpleroguelike.event.PoisonCured;
 import io.github.matteocardarelli.simpleroguelike.event.PoisonEnded;
 import io.github.matteocardarelli.simpleroguelike.event.Poisoned;
+import io.github.matteocardarelli.simpleroguelike.event.TrapDiscovered;
+import io.github.matteocardarelli.simpleroguelike.event.TrapTriggered;
 import io.github.matteocardarelli.simpleroguelike.event.WareTaken;
 import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
@@ -167,6 +169,18 @@ public final class EventMessageFormatter {
         register(
                 FloorChanged.class,
                 (e, player) -> texts.text(R.string.log_floor_changed, e.depth()));
+        register(
+                TrapDiscovered.class,
+                (e, player) ->
+                        isSpikes(e.kind())
+                                ? texts.text(R.string.log_trap_discovered_spikes)
+                                : texts.text(R.string.log_trap_discovered_dart));
+        register(
+                TrapTriggered.class,
+                (e, player) ->
+                        isSpikes(e.kind())
+                                ? texts.text(R.string.log_trap_triggered_spikes)
+                                : texts.text(R.string.log_trap_triggered_dart));
         register(LeverPulled.class, (e, player) -> texts.text(R.string.log_lever_pulled));
         register(
                 ChestOpened.class,
@@ -217,6 +231,10 @@ public final class EventMessageFormatter {
 
     private String amount(int plural, int amount) {
         return texts.quantity(plural, amount, amount);
+    }
+
+    private static boolean isSpikes(Kind kind) {
+        return kind.value().equals("trap_spikes");
     }
 
     private String name(Kind kind) {

@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Un oggetto fisso del piano: una porta, un cancello, una leva, uno scrigno o le scale. Sta in una
- * cella e cambia solo aprendosi, una volta sola, con i metodi di {@link Floor}. La posizione non è
- * qui: la tiene il piano.
+ * Un oggetto fisso del piano: una porta, un cancello, una leva, uno scrigno, le scale o una
+ * trappola. Sta in una cella e cambia solo aprendosi, una volta sola, con i metodi di {@link
+ * Floor}. Una trappola nasce nascosta; "aperta" vuol dire scattata, e una trappola scattata resta
+ * visibile. La posizione non è qui: la tiene il piano.
  */
 public final class Fixture {
 
@@ -16,6 +17,7 @@ public final class Fixture {
     private final List<Position> linked;
     private Optional<Item> contents;
     private boolean open;
+    private boolean hidden;
 
     private Fixture(FixtureType type, List<Position> linked, Optional<Item> contents) {
         this.type = type;
@@ -54,6 +56,20 @@ public final class Fixture {
         return new Fixture(FixtureType.CHEST, List.of(), contents);
     }
 
+    /** Una trappola a punte, nascosta. */
+    public static Fixture spikesTrap() {
+        Fixture trap = new Fixture(FixtureType.TRAP_SPIKES, List.of(), Optional.empty());
+        trap.hidden = true;
+        return trap;
+    }
+
+    /** Una trappola a dardi avvelenati, nascosta. */
+    public static Fixture dartTrap() {
+        Fixture trap = new Fixture(FixtureType.TRAP_DART, List.of(), Optional.empty());
+        trap.hidden = true;
+        return trap;
+    }
+
     public FixtureType type() {
         return type;
     }
@@ -65,6 +81,11 @@ public final class Fixture {
     /** Aperta, tirata o svuotato: vale per sempre. */
     public boolean isOpen() {
         return open;
+    }
+
+    /** Vero per una trappola non ancora scoperta né scattata: l'interfaccia non la vede. */
+    public boolean isHidden() {
+        return hidden;
     }
 
     public boolean blocksMovement() {
@@ -87,6 +108,23 @@ public final class Fixture {
 
     /** Rimette lo stato aperto salvato, senza toccare il contenuto; solo per riprendere. */
     void restoreOpen() {
+        open = true;
+        hidden = false;
+    }
+
+    /** Scopre una trappola nascosta, senza farla scattare. */
+    void discover() {
+        hidden = false;
+    }
+
+    /** Rimette lo stato scoperto salvato di una trappola. */
+    void restoreDiscovered() {
+        hidden = false;
+    }
+
+    /** Fa scattare una trappola: da ora è scoperta e spenta. */
+    void trigger() {
+        hidden = false;
         open = true;
     }
 

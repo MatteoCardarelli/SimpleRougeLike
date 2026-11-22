@@ -36,6 +36,8 @@ import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
 import io.github.matteocardarelli.simpleroguelike.event.PoisonCured;
 import io.github.matteocardarelli.simpleroguelike.event.PoisonEnded;
 import io.github.matteocardarelli.simpleroguelike.event.Poisoned;
+import io.github.matteocardarelli.simpleroguelike.event.TrapDiscovered;
+import io.github.matteocardarelli.simpleroguelike.event.TrapTriggered;
 import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
@@ -184,6 +186,21 @@ class EventMessageFormatterTest {
                 .contains(R.string.log_poison_cured_player + "[]");
         assertThat(formatter.format(new PoisonCured(GOBLIN, AT), PLAYER))
                 .contains(R.string.log_poison_cured_enemy + "[]");
+    }
+
+    @Test
+    void format_traps_haveAMessageForEachKind() {
+        Kind spikes = Kind.of("trap_spikes");
+        Kind dart = Kind.of("trap_dart");
+
+        assertThat(formatter.format(new TrapDiscovered(spikes, AT), PLAYER))
+                .contains(R.string.log_trap_discovered_spikes + "[]");
+        assertThat(formatter.format(new TrapDiscovered(dart, AT), PLAYER))
+                .contains(R.string.log_trap_discovered_dart + "[]");
+        assertThat(formatter.format(new TrapTriggered(spikes, AT, 8), PLAYER))
+                .contains(R.string.log_trap_triggered_spikes + "[]");
+        assertThat(formatter.format(new TrapTriggered(dart, AT, 3), PLAYER))
+                .contains(R.string.log_trap_triggered_dart + "[]");
     }
 
     @Test

@@ -61,7 +61,9 @@ class EventLogWriterTest {
                         "t12 MerchantAngered merchant=1 at=3,4",
                         "t12 Poisoned target=1 at=3,4 turns=5",
                         "t12 PoisonEnded target=1 at=3,4",
-                        "t12 PoisonCured target=1 at=3,4");
+                        "t12 PoisonCured target=1 at=3,4",
+                        "t12 TrapDiscovered kind=goblin at=3,4",
+                        "t12 TrapTriggered kind=goblin at=3,4 damage=8");
     }
 
     @Test
@@ -129,6 +131,8 @@ class EventLogWriterTest {
                         List.of(),
                         List.of(P),
                         List.of(P),
+                        List.of(P),
+                        List.of(P),
                         List.of(P));
     }
 
@@ -169,6 +173,8 @@ class EventLogWriterTest {
                 new MerchantAngered(A, P),
                 new Poisoned(A, P, 5),
                 new PoisonEnded(A, P),
-                new PoisonCured(A, P));
+                new PoisonCured(A, P),
+                new TrapDiscovered(GOBLIN, P),
+                new TrapTriggered(GOBLIN, P, 8));
     }
 }
