@@ -52,6 +52,22 @@ class SnapshotMapperTest {
     }
 
     @Test
+    void from_poison_isExposedForThePlayerAndForVisibleEnemies() {
+        Floor floor = FloorFixtures.parse("@x");
+        floor.updateVisibility(visible(floor, 0, 1));
+        floor.poison(new EntityId(1));
+        floor.poison(new EntityId(2));
+
+        GameSnapshot snapshot = MAPPER.from(floor, Phase.PLAYING, 1, 1);
+
+        assertThat(snapshot.player().poisonTurns()).isEqualTo(5);
+        assertThat(snapshot.visibleEnemies())
+                .singleElement()
+                .extracting(ActorView::poisonTurns)
+                .isEqualTo(5);
+    }
+
+    @Test
     void from_cellsTellWallsAndVisibility() {
         Floor floor = FloorFixtures.parse("#@..g#");
         floor.updateVisibility(visible(floor, 0, 1, 2));
@@ -103,6 +119,23 @@ class SnapshotMapperTest {
 
         assertThat(snapshot.fixtures())
                 .containsExactly(new FixtureView(new Position(1, 0), Kind.of("door"), false));
+    }
+
+    /** Una trappola nascosta non esce dal dominio; scoperta o scattata, sì. */
+    @Test
+    void from_traps_areAbsentWhileHidden_andPresentOnceDiscoveredOrTriggered() {
+        Floor floor = FloorFixtures.parse("@^v^");
+        floor.updateVisibility(visible(floor, 0, 1, 2, 3));
+
+        assertThat(MAPPER.from(floor, Phase.PLAYING, 1, 1).fixtures()).isEmpty();
+
+        floor.discoverTrap(new Position(1, 0));
+        floor.springTrap(new Position(2, 0));
+
+        assertThat(MAPPER.from(floor, Phase.PLAYING, 1, 1).fixtures())
+                .containsExactly(
+                        new FixtureView(new Position(1, 0), Kind.of("trap_spikes"), false),
+                        new FixtureView(new Position(2, 0), Kind.of("trap_dart"), true));
     }
 
     @Test

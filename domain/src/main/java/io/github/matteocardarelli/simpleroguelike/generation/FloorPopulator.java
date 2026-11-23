@@ -207,13 +207,13 @@ public final class FloorPopulator {
                 continue;
             }
             EnemyDefinition type =
-                    WeightedPicker.pick(enemies.all(), EnemyDefinition::spawnWeight, random);
+                    WeightedPicker.pick(available(spec), EnemyDefinition::spawnWeight, random);
             List<Position> members = List.of();
             if (type.packSize() > 1) {
                 members = packCells(free, cell, playerAt, spec, type.packSize() - 1);
                 if (type.packSize() > left || members.size() < type.packSize() - 1) {
                     // Un branco nasce intero o non nasce: al suo posto, uno che va da solo.
-                    type = WeightedPicker.pick(loners(), EnemyDefinition::spawnWeight, random);
+                    type = WeightedPicker.pick(loners(spec), EnemyDefinition::spawnWeight, random);
                     members = List.of();
                 }
             }
@@ -253,6 +253,12 @@ public final class FloorPopulator {
         List<ItemDefinition> chestTypes = new ArrayList<>();
         for (int i = 0; i < layout.chests().size(); i++) {
             chestTypes.add(WeightedPicker.pick(items.all(), ItemDefinition::spawnWeight, random));
+        }
+        // Le trappole si tirano per ultime: senza, il resto del piano nasce come prima.
+        List<Position> trapCells = trapCells(free, playerAt, spec.trapCount(), random);
+        List<Fixture> traps = new ArrayList<>();
+        for (int i = 0; i < trapCells.size(); i++) {
+            traps.add(random.nextInt(2) == 0 ? Fixture.spikesTrap() : Fixture.dartTrap());
         }
         FloorBuilder builder =
                 new FloorBuilder()
@@ -299,6 +305,9 @@ public final class FloorPopulator {
             builder.bossRoom(arena.get().interior());
         }
         layout.stairs().ifPresent(stairs -> builder.fixture(Fixture.stairs(), stairs));
+        for (int i = 0; i < trapCells.size(); i++) {
+            builder.fixture(traps.get(i), trapCells.get(i));
+        }
         Optional<Shop> shop = Optional.empty();
         if (shopPlan.isPresent()) {
             ShopPlan plan = shopPlan.get();
@@ -319,10 +328,43 @@ public final class FloorPopulator {
         return floor;
     }
 
-    /** I tipi di nemico che compaiono a caso e vanno da soli. */
-    private List<EnemyDefinition> loners() {
-        List<EnemyDefinition> loners = new ArrayList<>();
+    /**
+     * Le celle delle trappole, tra quelle ancora libere: mai nelle otto celle intorno al player.
+     * Quelle libere non hanno oggetti fissi, oggetti a terra né attori, e non sono nella stanza del
+     * boss, che è riservata. Le celle scelte si tolgono da {@code free}.
+     */
+    private static List<Position> trapCells(
+            List<Position> free, Position playerAt, int count, RandomSource random) {
+        if (count == 0) {
+            return List.of();
+        }
+        List<Position> candidates = new ArrayList<>();
+        for (Position cell : free) {
+            if (Math.max(Math.abs(cell.x() - playerAt.x()), Math.abs(cell.y() - playerAt.y()))
+                    > 1) {
+                candidates.add(cell);
+            }
+        }
+        List<Position> cells = take(candidates, count, random, "trappole");
+        free.removeAll(cells);
+        return cells;
+    }
+
+    /** I tipi di nemico che possono comparire a questa profondità. */
+    private List<EnemyDefinition> available(FloorSpec spec) {
+        List<EnemyDefinition> available = new ArrayList<>();
         for (EnemyDefinition definition : enemies.all()) {
+            if (definition.minDepth() <= spec.enemyLevel()) {
+                available.add(definition);
+            }
+        }
+        return available;
+    }
+
+    /** I tipi di nemico che compaiono a caso a questa profondità e vanno da soli. */
+    private List<EnemyDefinition> loners(FloorSpec spec) {
+        List<EnemyDefinition> loners = new ArrayList<>();
+        for (EnemyDefinition definition : available(spec)) {
             if (definition.packSize() == 1 && definition.spawnWeight() > 0) {
                 loners.add(definition);
             }

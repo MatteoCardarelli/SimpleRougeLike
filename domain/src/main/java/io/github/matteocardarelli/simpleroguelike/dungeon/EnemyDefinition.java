@@ -21,6 +21,8 @@ import io.github.matteocardarelli.simpleroguelike.model.Stats;
  * @param speed quante azioni fa in un turno: 1 per quasi tutti
  * @param arena per un boss, la forma della sua stanza, un quadrato o un cerchio più grande della
  *     sua impronta; per gli altri non conta
+ * @param poisons vero se ogni morso che va a segno avvelena il bersaglio
+ * @param minDepth il primo piano dove può comparire, da 1
  */
 public record EnemyDefinition(
         Kind kind,
@@ -36,7 +38,9 @@ public record EnemyDefinition(
         boolean boss,
         boolean merchant,
         int speed,
-        Footprint arena) {
+        Footprint arena,
+        boolean poisons,
+        int minDepth) {
 
     public EnemyDefinition {
         if (stats.maxHealth() <= 0) {
@@ -49,7 +53,8 @@ public record EnemyDefinition(
                 || packSize < 1
                 || dropChance < 0
                 || dropChance > 100
-                || speed < 1) {
+                || speed < 1
+                || minDepth < 1) {
             throw new IllegalArgumentException(
                     "Valori non validi: experienceReward="
                             + experienceReward
@@ -68,6 +73,41 @@ public record EnemyDefinition(
             throw new IllegalArgumentException(
                     "La stanza del boss deve essere più grande del boss: " + arena.size());
         }
+    }
+
+    /** Un nemico che non avvelena e compare da subito. */
+    public EnemyDefinition(
+            Kind kind,
+            Stats stats,
+            int experienceReward,
+            int aggroRange,
+            BehaviorKey behavior,
+            int spawnWeight,
+            int range,
+            int packSize,
+            int dropChance,
+            Footprint footprint,
+            boolean boss,
+            boolean merchant,
+            int speed,
+            Footprint arena) {
+        this(
+                kind,
+                stats,
+                experienceReward,
+                aggroRange,
+                behavior,
+                spawnWeight,
+                range,
+                packSize,
+                dropChance,
+                footprint,
+                boss,
+                merchant,
+                speed,
+                arena,
+                false,
+                1);
     }
 
     /** Un nemico con una stanza grande il doppio della sua impronta, se è un boss. */

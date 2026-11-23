@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- L'illustrazione di "spider", disegnata per il gioco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Le otto zampe -->
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M10,11L4,6L2,8" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M10,12.5L3,11L1,13" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M10,14L3,16L2,20" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M10.5,15.5L6,20L5,23" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M14,11L20,6L22,8" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M14,12.5L21,11L23,13" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M14,14L21,16L22,20" />
+    <path android:fillColor="#00000000" android:strokeColor="#FF263238" android:strokeWidth="1.2" android:pathData="M13.5,15.5L18,20L19,23" />
+    <!-- Il corpo e il capo -->
+    <path android:fillColor="#FF37474F" android:pathData="M7,15a5,5.5 0 1,0 10,0a5,5.5 0 1,0 -10,0z" />
+    <path android:fillColor="#FF263238" android:pathData="M9,9a3,2.8 0 1,0 6,0a3,2.8 0 1,0 -6,0z" />
+    <!-- Il segno sul dorso e gli occhi -->
+    <path android:fillColor="#FF8BC34A" android:pathData="M12,12.5L14,15.5L12,18.5L10,15.5z" />
+    <path android:fillColor="#FFE53935" android:pathData="M9.9,8.6a0.8,0.8 0 1,0 1.6,0a0.8,0.8 0 1,0 -1.6,0z" />
+    <path android:fillColor="#FFE53935" android:pathData="M12.5,8.6a0.8,0.8 0 1,0 1.6,0a0.8,0.8 0 1,0 -1.6,0z" />
+</vector>

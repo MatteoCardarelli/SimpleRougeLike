@@ -19,6 +19,9 @@ public interface SettingsHost {
     /** Il giocatore ha mostrato o nascosto il registro dei messaggi: vale subito. */
     void onLogVisibilityChanged(boolean visible);
 
+    /** Il giocatore ha acceso o spento i suoni: vale subito. */
+    void onSoundChanged(boolean on);
+
     /** Il giocatore vuole una partita nuova, già confermata; le impostazioni si sono già chiuse. */
     void onNewGameRequested();
 

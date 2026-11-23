@@ -350,6 +350,89 @@ class FloorPopulatorTest {
         assertThat(describe(populate(spec, 9))).isEqualTo(describe(populate(spec, 9)));
     }
 
+    private static FloorSpec atDepth(int depth) {
+        return new FloorSpec(10, 7, 10, 0, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, depth);
+    }
+
+    /**
+     * 3 + profondità trappole, mai su oggetti o attori, nella stanza del boss o accanto al player.
+     */
+    @Test
+    void populate_traps_countAndPlacementOverManySeeds() {
+        StringBuilder wall = new StringBuilder();
+        StringBuilder open = new StringBuilder("#");
+        for (int x = 0; x < 40; x++) {
+            wall.append('#');
+        }
+        for (int x = 0; x < 38; x++) {
+            open.append('.');
+        }
+        open.append('#');
+        String[] rows = new String[30];
+        for (int y = 0; y < 30; y++) {
+            rows[y] = y == 0 || y == 29 ? wall.toString() : open.toString();
+        }
+        Grid<TileType> terrain = FloorFixtures.terrain(rows);
+        for (int depth = 1; depth <= 5; depth++) {
+            int boss = depth == 5 ? 1 : 0;
+            FloorSpec spec =
+                    new FloorSpec(40, 30, 5, 3, 3, 1, 10, 4, 2, 1, 1, 1, boss, 0, depth, 3 + depth);
+            for (long seed = 1; seed <= 30; seed++) {
+                Floor floor =
+                        POPULATOR.populate(
+                                terrain,
+                                spec,
+                                new SeededRandomSource(seed),
+                                new EntityIdSequence());
+
+                Position player = floor.positionOf(floor.playerId());
+                var traps =
+                        floor.fixtures().entrySet().stream()
+                                .filter(e -> e.getValue().type().isTrap())
+                                .toList();
+                assertThat(traps).hasSize(3 + depth);
+                for (var entry : traps) {
+                    Position at = entry.getKey();
+                    assertThat(entry.getValue().isHidden()).isTrue();
+                    assertThat(floor.itemsOnGround()).doesNotContainKey(at);
+                    assertThat(floor.actorAt(at)).isEmpty();
+                    assertThat(floor.bossRoom().contains(at)).isFalse();
+                    int chebyshev =
+                            Math.max(Math.abs(at.x() - player.x()), Math.abs(at.y() - player.y()));
+                    assertThat(chebyshev).isGreaterThan(1);
+                }
+            }
+        }
+    }
+
+    @Test
+    void populate_withoutTraps_hasNone() {
+        Floor floor = populate(new FloorSpec(10, 7, 4, 3, 3, 1), 7);
+
+        assertThat(floor.fixtures().values()).noneMatch(f -> f.type().isTrap());
+    }
+
+    @Test
+    void populate_spiderNeverOnTheFirstFloor() {
+        for (long seed = 1; seed <= 60; seed++) {
+            assertThat(populate(atDepth(1), seed).enemies())
+                    .as("seed %d", seed)
+                    .extracting(Enemy::kind)
+                    .doesNotContain(StandardEnemyCatalog.SPIDER);
+        }
+    }
+
+    @Test
+    void populate_spiderCanAppearFromTheSecondFloor() {
+        boolean found = false;
+        for (long seed = 1; seed <= 60 && !found; seed++) {
+            found =
+                    populate(atDepth(2), seed).enemies().stream()
+                            .anyMatch(e -> e.kind().equals(StandardEnemyCatalog.SPIDER));
+        }
+        assertThat(found).isTrue();
+    }
+
     private static Floor populate(FloorSpec spec, long seed) {
         return POPULATOR.populate(ROOM, spec, new SeededRandomSource(seed), new EntityIdSequence());
     }

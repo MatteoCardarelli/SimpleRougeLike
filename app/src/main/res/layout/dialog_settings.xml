@@ -138,6 +138,42 @@
 
             </LinearLayout>
 
+            <View style="@style/SettingsDivider" />
+
+            <TextView
+                style="@style/SettingsSection"
+                android:text="@string/settings_section_audio" />
+
+            <LinearLayout style="@style/SettingsRow">
+
+                <ImageView
+                    style="@style/SettingsIcon"
+                    android:src="@drawable/ic_sound"
+                    tools:ignore="ContentDescription" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/sound_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="@string/settings_sound"
+                        android:textColor="@color/settings_text"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        style="@style/SettingsSummary"
+                        android:text="@string/settings_sound_summary" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
             <!-- Solo nelle build di debug -->
             <LinearLayout
                 android:id="@+id/testing_section"

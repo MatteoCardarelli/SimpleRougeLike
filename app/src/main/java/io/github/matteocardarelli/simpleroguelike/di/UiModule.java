@@ -7,6 +7,8 @@ import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.components.ActivityComponent;
 import dagger.hilt.android.qualifiers.ActivityContext;
+import dagger.hilt.android.scopes.ActivityScoped;
+import dagger.multibindings.IntoSet;
 import dagger.multibindings.Multibinds;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Player;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
@@ -19,6 +21,9 @@ import io.github.matteocardarelli.simpleroguelike.ui.playback.CompositeEventList
 import io.github.matteocardarelli.simpleroguelike.ui.playback.EventListener;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.EventPlayer;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
+import io.github.matteocardarelli.simpleroguelike.ui.sound.SoundEffects;
+import io.github.matteocardarelli.simpleroguelike.ui.sound.SoundMap;
+import io.github.matteocardarelli.simpleroguelike.ui.sound.SoundPoolOutput;
 import java.util.Set;
 
 /**
@@ -32,9 +37,28 @@ public abstract class UiModule {
 
     private UiModule() {}
 
-    /** Chi ascolta gli eventi mostrati: oggi nessuno, e l'insieme vuoto è ammesso. */
+    /** Chi ascolta gli eventi mostrati: oggi i suoni; l'insieme vuoto è ammesso. */
     @Multibinds
     abstract Set<EventListener> listeners();
+
+    /** Un solo giocatore di effetti per Activity: i suoni si caricano una volta e si rilasciano. */
+    @Provides
+    @ActivityScoped
+    static SoundPoolOutput soundPoolOutput(@ActivityContext Context context) {
+        return new SoundPoolOutput(context);
+    }
+
+    @Provides
+    @ActivityScoped
+    static SoundEffects soundEffects(SoundPoolOutput output) {
+        return new SoundEffects(new SoundMap(), output);
+    }
+
+    @Provides
+    @IntoSet
+    static EventListener soundListener(SoundEffects sounds) {
+        return sounds;
+    }
 
     @Provides
     static EventListener eventListener(Set<EventListener> listeners) {

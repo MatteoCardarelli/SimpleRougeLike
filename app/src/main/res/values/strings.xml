@@ -35,6 +35,10 @@
     <string name="kind_chest_description">Urtalo per aprirlo: dentro c\'è un oggetto.</string>
     <string name="kind_stairs_name">Scale</string>
     <string name="kind_stairs_description">Passaci sopra per scendere al piano successivo.</string>
+    <string name="kind_trap_spikes_name">Trappola a punte</string>
+    <string name="kind_trap_spikes_description">Punte nascoste nel pavimento: scattano quando ci entri e fanno 8 danni, una volta sola.</string>
+    <string name="kind_trap_dart_name">Trappola a dardi</string>
+    <string name="kind_trap_dart_description">Un dardo avvelenato parte quando ci entri: 3 danni e veleno, una volta sola.</string>
     <string name="kind_giant_slime_name">Slime gigante</string>
     <string name="kind_giant_slime_description">Il signore dell\'ultimo piano. Salta e schiaccia: quando vedi le celle rosse, spostati.</string>
     <string name="kind_wolf_name">Lupo</string>
@@ -51,6 +55,10 @@
     <string name="kind_merchant_description">Vende quello che ha a terra. Paga prima di uscire: derubato è fortissimo e veloce.</string>
     <string name="kind_coins_name">Monete</string>
     <string name="kind_coins_description">Quindici monete: vanno nel tuo contatore.</string>
+    <string name="kind_antidote_name">Antidoto</string>
+    <string name="kind_antidote_description">Un\'erba amara in una fiala: toglie il veleno. Non serve a niente se non sei avvelenato.</string>
+    <string name="kind_spider_name">Ragno</string>
+    <string name="kind_spider_description">Piccolo e fragile, ma ogni suo morso ti avvelena: 2 danni per turno.</string>
     <string name="kind_goblin_name">Goblin</string>
     <string name="kind_goblin_description">Piccolo, rapido e rancoroso. Quando ti vede ti insegue.</string>
 
@@ -116,7 +124,10 @@
     <string name="a11y_experience">Esperienza</string>
     <string name="a11y_experience_value">%1$d su %2$d, livello %3$d</string>
 
+    <string name="a11y_health_poisoned">%1$d su %2$d, avvelenato per %3$d turni</string>
     <string name="hud_health_value">%1$d/%2$d</string>
+    <string name="hud_health_value_poisoned">%1$d/%2$d · veleno %3$d</string>
+    <string name="hud_level_poisoned">%1$s · veleno %2$d</string>
     <string name="hud_experience_value">%1$d/%2$d · liv. %3$d</string>
     <string name="hud_level">liv. %1$d · piano %2$d/%3$d · monete %4$d · chiavi %5$d</string>
     <string name="hud_stats">Attacco %1$d · Difesa %2$d · Precisione %3$d · Schivata %4$d · Monete %5$d · Chiavi %6$d</string>
@@ -137,6 +148,9 @@
     <string name="settings_section_screen">Schermata</string>
     <string name="settings_show_log">Mostra il registro dei messaggi</string>
     <string name="settings_show_log_summary">Le ultime azioni, in fondo alla mappa</string>
+    <string name="settings_section_audio">Audio</string>
+    <string name="settings_sound">Suoni</string>
+    <string name="settings_sound_summary">Effetti sonori, al volume dei contenuti multimediali</string>
     <string name="settings_section_testing">Collaudo</string>
     <string name="settings_write_note">Scrivi una nota di collaudo</string>
     <string name="settings_write_note_summary">Cosa non va, con la partita per rigiocarla</string>
@@ -152,6 +166,17 @@
     <string name="feedback_saved">Nota salvata</string>
     <string name="feedback_empty">Nota vuota: non salvata</string>
     <string name="feedback_failed">Impossibile salvare la nota</string>
+
+    <string name="log_trap_discovered_spikes">Scopri una trappola a punte.</string>
+    <string name="log_trap_discovered_dart">Scopri una trappola a dardi avvelenati.</string>
+    <string name="log_trap_triggered_spikes">Una trappola a punte ti ferisce!</string>
+    <string name="log_trap_triggered_dart">Un dardo avvelenato ti colpisce!</string>
+    <string name="log_poisoned_player">Sei avvelenato: 2 danni per turno, per %1$d turni.</string>
+    <string name="log_poisoned_enemy">Un nemico è avvelenato.</string>
+    <string name="log_poison_ended_player">Il veleno è finito.</string>
+    <string name="log_poison_ended_enemy">Il veleno di un nemico è finito.</string>
+    <string name="log_poison_cured_player">L\'antidoto ti toglie il veleno.</string>
+    <string name="log_poison_cured_enemy">Il veleno di un nemico è stato curato.</string>
 
     <plurals name="log_damaged_player">
         <item quantity="one">Subisci %1$d danno.</item>

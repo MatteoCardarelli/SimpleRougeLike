@@ -13,6 +13,7 @@ import io.github.matteocardarelli.simpleroguelike.model.Position;
  * @param boss vero per il boss, di cui l'interfaccia mostra la salute
  * @param charging vero per chi si carica per saltare
  * @param airborne vero per chi è in aria sopra la sua ombra: non si colpisce
+ * @param poisonTurns i turni di veleno che restano; 0 se non è avvelenato
  */
 public record ActorView(
         EntityId id,
@@ -23,7 +24,22 @@ public record ActorView(
         int size,
         boolean boss,
         boolean charging,
-        boolean airborne) {
+        boolean airborne,
+        int poisonTurns) {
+
+    /** Un nemico non avvelenato. */
+    public ActorView(
+            EntityId id,
+            Kind kind,
+            Position position,
+            int health,
+            int maxHealth,
+            int size,
+            boolean boss,
+            boolean charging,
+            boolean airborne) {
+        this(id, kind, position, health, maxHealth, size, boss, charging, airborne, 0);
+    }
 
     /** Un nemico a terra, fermo. */
     public ActorView(

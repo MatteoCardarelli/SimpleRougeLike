@@ -4,6 +4,7 @@ import io.github.matteocardarelli.simpleroguelike.dungeon.ItemCatalog;
 import io.github.matteocardarelli.simpleroguelike.dungeon.ItemDefinition;
 import io.github.matteocardarelli.simpleroguelike.dungeon.KeyType;
 import io.github.matteocardarelli.simpleroguelike.dungeon.Throwing;
+import io.github.matteocardarelli.simpleroguelike.effect.CureEffect;
 import io.github.matteocardarelli.simpleroguelike.effect.HealEffect;
 import io.github.matteocardarelli.simpleroguelike.model.EquipmentSlot;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
@@ -20,6 +21,9 @@ public final class StandardItemCatalog implements ItemCatalog {
 
     /** Cura più del doppio della pozione, e compare circa una volta ogni quattro. */
     public static final Kind GREATER_POTION = Kind.of("greater_potion");
+
+    /** Toglie il veleno; non si consuma se chi lo usa non è avvelenato. */
+    public static final Kind ANTIDOTE = Kind.of("antidote");
 
     public static final Kind SWORD = Kind.of("sword");
     public static final Kind AXE = Kind.of("axe");
@@ -44,6 +48,7 @@ public final class StandardItemCatalog implements ItemCatalog {
             List.of(
                     new ItemDefinition(POTION, new HealEffect(25), true, 3),
                     new ItemDefinition(GREATER_POTION, new HealEffect(60), true, 1),
+                    new ItemDefinition(ANTIDOTE, new CureEffect(), true, 2),
                     ItemDefinition.equipment(SWORD, EquipmentSlot.WEAPON, new Stats(0, 4), 2),
                     ItemDefinition.equipment(AXE, EquipmentSlot.WEAPON, new Stats(0, 7), 1),
                     ItemDefinition.equipment(

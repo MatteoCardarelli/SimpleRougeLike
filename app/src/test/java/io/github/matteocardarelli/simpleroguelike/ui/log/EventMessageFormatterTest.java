@@ -33,6 +33,11 @@ import io.github.matteocardarelli.simpleroguelike.event.MerchantAngered;
 import io.github.matteocardarelli.simpleroguelike.event.Missed;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.event.NotEnoughCoins;
+import io.github.matteocardarelli.simpleroguelike.event.PoisonCured;
+import io.github.matteocardarelli.simpleroguelike.event.PoisonEnded;
+import io.github.matteocardarelli.simpleroguelike.event.Poisoned;
+import io.github.matteocardarelli.simpleroguelike.event.TrapDiscovered;
+import io.github.matteocardarelli.simpleroguelike.event.TrapTriggered;
 import io.github.matteocardarelli.simpleroguelike.event.WaresPaid;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.model.Kind;
@@ -165,6 +170,37 @@ class EventMessageFormatterTest {
                 .contains(R.string.log_chest_opened + "[" + R.string.kind_potion_name + "[]]");
         assertThat(formatter.format(new ChestOpened(AT, java.util.Optional.empty()), PLAYER))
                 .contains(R.string.log_chest_empty + "[]");
+    }
+
+    @Test
+    void format_poison_distinguishesThePlayerFromTheOthers() {
+        assertThat(formatter.format(new Poisoned(PLAYER, AT, 5), PLAYER))
+                .contains(R.string.log_poisoned_player + "[5]");
+        assertThat(formatter.format(new Poisoned(GOBLIN, AT, 5), PLAYER))
+                .contains(R.string.log_poisoned_enemy + "[]");
+        assertThat(formatter.format(new PoisonEnded(PLAYER, AT), PLAYER))
+                .contains(R.string.log_poison_ended_player + "[]");
+        assertThat(formatter.format(new PoisonEnded(GOBLIN, AT), PLAYER))
+                .contains(R.string.log_poison_ended_enemy + "[]");
+        assertThat(formatter.format(new PoisonCured(PLAYER, AT), PLAYER))
+                .contains(R.string.log_poison_cured_player + "[]");
+        assertThat(formatter.format(new PoisonCured(GOBLIN, AT), PLAYER))
+                .contains(R.string.log_poison_cured_enemy + "[]");
+    }
+
+    @Test
+    void format_traps_haveAMessageForEachKind() {
+        Kind spikes = Kind.of("trap_spikes");
+        Kind dart = Kind.of("trap_dart");
+
+        assertThat(formatter.format(new TrapDiscovered(spikes, AT), PLAYER))
+                .contains(R.string.log_trap_discovered_spikes + "[]");
+        assertThat(formatter.format(new TrapDiscovered(dart, AT), PLAYER))
+                .contains(R.string.log_trap_discovered_dart + "[]");
+        assertThat(formatter.format(new TrapTriggered(spikes, AT, 8), PLAYER))
+                .contains(R.string.log_trap_triggered_spikes + "[]");
+        assertThat(formatter.format(new TrapTriggered(dart, AT, 3), PLAYER))
+                .contains(R.string.log_trap_triggered_dart + "[]");
     }
 
     @Test

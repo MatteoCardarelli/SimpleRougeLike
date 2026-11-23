@@ -1,6 +1,7 @@
 package io.github.matteocardarelli.simpleroguelike.ui.hud;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.view.View;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.databinding.ViewPlayerBarsBinding;
@@ -23,7 +24,7 @@ public final class PlayerBars {
         fill(bars, player);
         bars.healthValue.setVisibility(View.GONE);
         bars.statsValue.setVisibility(View.GONE);
-        bars.xpValue.setText(
+        String level =
                 withBossKey(
                         context,
                         player,
@@ -33,7 +34,12 @@ public final class PlayerBars {
                                 depth,
                                 floors,
                                 player.coins(),
-                                player.keys())));
+                                player.keys()));
+        bars.xpValue.setText(
+                isPoisoned(player)
+                        ? context.getString(
+                                R.string.hud_level_poisoned, level, player.poisonTurns())
+                        : level);
     }
 
     /**
@@ -45,7 +51,14 @@ public final class PlayerBars {
         fill(bars, player);
         bars.healthValue.setVisibility(View.VISIBLE);
         bars.healthValue.setText(
-                context.getString(R.string.hud_health_value, player.health(), player.maxHealth()));
+                player.poisonTurns() > 0
+                        ? context.getString(
+                                R.string.hud_health_value_poisoned,
+                                player.health(),
+                                player.maxHealth(),
+                                player.poisonTurns())
+                        : context.getString(
+                                R.string.hud_health_value, player.health(), player.maxHealth()));
         bars.xpValue.setText(
                 context.getString(
                         R.string.hud_experience_value,
@@ -67,6 +80,11 @@ public final class PlayerBars {
                                 player.keys())));
     }
 
+    /** Vero se il player è avvelenato: la sua barra di salute lo mostra. */
+    public static boolean isPoisoned(PlayerView player) {
+        return player.poisonTurns() > 0;
+    }
+
     /** Il testo, con la chiave del boss in fondo se il player ce l'ha. */
     private static String withBossKey(Context context, PlayerView player, String text) {
         return player.bossKeys() > 0 ? context.getString(R.string.hud_boss_key, text) : text;
@@ -77,11 +95,22 @@ public final class PlayerBars {
         Context context = bars.getRoot().getContext();
         bars.healthBar.setMax(player.maxHealth());
         bars.healthBar.setProgress(player.health());
+        bars.healthBar.setProgressTintList(
+                ColorStateList.valueOf(
+                        context.getColor(
+                                isPoisoned(player) ? R.color.health_poisoned : R.color.health)));
         bars.xpBar.setMax(player.experienceToNextLevel());
         bars.xpBar.setProgress(player.experience());
         // TalkBack legge il nome della barra e il suo valore, non una percentuale.
         bars.healthBar.setStateDescription(
-                context.getString(R.string.a11y_health_value, player.health(), player.maxHealth()));
+                isPoisoned(player)
+                        ? context.getString(
+                                R.string.a11y_health_poisoned,
+                                player.health(),
+                                player.maxHealth(),
+                                player.poisonTurns())
+                        : context.getString(
+                                R.string.a11y_health_value, player.health(), player.maxHealth()));
         bars.xpBar.setStateDescription(
                 context.getString(
                         R.string.a11y_experience_value,

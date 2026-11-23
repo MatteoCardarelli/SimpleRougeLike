@@ -18,6 +18,7 @@ public abstract class Actor {
     private final EntityId id;
     private Stats stats;
     private int health;
+    private int poisonTurns;
 
     Actor(EntityId id, Stats stats) {
         if (stats.maxHealth() <= 0) {
@@ -82,6 +83,44 @@ public abstract class Actor {
             throw new IllegalArgumentException("Salute salvata non valida: " + value);
         }
         health = value;
+    }
+
+    /** Quanti turni di veleno restano; 0 se l'attore non è avvelenato. */
+    public final int poisonTurns() {
+        return poisonTurns;
+    }
+
+    public final boolean isPoisoned() {
+        return poisonTurns > 0;
+    }
+
+    /** Avvelena per {@code turns} turni: un nuovo veleno ricomincia da capo, non si somma. */
+    final void poisonFor(int turns) {
+        poisonTurns = turns;
+    }
+
+    /** Toglie il veleno; vero se ce n'era. */
+    final boolean curePoison() {
+        boolean was = poisonTurns > 0;
+        poisonTurns = 0;
+        return was;
+    }
+
+    /** Consuma un turno di veleno; vero se è appena finito. */
+    final boolean wearPoison() {
+        if (poisonTurns == 0) {
+            return false;
+        }
+        poisonTurns--;
+        return poisonTurns == 0;
+    }
+
+    /** Rimette il veleno salvato; solo per riprendere una partita. */
+    final void restoreSavedPoison(int turns) {
+        if (turns < 0) {
+            throw new IllegalArgumentException("Veleno salvato non valido: " + turns);
+        }
+        poisonTurns = turns;
     }
 
     /** Riporta la salute entro la salute massima, se un bonus tolto l'ha abbassata. */

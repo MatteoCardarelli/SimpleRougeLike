@@ -3,10 +3,12 @@ package io.github.matteocardarelli.simpleroguelike.ui.playback;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.matteocardarelli.simpleroguelike.event.Attacked;
+import io.github.matteocardarelli.simpleroguelike.event.Died;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
 import io.github.matteocardarelli.simpleroguelike.model.Direction;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
+import io.github.matteocardarelli.simpleroguelike.model.Kind;
 import io.github.matteocardarelli.simpleroguelike.model.Position;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,5 +121,68 @@ class AnimationsTest {
         playToEnd(new Attacked(HERO, GOBLIN, C, new Position(5, 4)));
 
         assertThat(hero().facing()).isEqualTo(Direction.UP);
+    }
+
+    private Sprite effectOfKind(Kind kind) {
+        return scene.effects().stream().filter(e -> e.kind().equals(kind)).findFirst().orElse(null);
+    }
+
+    private static final Position TARGET = new Position(5, 4);
+
+    @Test
+    void bump_showsASlashOnTheTargetThatPlaysThreeFramesAndVanishes() {
+        scene.spawn(HERO, SceneTest.PLAYER, C);
+        scene.spawn(GOBLIN, SceneTest.PLAYER, TARGET);
+        player.play(List.of(new Attacked(HERO, GOBLIN, C, TARGET)), scene, () -> {});
+
+        clock.frame(0);
+        Sprite slash = effectOfKind(Animations.FX_SLASH);
+        assertThat(slash).isNotNull();
+        assertThat(slash.x()).isEqualTo(5f);
+        assertThat(slash.y()).isEqualTo(4f);
+        assertThat(slash.walkFrame()).isZero();
+        clock.frame(Animations.BUMP_MS / 2);
+        assertThat(slash.walkFrame()).isEqualTo(1);
+        clock.frame(Animations.BUMP_MS - 1);
+        assertThat(slash.walkFrame()).isEqualTo(2);
+        clock.frame(Animations.BUMP_MS);
+        assertThat(effectOfKind(Animations.FX_SLASH)).isNull();
+    }
+
+    @Test
+    void bump_finishRemovesTheSlash() {
+        scene.spawn(HERO, SceneTest.PLAYER, C);
+        scene.spawn(GOBLIN, SceneTest.PLAYER, TARGET);
+        player.play(List.of(new Attacked(HERO, GOBLIN, C, TARGET)), scene, () -> {});
+        clock.frame(0);
+        assertThat(effectOfKind(Animations.FX_SLASH)).isNotNull();
+
+        player.finish();
+
+        assertThat(effectOfKind(Animations.FX_SLASH)).isNull();
+    }
+
+    @Test
+    void fade_showsAPuffThatPlaysFourFramesAndVanishes() {
+        scene.spawn(GOBLIN, SceneTest.PLAYER, TARGET);
+        player.play(List.of(new Died(GOBLIN, SceneTest.PLAYER, TARGET)), scene, () -> {});
+
+        clock.frame(0);
+        Sprite puff = effectOfKind(Animations.FX_PUFF);
+        assertThat(puff).isNotNull();
+        assertThat(puff.x()).isEqualTo(5f);
+        assertThat(puff.y()).isEqualTo(4f);
+        assertThat(puff.walkFrame()).isZero();
+        clock.frame(Animations.FADE_MS - 1);
+        assertThat(puff.walkFrame()).isEqualTo(3);
+        clock.frame(Animations.FADE_MS);
+        assertThat(effectOfKind(Animations.FX_PUFF)).isNull();
+    }
+
+    @Test
+    void frameAt_spreadsTheFramesOverTheDuration() {
+        assertThat(Animations.frameAt(0f, 4)).isZero();
+        assertThat(Animations.frameAt(0.3f, 4)).isEqualTo(1);
+        assertThat(Animations.frameAt(1f, 4)).isEqualTo(3);
     }
 }

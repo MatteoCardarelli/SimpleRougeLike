@@ -36,13 +36,44 @@ class ContentPresentationTest {
 
         assertThat(content.kinds()).containsAll(kinds);
         for (Kind kind : kinds) {
-            assertThat(content.artRes(kind)).as(kind.value()).isNotZero();
+            assertThat(content.artRes(kind) != 0 || content.spriteRes(kind) != 0)
+                    .as(kind.value())
+                    .isTrue();
+        }
+    }
+
+    /** Ogni oggetto del catalogo ha la sua immagine pixel art. */
+    @Test
+    void everyItemOfTheCatalog_hasItsSprite() {
+        for (ItemDefinition item : new StandardItemCatalog().all()) {
+            assertThat(content.spriteRes(item.kind())).as(item.kind().value()).isNotZero();
+        }
+    }
+
+    /** Ogni nemico del catalogo ha la sua immagine pixel art. */
+    @Test
+    void everyEnemyOfTheCatalog_hasItsSprite() {
+        for (EnemyDefinition enemy : new StandardEnemyCatalog().all()) {
+            assertThat(content.spriteRes(enemy.kind())).as(enemy.kind().value()).isNotZero();
         }
     }
 
     @Test
-    void style_withoutArt_isRejected() {
+    void style_withoutSprite_hasNone() {
+        assertThat(new ContentPresentation.Style(1, 1, 1, 1).sprite()).isZero();
+    }
+
+    @Test
+    void style_withoutArtNorSprite_isRejected() {
         assertThatThrownBy(() -> new ContentPresentation.Style(1, 1, 1, 0))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void style_withASpriteOnly_isAccepted() {
+        ContentPresentation.Style style = ContentPresentation.Style.ofSprite(1, 1, 1, 7);
+
+        assertThat(style.art()).isZero();
+        assertThat(style.sprite()).isEqualTo(7);
     }
 }

@@ -43,9 +43,11 @@ import io.github.matteocardarelli.simpleroguelike.ui.playback.Scene;
 import io.github.matteocardarelli.simpleroguelike.ui.playback.TurnPlayback;
 import io.github.matteocardarelli.simpleroguelike.ui.render.Camera;
 import io.github.matteocardarelli.simpleroguelike.ui.render.CellSize;
-import io.github.matteocardarelli.simpleroguelike.ui.render.TilePalette;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsDialog;
 import io.github.matteocardarelli.simpleroguelike.ui.settings.SettingsHost;
+import io.github.matteocardarelli.simpleroguelike.ui.sound.Sound;
+import io.github.matteocardarelli.simpleroguelike.ui.sound.SoundEffects;
+import io.github.matteocardarelli.simpleroguelike.ui.sound.SoundPoolOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +74,8 @@ public class GameActivity extends AppCompatActivity
     @Inject EventPlayer eventPlayer;
     @Inject Scene scene;
     @Inject EventMessageFormatter formatter;
+    @Inject SoundEffects sounds;
+    @Inject SoundPoolOutput soundOutput;
 
     /** Quante righe mostra il registro: le ultime, le più recenti in fondo. */
     private static final int LOG_LINES = 4;
@@ -87,6 +91,7 @@ public class GameActivity extends AppCompatActivity
     private @Nullable Snackbar wareNotice;
     private @Nullable EntityId wareShown;
     private boolean facingRestored;
+    private @Nullable Phase shownPhase;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,7 +110,6 @@ public class GameActivity extends AppCompatActivity
 
         binding.gameView.setUp(
                 new Camera(CellSize.pixelPerfect(getResources().getDimension(R.dimen.cell_size))),
-                TilePalette.from(this),
                 content);
         gestures = new GestureDetector(this, new SwipeInputMapper(input));
         walk = new HoldToWalk(getResources().getDimension(R.dimen.swipe_min_distance));
@@ -202,6 +206,9 @@ public class GameActivity extends AppCompatActivity
      */
     private void render(GameUiState state) {
         GameSnapshot snapshot = state.result().snapshot();
+        sounds.setEnabled(viewModel.settings().soundOn());
+        sounds.setPlayer(snapshot.player().id());
+        playVictoryOnce(snapshot.phase());
         walk.onTurnShown(TurnSummaries.of(state.result(), snapshot.player().id()));
         if (state.inventoryOpen()) {
             stopWalking();
@@ -237,6 +244,17 @@ public class GameActivity extends AppCompatActivity
     }
 
     /**
+     * La vittoria non è un evento ma una fase della partita: suona quando si passa a VICTORY, non
+     * quando una schermata ricreata dopo una rotazione la trova già vinta.
+     */
+    private void playVictoryOnce(Phase phase) {
+        if (shownPhase != null && shownPhase != Phase.VICTORY && phase == Phase.VICTORY) {
+            sounds.play(Sound.VICTORY);
+        }
+        shownPhase = phase;
+    }
+
+    /**
      * Alla prima visualizzazione di una nuova Activity, dopo una rotazione, il player guarda dove
      * guardava prima: la scena si ricrea dallo snapshot, che non porta la direzione.
      */
@@ -254,6 +272,7 @@ public class GameActivity extends AppCompatActivity
             scene.sprite(viewModel.state().result().snapshot().player().id())
                     .ifPresent(s -> viewModel.setPlayerFacing(s.facing()));
         }
+        soundOutput.release();
         super.onDestroy();
     }
 
@@ -435,6 +454,12 @@ public class GameActivity extends AppCompatActivity
     @Override
     public void onLogVisibilityChanged(boolean visible) {
         viewModel.setLogVisible(visible);
+    }
+
+    @Override
+    public void onSoundChanged(boolean on) {
+        viewModel.setSoundOn(on);
+        sounds.setEnabled(on);
     }
 
     @Override

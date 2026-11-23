@@ -45,7 +45,14 @@ public final class TestGraph {
                         ContentModule.jumpRules(
                                 ContentModule.damageRules(ContentModule.levelingRules()))),
                 GameModule.fieldOfView(),
-                Set.<TurnHook>of(GameModule.lootHook(ContentModule.itemCatalog())),
+                Set.<TurnHook>of(
+                        GameModule.trapDiscoveryHook(
+                                ContentModule.trapRules(
+                                        ContentModule.damageRules(ContentModule.levelingRules()))),
+                        GameModule.poisonHook(
+                                ContentModule.poisonRules(
+                                        ContentModule.damageRules(ContentModule.levelingRules()))),
+                        GameModule.lootHook(ContentModule.itemCatalog())),
                 config);
     }
 

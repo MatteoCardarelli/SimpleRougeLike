@@ -26,7 +26,7 @@ t6 Attacked attacker=1 target=12 from=44,47 at=45,47
 t6 Damaged target=12 at=45,47 amount=3 hp=0
 t6 Died actor=12 kind=goblin at=45,47
 t6 ExperienceGained at=44,47 amount=25
-t6 ItemDropped item=27 kind=potion at=45,47
+t6 ItemDropped item=27 kind=coins at=45,47
 t7 > move left
 t7 Moved actor=1 kind=player from=44,47 to=43,47
 t8 > move left
@@ -70,7 +70,7 @@ t27 > move right
 t27 Moved actor=1 kind=player from=43,47 to=44,47
 t28 > move right
 t28 Moved actor=1 kind=player from=44,47 to=45,47
-t28 ItemPickedUp item=27 kind=potion at=45,47
+t28 CoinsPickedUp amount=15 at=45,47
 t29 > move right
 t29 Moved actor=1 kind=player from=45,47 to=46,47
 t30 > move right
@@ -615,7 +615,7 @@ t309 > move left
 t309 Moved actor=1 kind=player from=23,32 to=22,32
 t310 > move left
 t310 Moved actor=1 kind=player from=22,32 to=21,32
-t310 ItemPickedUp item=17 kind=sword at=21,32
+t310 CoinsPickedUp amount=15 at=21,32
 t311 > move left
 t312 > move up
 t312 Moved actor=1 kind=player from=21,32 to=21,31
@@ -644,6 +644,7 @@ t325 > move left
 t325 Moved actor=1 kind=player from=26,31 to=25,31
 t326 > move left
 t326 Moved actor=1 kind=player from=25,31 to=24,31
+t326 TrapDiscovered kind=trap_dart at=24,30
 t327 > move left
 t327 Moved actor=1 kind=player from=24,31 to=23,31
 t328 > move left
@@ -659,133 +660,133 @@ t334 > move right
 t334 Moved actor=1 kind=player from=22,31 to=23,31
 t335 > move right
 t335 Moved actor=1 kind=player from=23,31 to=24,31
+t335 Moved actor=13 kind=wolf from=33,34 to=32,34
 t336 > move right
 t336 Moved actor=1 kind=player from=24,31 to=25,31
+t336 Moved actor=13 kind=wolf from=32,34 to=32,33
 t337 > move right
 t337 Moved actor=1 kind=player from=25,31 to=26,31
+t337 Moved actor=13 kind=wolf from=32,33 to=31,33
 t338 > move right
 t338 Moved actor=1 kind=player from=26,31 to=27,31
+t338 Moved actor=13 kind=wolf from=31,33 to=30,33
 t339 > move right
 t339 Moved actor=1 kind=player from=27,31 to=28,31
-t340 > move right
+t339 Moved actor=13 kind=wolf from=30,33 to=29,33
+t340 > move down
+t340 Moved actor=1 kind=player from=28,31 to=28,32
+t340 Moved actor=13 kind=wolf from=29,33 to=28,33
 t341 > move down
-t341 Moved actor=1 kind=player from=28,31 to=28,32
-t341 Moved actor=13 kind=wolf from=32,33 to=31,33
-t342 > move right
-t342 Moved actor=1 kind=player from=28,32 to=29,32
-t342 Moved actor=13 kind=wolf from=31,33 to=30,33
+t341 Attacked attacker=1 target=13 from=28,32 at=28,33
+t341 Damaged target=13 at=28,33 amount=10 hp=4
+t341 Attacked attacker=13 target=1 from=28,33 at=28,32
+t341 Damaged target=1 at=28,32 amount=3 hp=67
+t342 > move down
+t342 Attacked attacker=1 target=13 from=28,32 at=28,33
+t342 Damaged target=13 at=28,33 amount=4 hp=0
+t342 Died actor=13 kind=wolf at=28,33
+t342 ExperienceGained at=28,32 amount=15
 t343 > move right
-t343 Moved actor=13 kind=wolf from=30,33 to=29,33
-t344 > move up
-t344 Attacked attacker=13 target=1 from=29,33 at=29,32
-t344 Missed attacker=13 target=1 from=29,33 at=29,32
+t343 Moved actor=1 kind=player from=28,32 to=29,32
+t344 > move right
 t345 > move down
-t345 Attacked attacker=1 target=13 from=29,32 at=29,33
-t345 Damaged target=13 at=29,33 amount=10 hp=4
-t345 Attacked attacker=13 target=1 from=29,33 at=29,32
-t345 Damaged target=1 at=29,32 amount=3 hp=67
+t345 Moved actor=1 kind=player from=29,32 to=29,33
 t346 > move down
-t346 Attacked attacker=1 target=13 from=29,32 at=29,33
-t346 Missed attacker=1 target=13 from=29,32 at=29,33
-t346 Attacked attacker=13 target=1 from=29,33 at=29,32
-t346 Damaged target=1 at=29,32 amount=3 hp=64
+t346 Moved actor=1 kind=player from=29,33 to=29,34
 t347 > move down
-t347 Attacked attacker=1 target=13 from=29,32 at=29,33
-t347 Damaged target=13 at=29,33 amount=4 hp=0
-t347 Died actor=13 kind=wolf at=29,33
-t347 ExperienceGained at=29,32 amount=15
+t347 Moved actor=1 kind=player from=29,34 to=29,35
+t347 ItemPickedUp item=25 kind=key at=29,35
 t348 > move down
-t348 Moved actor=1 kind=player from=29,32 to=29,33
+t348 Moved actor=1 kind=player from=29,35 to=29,36
 t349 > move down
-t349 Moved actor=1 kind=player from=29,33 to=29,34
+t349 Moved actor=1 kind=player from=29,36 to=29,37
 t350 > move down
-t350 Moved actor=1 kind=player from=29,34 to=29,35
-t350 ItemPickedUp item=25 kind=key at=29,35
-t351 > move down
-t351 Moved actor=1 kind=player from=29,35 to=29,36
-t352 > move down
-t352 Moved actor=1 kind=player from=29,36 to=29,37
-t353 > move down
+t351 > move up
+t351 Moved actor=1 kind=player from=29,37 to=29,36
+t352 > move up
+t352 Moved actor=1 kind=player from=29,36 to=29,35
+t353 > move up
+t353 Moved actor=1 kind=player from=29,35 to=29,34
 t354 > move up
-t354 Moved actor=1 kind=player from=29,37 to=29,36
+t354 Moved actor=1 kind=player from=29,34 to=29,33
 t355 > move up
-t355 Moved actor=1 kind=player from=29,36 to=29,35
+t355 Moved actor=1 kind=player from=29,33 to=29,32
 t356 > move up
-t356 Moved actor=1 kind=player from=29,35 to=29,34
-t357 > move up
-t357 Moved actor=1 kind=player from=29,34 to=29,33
-t358 > move up
-t358 Moved actor=1 kind=player from=29,33 to=29,32
-t359 > move up
-t360 > move right
-t361 > move up
-t362 > move left
-t362 Moved actor=1 kind=player from=29,32 to=28,32
-t363 > move left
-t363 Moved actor=1 kind=player from=28,32 to=27,32
-t364 > move left
-t364 Moved actor=1 kind=player from=27,32 to=26,32
-t365 > move left
-t365 Moved actor=1 kind=player from=26,32 to=25,32
-t366 > move left
-t366 Moved actor=1 kind=player from=25,32 to=24,32
-t367 > move left
-t367 Moved actor=1 kind=player from=24,32 to=23,32
-t368 > move left
-t368 Moved actor=1 kind=player from=23,32 to=22,32
-t369 > move left
-t369 Moved actor=1 kind=player from=22,32 to=21,32
-t370 > move left
-t371 > move up
-t371 Moved actor=1 kind=player from=21,32 to=21,31
-t372 > move up
-t373 > move up
-t374 > move right
-t374 Moved actor=1 kind=player from=21,31 to=22,31
-t375 > move right
-t375 Moved actor=1 kind=player from=22,31 to=23,31
-t376 > move right
-t376 Moved actor=1 kind=player from=23,31 to=24,31
-t377 > move right
-t377 Moved actor=1 kind=player from=24,31 to=25,31
-t378 > move right
-t378 Moved actor=1 kind=player from=25,31 to=26,31
-t379 > move right
-t379 Moved actor=1 kind=player from=26,31 to=27,31
-t380 > move right
-t380 Moved actor=1 kind=player from=27,31 to=28,31
-t381 > move right
-t382 > move right
-t383 > move up
-t384 > move down
-t384 Moved actor=1 kind=player from=28,31 to=28,32
-t385 > move down
-t385 Moved actor=1 kind=player from=28,32 to=28,33
-t386 > move down
-t386 Moved actor=1 kind=player from=28,33 to=28,34
-t387 > move down
-t387 Moved actor=1 kind=player from=28,34 to=28,35
-t388 > move down
-t388 Moved actor=1 kind=player from=28,35 to=28,36
-t389 > move down
-t389 Moved actor=1 kind=player from=28,36 to=28,37
-t390 > move down
-t390 Moved actor=1 kind=player from=28,37 to=28,38
-t391 > move down
-t392 > move down
-t393 > move right
-t394 > move left
-t394 Moved actor=1 kind=player from=28,38 to=27,38
-t395 > move left
-t395 Moved actor=1 kind=player from=27,38 to=26,38
-t396 > move left
-t396 Moved actor=1 kind=player from=26,38 to=25,38
-t397 > move left
-t397 Moved actor=1 kind=player from=25,38 to=24,38
-t398 > move left
-t398 Moved actor=1 kind=player from=24,38 to=23,38
-t399 > move left
-t399 Moved actor=1 kind=player from=23,38 to=22,38
-t400 > move left
-t400 Moved actor=1 kind=player from=22,38 to=21,38
-t401 phase=playing player=21,38 hp=64/100 level=1 xp=85/100 enemies=0 items=0 inventory=2
+t357 > move down
+t357 Moved actor=1 kind=player from=29,32 to=29,33
+t358 > move down
+t358 Moved actor=1 kind=player from=29,33 to=29,34
+t359 > move down
+t359 Moved actor=1 kind=player from=29,34 to=29,35
+t360 > move down
+t360 Moved actor=1 kind=player from=29,35 to=29,36
+t361 > move down
+t361 Moved actor=1 kind=player from=29,36 to=29,37
+t362 > move down
+t363 > move up
+t363 Moved actor=1 kind=player from=29,37 to=29,36
+t364 > move up
+t364 Moved actor=1 kind=player from=29,36 to=29,35
+t365 > move up
+t365 Moved actor=1 kind=player from=29,35 to=29,34
+t366 > move up
+t366 Moved actor=1 kind=player from=29,34 to=29,33
+t367 > move up
+t367 Moved actor=1 kind=player from=29,33 to=29,32
+t368 > move up
+t369 > move right
+t370 > move up
+t371 > move left
+t371 Moved actor=1 kind=player from=29,32 to=28,32
+t372 > move left
+t372 Moved actor=1 kind=player from=28,32 to=27,32
+t373 > move left
+t373 Moved actor=1 kind=player from=27,32 to=26,32
+t374 > move left
+t374 Moved actor=1 kind=player from=26,32 to=25,32
+t375 > move left
+t375 Moved actor=1 kind=player from=25,32 to=24,32
+t376 > move left
+t376 Moved actor=1 kind=player from=24,32 to=23,32
+t377 > move left
+t377 Moved actor=1 kind=player from=23,32 to=22,32
+t378 > move left
+t378 Moved actor=1 kind=player from=22,32 to=21,32
+t379 > move left
+t380 > move up
+t380 Moved actor=1 kind=player from=21,32 to=21,31
+t381 > move up
+t382 > move up
+t383 > move right
+t383 Moved actor=1 kind=player from=21,31 to=22,31
+t384 > move right
+t384 Moved actor=1 kind=player from=22,31 to=23,31
+t385 > move right
+t385 Moved actor=1 kind=player from=23,31 to=24,31
+t386 > move right
+t386 Moved actor=1 kind=player from=24,31 to=25,31
+t387 > move right
+t387 Moved actor=1 kind=player from=25,31 to=26,31
+t388 > move right
+t388 Moved actor=1 kind=player from=26,31 to=27,31
+t389 > move right
+t389 Moved actor=1 kind=player from=27,31 to=28,31
+t390 > move right
+t391 > move right
+t392 > move up
+t393 > move down
+t393 Moved actor=1 kind=player from=28,31 to=28,32
+t394 > move down
+t394 Moved actor=1 kind=player from=28,32 to=28,33
+t395 > move down
+t395 Moved actor=1 kind=player from=28,33 to=28,34
+t396 > move down
+t396 Moved actor=1 kind=player from=28,34 to=28,35
+t397 > move down
+t397 Moved actor=1 kind=player from=28,35 to=28,36
+t398 > move down
+t398 Moved actor=1 kind=player from=28,36 to=28,37
+t399 > move down
+t399 Moved actor=1 kind=player from=28,37 to=28,38
+t400 > move down
+t401 phase=playing player=28,38 hp=67/100 level=1 xp=85/100 enemies=0 items=0 inventory=0

@@ -128,6 +128,71 @@ class FloorCodecTest {
     }
 
     @Test
+    void read_restoresTheThreeStatesOfATrap() {
+        Floor floor = FloorFixtures.parse("@^v^.");
+        floor.discoverTrap(new Position(2, 0));
+        floor.springTrap(new Position(3, 0));
+
+        Floor read = CODEC.read(CODEC.write(floor));
+
+        Fixture hidden = read.fixtureAt(new Position(1, 0)).orElseThrow();
+        Fixture discovered = read.fixtureAt(new Position(2, 0)).orElseThrow();
+        Fixture spent = read.fixtureAt(new Position(3, 0)).orElseThrow();
+        assertThat(hidden.type()).isEqualTo(FixtureType.TRAP_SPIKES);
+        assertThat(hidden.isHidden()).isTrue();
+        assertThat(hidden.isOpen()).isFalse();
+        assertThat(discovered.type()).isEqualTo(FixtureType.TRAP_DART);
+        assertThat(discovered.isHidden()).isFalse();
+        assertThat(discovered.isOpen()).isFalse();
+        assertThat(spent.isHidden()).isFalse();
+        assertThat(spent.isOpen()).isTrue();
+        assertThat(CODEC.write(read)).isEqualTo(CODEC.write(floor));
+    }
+
+    /** Un salvataggio di prima delle trappole non ha righe di trappola: il piano non ne ha. */
+    @Test
+    void read_ofAFloorWithoutTraps_hasNone() {
+        Floor read = CODEC.read(CODEC.write(played()));
+
+        assertThat(read.fixtures().values()).noneMatch(f -> f.type().isTrap());
+    }
+
+    @Test
+    void read_restoresThePoisonOfThePlayerAndOfAnEnemy() {
+        Floor floor = played();
+        floor.poison(floor.playerId());
+        floor.wearPoison(floor.playerId());
+        floor.poison(floor.enemies().get(0).id());
+
+        Floor read = CODEC.read(CODEC.write(floor));
+
+        assertThat(read.player().poisonTurns()).isEqualTo(4);
+        assertThat(read.enemies().get(0).poisonTurns()).isEqualTo(5);
+        assertThat(read.enemies().get(1).isPoisoned()).isFalse();
+    }
+
+    /** Un salvataggio di prima del veleno non ha il campo: nessuno è avvelenato. */
+    @Test
+    void read_ofLinesWithoutThePoisonField_readsThemAsNotPoisoned() {
+        Floor floor = played();
+        floor.poison(floor.playerId());
+        floor.poison(floor.enemies().get(0).id());
+        List<String> lines = new ArrayList<>();
+        for (String line : CODEC.write(floor)) {
+            if (line.startsWith("player ") || line.startsWith("enemy ")) {
+                lines.add(line.substring(0, line.lastIndexOf(' ')));
+            } else {
+                lines.add(line);
+            }
+        }
+
+        Floor read = CODEC.read(lines);
+
+        assertThat(read.player().isPoisoned()).isFalse();
+        assertThat(read.enemies().get(0).isPoisoned()).isFalse();
+    }
+
+    @Test
     void read_restoresExploredAndVisibleCells() {
         Floor floor = played();
 

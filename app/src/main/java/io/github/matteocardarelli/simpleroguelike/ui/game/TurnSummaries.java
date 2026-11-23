@@ -6,6 +6,7 @@ import io.github.matteocardarelli.simpleroguelike.event.DoorOpened;
 import io.github.matteocardarelli.simpleroguelike.event.DoorUnlocked;
 import io.github.matteocardarelli.simpleroguelike.event.GameEvent;
 import io.github.matteocardarelli.simpleroguelike.event.Moved;
+import io.github.matteocardarelli.simpleroguelike.event.TrapDiscovered;
 import io.github.matteocardarelli.simpleroguelike.model.EntityId;
 import io.github.matteocardarelli.simpleroguelike.session.TurnResult;
 import io.github.matteocardarelli.simpleroguelike.snapshot.ActorView;
@@ -19,7 +20,8 @@ import java.util.Set;
  * Riassume un risultato del turno per {@link
  * io.github.matteocardarelli.simpleroguelike.ui.input.HoldToWalk}. Gli eventi si riconoscono con un
  * registro per classe, non con {@code instanceof}: un passo avanti è un movimento o un attacco del
- * player, o una porta che si apre o si sblocca; un danno è quello subito dal player.
+ * player, o una porta che si apre o si sblocca; un danno è quello subito dal player, o una trappola
+ * scoperta.
  */
 final class TurnSummaries {
 
@@ -36,6 +38,8 @@ final class TurnSummaries {
         PROGRESS.put(Attacked.class, (e, player) -> ((Attacked) e).attacker().equals(player));
         PROGRESS.put(DoorOpened.class, (e, player) -> true);
         PROGRESS.put(DoorUnlocked.class, (e, player) -> true);
+        // Una trappola scoperta ferma il passo continuo come un danno: il player decide da dove va.
+        DAMAGE.put(TrapDiscovered.class, (e, player) -> true);
         DAMAGE.put(Damaged.class, (e, player) -> ((Damaged) e).target().equals(player));
     }
 

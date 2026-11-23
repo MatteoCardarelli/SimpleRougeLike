@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import io.github.matteocardarelli.simpleroguelike.R;
 import io.github.matteocardarelli.simpleroguelike.databinding.SheetInventoryBinding;
 import io.github.matteocardarelli.simpleroguelike.snapshot.InventoryEntry;
+import io.github.matteocardarelli.simpleroguelike.ui.content.ArtViews;
 import io.github.matteocardarelli.simpleroguelike.ui.content.ContentPresentation;
 import io.github.matteocardarelli.simpleroguelike.ui.hud.PlayerBars;
 import java.util.Optional;
@@ -115,7 +116,7 @@ public final class InventorySheet extends BottomSheetDialogFragment {
         if (selected.isPresent()) {
             InventoryEntry entry = selected.get();
             binding.detailArt.setVisibility(View.VISIBLE);
-            binding.detailArt.setImageResource(content.artRes(entry.kind()));
+            ArtViews.show(binding.detailArt, content, entry.kind());
             binding.detailName.setText(content.nameRes(entry.kind()));
             binding.detailDescription.setText(content.descriptionRes(entry.kind()));
             // Una chiave non si usa: la consuma la porta che apre.

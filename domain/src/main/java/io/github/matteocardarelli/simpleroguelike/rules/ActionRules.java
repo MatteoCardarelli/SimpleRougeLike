@@ -17,14 +17,17 @@ import java.util.Optional;
  * è un attacco, in una cella libera è uno spostamento, altrimenti non succede niente. Il player,
  * quando si sposta, raccoglie l'oggetto che trova a terra; contro un oggetto fisso lo usa: apre una
  * porta o uno scrigno, tira una leva; contro il mercante paga la merce presa, e uscendo dal negozio
- * senza pagare lo fa arrabbiare.
+ * senza pagare lo fa arrabbiare. Entrando in una trappola la fa scattare ({@link TrapRules}); i
+ * nemici non le fanno scattare.
  */
 public final class ActionRules {
 
     private final CombatRules combat;
+    private final TrapRules traps;
 
     public ActionRules(CombatRules combat) {
         this.combat = combat;
+        this.traps = new TrapRules(combat.damageRules());
     }
 
     /**
@@ -75,6 +78,7 @@ public final class ActionRules {
         if (actorId.equals(floor.playerId())) {
             floor.pickUp(actorId).ifPresent(events::add);
             floor.checkTheft().ifPresent(events::add);
+            events.addAll(traps.trigger(floor, floor.positionOf(actorId)));
         }
         return ActionResult.performed(events);
     }
